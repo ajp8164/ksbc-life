@@ -1,7 +1,7 @@
-import { Platform, StatusBar } from 'react-native';
+import { Platform, StatusBar, Text } from 'react-native';
 import React, { useEffect } from 'react';
 
-import AccountNavigator from './AccountNavigator';
+import MoreNavigator from './MoreNavigator';
 import HomeNavigator from './HomeNavigator';
 import { Icon } from '@rneui/base';
 import SystemNavigationBar from 'react-native-system-navigation-bar';
@@ -39,6 +39,18 @@ const TabNavigator = () => {
         tabBarInactiveTintColor: theme.colors.lightGray,
         tabBarActiveBackgroundColor: theme.colors.activeTabBackground,
         tabBarInactiveBackgroundColor: theme.colors.inactiveTabBackground,
+        // eslint-disable-next-line react/no-unstable-nested-components
+        tabBarLabel: ({ focused }) => (
+          <Text
+            style={[
+              theme.styles.textTiny,
+              focused
+                ? { color: theme.colors.brandPrimary }
+                : { color: theme.colors.lightGray },
+            ]}>
+            {''}
+          </Text>
+        ),
         tabBarStyle: {
           backgroundColor: theme.colors.inactiveTabBackground,
           borderTopColor: theme.colors.tabBarBorder,
@@ -50,11 +62,11 @@ const TabNavigator = () => {
         name="HomeTab"
         component={HomeNavigator}
         options={{
-          tabBarLabel: 'Dashboard',
+          tabBarLabel: 'Home',
           // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({ color }) => (
             <Icon
-              name={'chart-line'}
+              name={'home-circle'}
               type={'material-community'}
               color={color}
               size={28}
@@ -63,20 +75,20 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="AccountTab"
-        component={AccountNavigator}
-        options={() => ({
-          tabBarLabel: 'Account',
+        name="MoreTab"
+        component={MoreNavigator}
+        options={{
+          tabBarLabel: 'More',
           // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({ color }) => (
             <Icon
-              name={'chart-line'}
+              name={'microsoft-xbox-controller-menu'}
               type={'material-community'}
               color={color}
               size={28}
             />
           ),
-        })}
+        }}
       />
     </Tab.Navigator>
   );

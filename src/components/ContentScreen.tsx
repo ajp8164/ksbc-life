@@ -7,15 +7,12 @@ import {
 import React, { useEffect } from 'react';
 import { ScrollView, View } from 'react-native';
 
-import { AccountNavigatorParamList } from 'types/navigation';
+import { MoreNavigatorParamList } from 'types/navigation';
 import { ContentContainer } from 'types/content';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { makeStyles } from '@rneui/themed';
 
-export type Props = NativeStackScreenProps<
-  AccountNavigatorParamList,
-  'Content'
->;
+export type Props = NativeStackScreenProps<MoreNavigatorParamList, 'Content'>;
 
 const ContentScreen = ({ route, navigation }: Props) => {
   const theme = useTheme();

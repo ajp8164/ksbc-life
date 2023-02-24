@@ -2,7 +2,7 @@ import { AppTheme, useTheme } from 'theme';
 import { Divider, ListItem, viewport } from '@react-native-ajp-elements/ui';
 import { ScrollView, Text } from 'react-native';
 
-import { AccountNavigatorParamList } from 'types/navigation';
+import { MoreNavigatorParamList } from 'types/navigation';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,7 +13,7 @@ import { makeStyles } from '@rneui/themed';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useHeaderHeight } from '@react-navigation/elements';
 
-export type Props = NativeStackScreenProps<AccountNavigatorParamList, 'About'>;
+export type Props = NativeStackScreenProps<MoreNavigatorParamList, 'About'>;
 
 const AboutScreen = ({ navigation }: Props) => {
   const theme = useTheme();

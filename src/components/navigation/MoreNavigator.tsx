@@ -1,20 +1,20 @@
 import AboutScreen from 'components/AboutScreen';
-import { AccountNavigatorParamList } from 'types/navigation';
-import AccountScreen from 'components/AccountScreen';
+import { MoreNavigatorParamList } from 'types/navigation';
+import MoreScreen from 'components/MoreScreen';
 import AppSettingsScreen from 'components/AppSettingsScreen';
 import ContentScreen from 'components/ContentScreen';
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from 'theme';
 
-const AccountStack = createNativeStackNavigator<AccountNavigatorParamList>();
+const MoreStack = createNativeStackNavigator<MoreNavigatorParamList>();
 
-const AccountNavigator = () => {
+const MoreNavigator = () => {
   const theme = useTheme();
 
   return (
-    <AccountStack.Navigator
-      initialRouteName="Account"
+    <MoreStack.Navigator
+      initialRouteName="More"
       screenOptions={{
         headerLargeTitleShadowVisible: theme.mode === 'light',
         headerLargeStyle: {
@@ -28,16 +28,16 @@ const AccountNavigator = () => {
         },
         headerTintColor: theme.colors.screenHeaderBackButton,
       }}>
-      <AccountStack.Screen
-        name="Account"
-        component={AccountScreen}
+      <MoreStack.Screen
+        name="More"
+        component={MoreScreen}
         options={{
-          title: 'Account',
+          title: 'More',
           headerLeft: () => null,
           headerLargeTitle: true,
         }}
       />
-      <AccountStack.Screen
+      <MoreStack.Screen
         name="AppSettings"
         component={AppSettingsScreen}
         options={{
@@ -45,7 +45,7 @@ const AccountNavigator = () => {
           headerLargeTitle: true,
         }}
       />
-      <AccountStack.Screen
+      <MoreStack.Screen
         name="Content"
         component={ContentScreen}
         options={{
@@ -53,7 +53,7 @@ const AccountNavigator = () => {
           headerLargeTitle: true,
         }}
       />
-      <AccountStack.Screen
+      <MoreStack.Screen
         name="About"
         component={AboutScreen}
         options={{
@@ -61,8 +61,8 @@ const AccountNavigator = () => {
           headerLargeTitle: true,
         }}
       />
-    </AccountStack.Navigator>
+    </MoreStack.Navigator>
   );
 };
 
-export default AccountNavigator;
+export default MoreNavigator;

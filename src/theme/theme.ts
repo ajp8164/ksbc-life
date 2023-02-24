@@ -5,10 +5,12 @@ import { theme as rneulTheme } from '@react-native-ajp-elements/ui';
 export const theme = createTheme(
   lodash.merge({}, rneulTheme, {
     darkColors: {
-      example: '#ffffff',
+      brandPrimary: '#194E6A',
+      brandSecondary: '#80BFE1',
     },
     lightColors: {
-      example: '#ffffff',
+      brandPrimary: '#194E6A',
+      brandSecondary: '#80BFE1',
     },
   }),
 );

@@ -7,13 +7,13 @@ export enum StartupScreen {
   Welcome = 'Welcome',
 }
 
-export type AccountNavigatorParamList = {
+export type MoreNavigatorParamList = {
   About: undefined;
-  Account: undefined;
   AppSettings: undefined;
   Content: {
     content: ContentView;
   };
+  More: undefined;
 };
 
 export type MainNavigatorParamList = {
@@ -30,6 +30,6 @@ export type StartupNavigatorParamList = {
 };
 
 export type TabNavigatorParamList = {
-  AccountTab: undefined;
   HomeTab: undefined;
+  MoreTab: undefined;
 };
