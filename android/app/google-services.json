@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "85125896421",
+    "project_id": "ksbc-life",
+    "storage_bucket": "ksbc-life.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:85125896421:android:bd178eaf64119107f15c0c",
+        "android_client_info": {
+          "package_name": "org.kingspring.life"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "85125896421-4t2bm6i79t0plmfga320gatishpi85h4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDs6lyN4T7lRKOmMvkDUxlMrT6Vr8lszYI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "85125896421-4t2bm6i79t0plmfga320gatishpi85h4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

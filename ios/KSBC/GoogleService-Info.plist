@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>85125896421-u2psomm2metko5dsb7eetdsi6cirfci7.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.85125896421-u2psomm2metko5dsb7eetdsi6cirfci7</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>85125896421-h800e7hcgped35445l6aeeb5nad51v3i.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCmuwCJKOaQBHh04Odi1nQ7m7ILrr8WXlk</string>
+	<key>GCM_SENDER_ID</key>
+	<string>85125896421</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>org.kingspring.life</string>
+	<key>PROJECT_ID</key>
+	<string>ksbc-life</string>
+	<key>STORAGE_BUCKET</key>
+	<string>ksbc-life.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:85125896421:ios:0f3214f838446376f15c0c</string>
+</dict>
+</plist>

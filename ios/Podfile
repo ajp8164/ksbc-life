@@ -43,6 +43,13 @@ target 'KSBC' do
 
   pod 'RNBootSplash', :path => '../node_modules/react-native-bootsplash'
 
+  # See https://stackoverflow.com/questions/72289521/swift-pods-cannot-yet-be-integrated-as-static-libraries-firebasecoreinternal-lib
+  pod 'Firebase', :modular_headers => true
+  pod 'FirebaseCore', :modular_headers => true
+  pod 'FirebaseCoreInternal', :modular_headers => true
+  pod 'GoogleUtilities', :modular_headers => true
+  $RNFirebaseAsStaticFramework = true
+
   target 'KSBCTests' do
     inherit! :complete
     # Pods for testing
