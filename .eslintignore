@@ -1,0 +1,5 @@
+ios/
+android/
+assets/
+.eslintrc.js
+metro.config.js

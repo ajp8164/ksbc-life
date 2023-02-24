@@ -1,0 +1,97 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-Bold.otf",
+      "sha1": "83f8d8a7ab10a5a3ad50987bf3673eb629c67fa8"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-BoldG1.otf",
+      "sha1": "118812707b123146e6912608d0547fa8705c1ff1"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-BoldG2.otf",
+      "sha1": "28ec61387f93b937313bbf763c2a797059e8d619"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-BoldG3.otf",
+      "sha1": "d03b43de5ef9f51530f68b97f4fdd99c43e97436"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-BoldItalicG1.otf",
+      "sha1": "12946a776a145fe91fc03f69a3ca7e6501ed63eb"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-BoldItalicG2.otf",
+      "sha1": "810f6477b6bdeac89316a0091fcae5ec647a0ffc"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-BoldItalicG3.otf",
+      "sha1": "1cc7779a23217f812cc44e09252acb1e9ea96f02"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-Heavy.otf",
+      "sha1": "76cc46371a97bea53343001f7f8702f8f7d2a09d"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-HeavyItalic.otf",
+      "sha1": "c753b5505a0ccf0801d00367278f63dd3f430ccd"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-Italic.otf",
+      "sha1": "252a64c6e3989187f189d062c413f6d8b3184d47"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-ItalicG1.otf",
+      "sha1": "f943dbb946e5f2e426b73c916723ba03a5dcdecb"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-ItalicG2.otf",
+      "sha1": "afe3cd62ecc9d960c01d8948c8ab9284198f770a"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-ItalicG3.otf",
+      "sha1": "6c2d570ef04a07e6ad805c85491c6e21656ccf07"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-Light.otf",
+      "sha1": "a6b00c17e469e2826847d1170fc5ed7c7aa5e0ef"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-LightItalic.otf",
+      "sha1": "eb68f260bced3124998f79a36c587b3840206de1"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-Medium.otf",
+      "sha1": "af7634266bef17f7464060c266146ed762a56957"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-MediumItalic.otf",
+      "sha1": "d22e3c72f1f4d34377a1d1b34b247d86f96d2e94"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-Regular.otf",
+      "sha1": "e33ef22ca9a272bf3870715418e7ee5fd120998a"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-RegularG1.otf",
+      "sha1": "f077677daae6a7fe714bce51e4245a1d34ddc15d"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-RegularG2.otf",
+      "sha1": "da6e5e5a3ccfc58a4094f5bb3b8bc536ef5e0bfc"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-RegularG3.otf",
+      "sha1": "f87739c5dc0067ac8c93cbcc042e4dce2baeaf5f"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-Semibold.otf",
+      "sha1": "4a3cfeb752397ba4b3aa1dabe43259ad2210952f"
+    },
+    {
+      "path": "assets/fonts/SFUIText/SFUIText-SemiboldItalic.otf",
+      "sha1": "09c34e34d518ad6c9b576e68ce04cd88e9a3d86a"
+    }
+  ]
+}
