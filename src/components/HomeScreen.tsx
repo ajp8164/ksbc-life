@@ -1,29 +1,78 @@
 import { AppTheme, useTheme } from 'theme';
-import { ScrollView, Text } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import React from 'react';
 
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { makeStyles } from '@rneui/themed';
+import { openShareSheet, viewport } from '@react-native-ajp-elements/ui';
+import Card from 'components/molecules/Card';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { openURL } from '@react-native-ajp-elements/core';
 
 const HomeScreen = () => {
   const theme = useTheme();
   const s = useStyles(theme);
 
   return (
-    <SafeAreaView
-      edges={['top']}
-      style={[theme.styles.viewAlt, s.viewBackground]}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <Text style={theme.styles.textNormal}>{'Hello'}</Text>
+    <SafeAreaView edges={['left', 'right']} style={theme.styles.view}>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 15 }}
+        showsVerticalScrollIndicator={false}
+        contentInsetAdjustmentBehavior={'automatic'}>
+        <Card
+          title={"You're Invited"}
+          body={'Worship 11:00 am\nLife Groups 9:30 am'}
+          imageSource={require('img/ksbc-front.jpg')}
+          imageHeight={300}
+        />
+        <Card
+          title={'Daily Devotion'}
+          body={
+            'For God loved the world in this way: He gave his one and only Son, so that everyone who believes in him will not perish but have eternal life. For God loved the world in this way: He gave his one and only Son, so that everyone who believes in him will not perish but have eternal life.'
+          }
+          footer={'John 3:16 CSB'}
+          buttons={[
+            {
+              label: 'Share',
+              icon: 'share-variant',
+              onPress: () => {
+                openShareSheet({
+                  title: 'John 3:16 CSB',
+                  message:
+                    'For God loved the world in this way: He gave his one and only Son, so that everyone who believes in him will not perish but have eternal life.',
+                });
+              },
+            },
+            {
+              label: 'Read',
+              icon: 'book-open-variant',
+              onPress: () => {
+                openURL('https://www.bible.com/bible/1713/JHN.3.CSB');
+              },
+            },
+          ]}
+          cardStyle={{ backgroundColor: theme.colors.transparent }}
+          titleStyle={{ textAlign: 'left' }}
+        />
+        <View style={s.cardRow}>
+          <Card
+            imageSource={require('img/life-kids.jpg')}
+            flexBasis={viewport.width / 2 - 23}
+          />
+          <Card
+            imageSource={require('img/life-kids.jpg')}
+            flexBasis={viewport.width / 2 - 23}
+          />
+        </View>
+        <Card imageSource={require('img/life-kids.jpg')} />
       </ScrollView>
     </SafeAreaView>
   );
 };
 
-const useStyles = makeStyles((_theme, theme: AppTheme) => ({
-  viewBackground: {
-    backgroundColor: theme.colors.transparent,
-    paddingHorizontal: 0,
+const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
+  cardRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 }));
 

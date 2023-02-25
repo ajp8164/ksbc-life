@@ -25,7 +25,8 @@ const HomeNavigator = () => {
         name="Home"
         component={HomeScreen}
         options={{
-          headerShown: false,
+          headerTitle: 'hello',
+          headerLargeTitle: true,
         }}
       />
     </POSStack.Navigator>
