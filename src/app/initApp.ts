@@ -4,6 +4,7 @@ import { svgImages } from 'theme';
 import { AppError } from 'lib/errors';
 import { BackHandler } from 'react-native';
 import { appConfig } from 'config';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 export enum InitStatus {
   NotAuthorized = 'NotAuthorized',
@@ -25,6 +26,10 @@ export const initApp = async (): Promise<InitStatus> => {
       sentryLoggingEnabled: appConfig.sentryLoggingEnabled,
       svgImages,
       // userId: '',
+    });
+
+    GoogleSignin.configure({
+      webClientId: appConfig.firebaseOauthClientId,
     });
 
     return InitStatus.Success;

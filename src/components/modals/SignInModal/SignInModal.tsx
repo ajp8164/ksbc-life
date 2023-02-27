@@ -8,7 +8,8 @@ import { Modal } from '@react-native-ajp-elements/ui';
 type SignInModal = SignInModalMethods;
 
 const SignInModal = React.forwardRef<SignInModal, SignInModalProps>(
-  (_props, ref) => {
+  (props, ref) => {
+    const { onAuthStateChanged } = props;
     const innerRef = useRef<BottomSheetModalMethods>(null);
 
     useImperativeHandle(ref, () => ({
@@ -27,7 +28,7 @@ const SignInModal = React.forwardRef<SignInModal, SignInModalProps>(
 
     return (
       <Modal ref={innerRef}>
-        <SignInView />
+        <SignInView onAuthStateChanged={onAuthStateChanged} />
       </Modal>
     );
   },

@@ -9,18 +9,34 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { openURL } from '@react-native-ajp-elements/core';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeNavigatorParamList } from 'types/navigation';
-import { Button, Icon } from '@rneui/base';
+import { Button, Icon, Image } from '@rneui/base';
 import { SignInModal } from 'components/modals/SignInModal';
+import { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import { useDispatch, useSelector } from 'react-redux';
+import { saveUser } from 'store/slices/userProfile';
+import { selectUser } from 'store/selectors/userProfileSelectors';
 
 type Props = NativeStackScreenProps<HomeNavigatorParamList, 'Home'>;
 
 const HomeScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
+  const dispatch = useDispatch();
 
   const signInModalRef = useRef<SignInModal>(null);
+  const user = useSelector(selectUser);
 
   useEffect(() => {
+    setAvatar();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    setAvatar();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  const setAvatar = () => {
     navigation.setOptions({
       // eslint-disable-next-line react/no-unstable-nested-components
       headerRight: () => (
@@ -28,20 +44,32 @@ const HomeScreen = ({ navigation }: Props) => {
           <Button
             type={'clear'}
             icon={
-              <Icon
-                name="account-circle"
-                type={'material-community'}
-                color={theme.colors.brandSecondary}
-                size={28}
-              />
+              user && user.photoURL ? (
+                <Image
+                  source={{ uri: user.photoURL }}
+                  containerStyle={s.avatar}
+                />
+              ) : (
+                <Icon
+                  name="account-circle"
+                  type={'material-community'}
+                  color={theme.colors.brandSecondary}
+                  size={28}
+                />
+              )
             }
             onPress={signInModalRef.current?.present}
           />
         </>
       ),
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  };
+
+  const onAuthStateChanged = (user: FirebaseAuthTypes.User) => {
+    // Remove non-serializable properties (functions).
+    dispatch(saveUser({ user: JSON.parse(JSON.stringify(user)) }));
+    signInModalRef.current?.dismiss();
+  };
 
   return (
     <SafeAreaView edges={['left', 'right']} style={theme.styles.view}>
@@ -96,12 +124,20 @@ const HomeScreen = ({ navigation }: Props) => {
         </View>
         <Card imageSource={require('img/life-kids.jpg')} />
       </ScrollView>
-      <SignInModal ref={signInModalRef} />
+      <SignInModal
+        ref={signInModalRef}
+        onAuthStateChanged={onAuthStateChanged}
+      />
     </SafeAreaView>
   );
 };
 
 const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
+  avatar: {
+    width: 30,
+    height: 30,
+    borderRadius: 30,
+  },
   cardRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',

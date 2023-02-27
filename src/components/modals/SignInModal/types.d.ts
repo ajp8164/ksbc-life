@@ -8,8 +8,9 @@ declare const SignInModal: React.MemoExoticComponent<
   >
 >;
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface SignInModalProps {}
+export interface SignInModalProps {
+  onAuthStateChanged: (user: FirebaseAuthTypes.User) => void;
+}
 
 export interface SignInModalMethods {
   dismiss: () => void;

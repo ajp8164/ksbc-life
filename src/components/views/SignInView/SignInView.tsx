@@ -1,82 +1,121 @@
 import { AppTheme, useTheme } from 'theme';
 import { Text, View } from 'react-native';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles } from '@rneui/themed';
 import { Button } from '@rneui/base';
 import { SvgXml } from 'react-native-svg';
 import { getSvg } from '@react-native-ajp-elements/ui';
 import { appConfig } from 'config';
+import auth from '@react-native-firebase/auth';
+import { signInWithGoogle, signOut } from 'lib/userAuthentication';
+import { SignInViewMethods, SignInViewProps } from './types';
 
-const SignInView = () => {
-  const theme = useTheme();
-  const s = useStyles(theme);
+type SignInView = SignInViewMethods;
 
-  return (
-    <View style={{ height: '100%' }}>
-      <Text style={s.title}>{appConfig.businessName}</Text>
-      <Text style={s.description}>{'Sign in to take notes.'}</Text>
-      <Text style={s.subtitle}>{'Create Account'}</Text>
-      <Text style={s.footer}>
-        {'By signing up you agree to our Terms and Privacy Policy'}
-      </Text>
-      <Button
-        title={'Continue with Google'}
-        titleStyle={theme.styles.buttonOutlineTitle}
-        buttonStyle={theme.styles.buttonOutline}
-        containerStyle={s.signInButtonContainer}
-        icon={
-          <SvgXml
-            width={28}
-            height={28}
-            style={{ position: 'absolute', left: 5 }}
-            xml={getSvg('googleIcon')}
-          />
-        }
-      />
-      <Button
-        title={'Continue with Facebook'}
-        titleStyle={theme.styles.buttonOutlineTitle}
-        buttonStyle={theme.styles.buttonOutline}
-        containerStyle={s.signInButtonContainer}
-        icon={
-          <SvgXml
-            width={28}
-            height={28}
-            style={{ position: 'absolute', left: 5 }}
-            xml={getSvg('facebookIcon')}
-          />
-        }
-      />
-      <Button
-        title={'Continue with Apple'}
-        titleStyle={theme.styles.buttonOutlineTitle}
-        buttonStyle={theme.styles.buttonOutline}
-        containerStyle={s.signInButtonContainer}
-        icon={
-          <SvgXml
-            width={28}
-            height={28}
-            style={{ position: 'absolute', left: 5 }}
-            xml={getSvg('appleIcon')}
-          />
-        }
-      />
-      <Button
-        title={'Continue with Email'}
-        titleStyle={theme.styles.buttonOutlineTitle}
-        buttonStyle={theme.styles.buttonOutline}
-        containerStyle={s.signInButtonContainer}
-      />
-      <Button
-        title={'OR SIGN IN'}
-        titleStyle={theme.styles.buttonClearTitle}
-        buttonStyle={theme.styles.buttonClear}
-        containerStyle={s.signInButtonContainer}
-      />
-    </View>
-  );
-};
+const SignInView = React.forwardRef<SignInView, SignInViewProps>(
+  (props, _ref) => {
+    const { onAuthStateChanged } = props;
+
+    const theme = useTheme();
+    const s = useStyles(theme);
+
+    useEffect(() => {
+      const unsubscribe = auth().onAuthStateChanged(user => {
+        onAuthStateChanged(user);
+      });
+      return unsubscribe;
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    return (
+      <View style={{ height: '100%' }}>
+        <Text style={s.title}>{appConfig.businessName}</Text>
+        <Text style={s.description}>{'Sign in to take notes.'}</Text>
+        <Text style={s.subtitle}>{'Create Account'}</Text>
+        <Text style={s.footer}>
+          {'By signing up you agree to our Terms and Privacy Policy'}
+        </Text>
+        <Button
+          title={'Continue with Google'}
+          titleStyle={theme.styles.buttonOutlineTitle}
+          buttonStyle={theme.styles.buttonOutline}
+          containerStyle={s.signInButtonContainer}
+          icon={
+            <SvgXml
+              width={28}
+              height={28}
+              style={{ position: 'absolute', left: 5 }}
+              xml={getSvg('googleIcon')}
+            />
+          }
+          onPress={signInWithGoogle}
+        />
+        <Button
+          title={'Continue with Facebook'}
+          titleStyle={theme.styles.buttonOutlineTitle}
+          buttonStyle={theme.styles.buttonOutline}
+          containerStyle={s.signInButtonContainer}
+          icon={
+            <SvgXml
+              width={28}
+              height={28}
+              style={{ position: 'absolute', left: 5 }}
+              xml={getSvg('facebookIcon')}
+            />
+          }
+        />
+        <Button
+          title={'Continue with Twitter'}
+          titleStyle={theme.styles.buttonOutlineTitle}
+          buttonStyle={theme.styles.buttonOutline}
+          containerStyle={s.signInButtonContainer}
+          icon={
+            <SvgXml
+              width={28}
+              height={28}
+              style={{ position: 'absolute', left: 5 }}
+              xml={getSvg('twitterIcon')}
+            />
+          }
+        />
+        <Button
+          title={'Continue with Apple'}
+          titleStyle={theme.styles.buttonOutlineTitle}
+          buttonStyle={theme.styles.buttonOutline}
+          containerStyle={s.signInButtonContainer}
+          icon={
+            <SvgXml
+              width={28}
+              height={28}
+              style={{ position: 'absolute', left: 5 }}
+              xml={getSvg('appleIcon')}
+            />
+          }
+        />
+        <Button
+          title={'Continue with Email'}
+          titleStyle={theme.styles.buttonOutlineTitle}
+          buttonStyle={theme.styles.buttonOutline}
+          containerStyle={s.signInButtonContainer}
+        />
+        <Button
+          title={'OR SIGN IN'}
+          titleStyle={theme.styles.buttonClearTitle}
+          buttonStyle={theme.styles.buttonClear}
+          containerStyle={s.signInButtonContainer}
+        />
+        <Button
+          title={'SIGN OUT'}
+          titleStyle={theme.styles.buttonClearTitle}
+          buttonStyle={theme.styles.buttonClear}
+          containerStyle={s.signInButtonContainer}
+          onPress={signOut}
+        />
+      </View>
+    );
+  },
+);
 
 const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   description: {
