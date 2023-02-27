@@ -72,6 +72,7 @@ const Card = ({
           {buttons.map(b => {
             return (
               <Button
+                key={b.label}
                 type="clear"
                 title={b.label}
                 icon={
