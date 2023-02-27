@@ -1,6 +1,6 @@
 import { AppTheme, useTheme } from 'theme';
 import { ScrollView, View } from 'react-native';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import { makeStyles } from '@rneui/themed';
 import { openShareSheet, viewport } from '@react-native-ajp-elements/ui';
@@ -10,12 +10,15 @@ import { openURL } from '@react-native-ajp-elements/core';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeNavigatorParamList } from 'types/navigation';
 import { Button, Icon } from '@rneui/base';
+import { SignInModal } from 'components/modals/SignInModal';
 
 type Props = NativeStackScreenProps<HomeNavigatorParamList, 'Home'>;
 
 const HomeScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
+
+  const signInModalRef = useRef<SignInModal>(null);
 
   useEffect(() => {
     navigation.setOptions({
@@ -32,6 +35,7 @@ const HomeScreen = ({ navigation }: Props) => {
                 size={28}
               />
             }
+            onPress={signInModalRef.current?.present}
           />
         </>
       ),
@@ -92,6 +96,7 @@ const HomeScreen = ({ navigation }: Props) => {
         </View>
         <Card imageSource={require('img/life-kids.jpg')} />
       </ScrollView>
+      <SignInModal ref={signInModalRef} />
     </SafeAreaView>
   );
 };
