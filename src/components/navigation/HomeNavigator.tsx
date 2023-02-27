@@ -1,3 +1,5 @@
+import { getSvg } from '@react-native-ajp-elements/ui';
+import { SvgXml } from 'react-native-svg';
 import { HomeNavigatorParamList } from 'types/navigation';
 import HomeScreen from 'components/HomeScreen';
 import React from 'react';
@@ -25,8 +27,15 @@ const HomeNavigator = () => {
         name="Home"
         component={HomeScreen}
         options={{
-          headerTitle: 'hello',
-          headerLargeTitle: true,
+          // eslint-disable-next-line react/no-unstable-nested-components
+          headerTitle: () => (
+            <SvgXml
+              width={45}
+              height={45}
+              style={{ top: -5 }}
+              xml={getSvg('brandIcon')}
+            />
+          ),
         }}
       />
     </POSStack.Navigator>

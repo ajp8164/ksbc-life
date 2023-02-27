@@ -1,16 +1,43 @@
 import { AppTheme, useTheme } from 'theme';
 import { ScrollView, View } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { makeStyles } from '@rneui/themed';
 import { openShareSheet, viewport } from '@react-native-ajp-elements/ui';
 import Card from 'components/molecules/Card';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { openURL } from '@react-native-ajp-elements/core';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { HomeNavigatorParamList } from 'types/navigation';
+import { Button, Icon } from '@rneui/base';
 
-const HomeScreen = () => {
+type Props = NativeStackScreenProps<HomeNavigatorParamList, 'Home'>;
+
+const HomeScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
+
+  useEffect(() => {
+    navigation.setOptions({
+      // eslint-disable-next-line react/no-unstable-nested-components
+      headerRight: () => (
+        <>
+          <Button
+            type={'clear'}
+            icon={
+              <Icon
+                name="account-circle"
+                type={'material-community'}
+                color={theme.colors.brandSecondary}
+                size={28}
+              />
+            }
+          />
+        </>
+      ),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <SafeAreaView edges={['left', 'right']} style={theme.styles.view}>
