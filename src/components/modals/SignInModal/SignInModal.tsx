@@ -1,15 +1,24 @@
-import { SignInModalMethods, SignInModalProps } from './types';
+import {
+  SignInModalMethods,
+  SignInModalProps,
+  SignInNavigatorParamList,
+} from './types';
 import React, { useImperativeHandle, useRef } from 'react';
 
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import SignInView from '../../views/SignInView';
 import { Modal } from '@react-native-ajp-elements/ui';
+import { NavigationContainer } from '@react-navigation/native';
+import ChooseSignInScreen from './ChooseSignInScreen';
+import EmailSignInScreen from './EmailSignInScreen';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import ForgotPasswordScreen from './ForgotPasswordScreen';
+
+const Stack = createNativeStackNavigator<SignInNavigatorParamList>();
 
 type SignInModal = SignInModalMethods;
 
 const SignInModal = React.forwardRef<SignInModal, SignInModalProps>(
-  (props, ref) => {
-    const { onAuthStateChanged } = props;
+  (_props, ref) => {
     const innerRef = useRef<BottomSheetModalMethods>(null);
 
     useImperativeHandle(ref, () => ({
@@ -28,7 +37,35 @@ const SignInModal = React.forwardRef<SignInModal, SignInModalProps>(
 
     return (
       <Modal ref={innerRef}>
-        <SignInView onAuthStateChanged={onAuthStateChanged} />
+        <NavigationContainer independent={true}>
+          <Stack.Navigator screenOptions={{}}>
+            <Stack.Screen
+              name="ChooseSignInScreen"
+              component={ChooseSignInScreen}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="EmailSignInScreen"
+              component={EmailSignInScreen}
+              options={{
+                headerTitle: 'Sign In',
+                headerBackTitle: 'Back',
+                headerShadowVisible: false,
+              }}
+            />
+            <Stack.Screen
+              name="ForgotPasswordScreen"
+              component={ForgotPasswordScreen}
+              options={{
+                headerTitle: 'Forgot Password?',
+                headerBackTitle: 'Back',
+                headerShadowVisible: false,
+              }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
       </Modal>
     );
   },

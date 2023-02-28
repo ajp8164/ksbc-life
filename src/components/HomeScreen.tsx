@@ -11,10 +11,10 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeNavigatorParamList } from 'types/navigation';
 import { Button, Icon, Image } from '@rneui/base';
 import { SignInModal } from 'components/modals/SignInModal';
-import { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveUser } from 'store/slices/userProfile';
 import { selectUser } from 'store/selectors/userProfileSelectors';
+import auth from '@react-native-firebase/auth';
 
 type Props = NativeStackScreenProps<HomeNavigatorParamList, 'Home'>;
 
@@ -65,11 +65,15 @@ const HomeScreen = ({ navigation }: Props) => {
     });
   };
 
-  const onAuthStateChanged = (user: FirebaseAuthTypes.User) => {
-    // Remove non-serializable properties (functions).
-    dispatch(saveUser({ user: JSON.parse(JSON.stringify(user)) }));
-    signInModalRef.current?.dismiss();
-  };
+  useEffect(() => {
+    const unsubscribe = auth().onAuthStateChanged(user => {
+      // Remove non-serializable properties (functions).
+      dispatch(saveUser({ user: JSON.parse(JSON.stringify(user)) }));
+      signInModalRef.current?.dismiss();
+    });
+    return unsubscribe;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <SafeAreaView edges={['left', 'right']} style={theme.styles.view}>
@@ -124,10 +128,7 @@ const HomeScreen = ({ navigation }: Props) => {
         </View>
         <Card imageSource={require('img/life-kids.jpg')} />
       </ScrollView>
-      <SignInModal
-        ref={signInModalRef}
-        onAuthStateChanged={onAuthStateChanged}
-      />
+      <SignInModal ref={signInModalRef} />
     </SafeAreaView>
   );
 };
@@ -137,6 +138,7 @@ const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
     width: 30,
     height: 30,
     borderRadius: 30,
+    top: -5,
   },
   cardRow: {
     flexDirection: 'row',

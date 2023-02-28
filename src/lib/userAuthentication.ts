@@ -85,6 +85,28 @@ export const signInWithTwitter = async () => {
   }
 };
 
+export const signInwithEmailAndPassword = async (
+  email: string,
+  password: string,
+) => {
+  auth()
+    .createUserWithEmailAndPassword(email, password)
+    .then(() => {
+      console.log('User account created & signed in!');
+    })
+    .catch(error => {
+      if (error.code === 'auth/email-already-in-use') {
+        console.log('That email address is already in use!');
+      }
+
+      if (error.code === 'auth/invalid-email') {
+        console.log('That email address is invalid!');
+      }
+
+      console.error(error);
+    });
+};
+
 export const signOut = async () => {
   try {
     return await auth().signOut();
@@ -92,6 +114,19 @@ export const signOut = async () => {
   } catch (e: any) {
     if (!e.message.includes('auth/no-current-user')) {
       log.error(`Sign out error: ${e.message}`);
+    }
+  }
+};
+
+export const sendPasswordResetEmail = async (email: string) => {
+  try {
+    return await auth().sendPasswordResetEmail(email);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
+    if (e.message.includes('auth/user-not-found')) {
+      throw e;
+    } else {
+      log.error(`Password reset error: ${e.message}`);
     }
   }
 };
