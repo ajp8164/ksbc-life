@@ -13,7 +13,10 @@ export type MoreNavigatorParamList = {
   Content: {
     content: ContentView;
   };
-  More: undefined;
+  More: {
+    subNav?: string;
+  };
+  UserProfile: undefined;
 };
 
 export type MainNavigatorParamList = {

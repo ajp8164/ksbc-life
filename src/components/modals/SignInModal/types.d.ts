@@ -18,6 +18,7 @@ export interface SignInModalMethods {
 
 export type SignInNavigatorParamList = {
   ChooseSignInScreen: undefined;
+  CreateAccountScreen: undefined;
   EmailSignInScreen: undefined;
   ForgotPasswordScreen: undefined;
 };

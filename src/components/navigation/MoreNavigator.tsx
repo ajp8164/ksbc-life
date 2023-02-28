@@ -6,6 +6,8 @@ import ContentScreen from 'components/ContentScreen';
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from 'theme';
+import UserProfileScreen from 'components/UserProfileScreen';
+import { appConfig } from 'config';
 
 const MoreStack = createNativeStackNavigator<MoreNavigatorParamList>();
 
@@ -38,6 +40,13 @@ const MoreNavigator = () => {
         }}
       />
       <MoreStack.Screen
+        name="UserProfile"
+        component={UserProfileScreen}
+        options={{
+          headerLargeTitle: true,
+        }}
+      />
+      <MoreStack.Screen
         name="AppSettings"
         component={AppSettingsScreen}
         options={{
@@ -57,7 +66,7 @@ const MoreNavigator = () => {
         name="About"
         component={AboutScreen}
         options={{
-          title: 'About',
+          title: `About ${appConfig.appName}`,
           headerLargeTitle: true,
         }}
       />

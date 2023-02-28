@@ -20,14 +20,18 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { makeStyles } from '@rneui/themed';
 import { SignInNavigatorParamList } from './types';
 import { Button } from '@rneui/base';
-import { signInwithEmailAndPassword } from 'lib/userAuthentication';
+import { createUserWithEmailAndPassword } from 'lib/userAuthentication';
 
 enum Fields {
+  firstName,
+  lastName,
   email,
   password,
 }
 
 type FormValues = {
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
 };
@@ -40,14 +44,16 @@ export interface EditorState {
 
 export type Props = NativeStackScreenProps<
   SignInNavigatorParamList,
-  'EmailSignInScreen'
+  'CreateAccountScreen'
 >;
 
-const EmailSignInScreen = ({ navigation }: Props) => {
+const CreateAccountScreen = () => {
   const theme = useTheme();
   const s = useStyles(theme);
 
   const formikRef = useRef<FormikProps<FormValues>>(null);
+  const refFirstName = useRef<TextInput>(null);
+  const refLastName = useRef<TextInput>(null);
   const refEmail = useRef<TextInput>(null);
   const refPassword = useRef<TextInput>(null);
 
@@ -81,7 +87,12 @@ const EmailSignInScreen = ({ navigation }: Props) => {
   ) => {
     Keyboard.dismiss();
     setEditorState({ isSubmitting: true });
-    signInwithEmailAndPassword(values.email, values.password)
+    createUserWithEmailAndPassword(
+      values.firstName,
+      values.lastName,
+      values.email,
+      values.password,
+    )
       .then(() => {
         setEditorState({ isSubmitting: false });
         resetForm({ values });
@@ -89,13 +100,15 @@ const EmailSignInScreen = ({ navigation }: Props) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((e: any) => {
         setEditorState({ isSubmitting: false });
-        Alert.alert('Sign In Error', e.message, [{ text: 'OK' }], {
+        Alert.alert('Account Error', e.message, [{ text: 'OK' }], {
           cancelable: false,
         });
       });
   };
 
   const validationSchema = Yup.object().shape({
+    firstName: Yup.string().required('First name is required'),
+    lastName: Yup.string().required('Last name is required'),
     email: Yup.string()
       .email('Not a valid email address')
       .matches(/\..{2,}$/, 'Email domain needs min 2 characters') // Email domain at least 2 chars
@@ -105,7 +118,7 @@ const EmailSignInScreen = ({ navigation }: Props) => {
       .min(8, 'Minimum length 8 characters')
       .matches(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/,
-        'Include uppercase, lowercase, number and special character',
+        'Include uppercase, lowercase, number and one of !@#$%^&*',
       ),
   });
 
@@ -118,6 +131,8 @@ const EmailSignInScreen = ({ navigation }: Props) => {
           <Formik
             innerRef={formikRef}
             initialValues={{
+              firstName: '',
+              lastName: '',
               email: '',
               password: '',
             }}
@@ -126,6 +141,50 @@ const EmailSignInScreen = ({ navigation }: Props) => {
             onSubmit={signIn}>
             {formik => (
               <View style={[theme.styles.viewAlt, s.view]}>
+                <ListItemInput
+                  refInner={refFirstName}
+                  placeholder="First Name"
+                  placeholderTextColor={theme.colors.textPlaceholder}
+                  value={formik.values.firstName}
+                  errorText={
+                    formik.values.firstName !== formik.initialValues.firstName
+                      ? formik.errors.firstName
+                      : undefined
+                  }
+                  errorColor={theme.colors.error}
+                  autoCapitalize={'none'}
+                  autoCorrect={false}
+                  onBlur={() => {
+                    formik.handleBlur('firstName');
+                    setEditorState({ focusedField: undefined });
+                  }}
+                  onChangeText={formik.handleChange('firstName')}
+                  onFocus={() =>
+                    setEditorState({ focusedField: Fields.firstName })
+                  }
+                />
+                <ListItemInput
+                  refInner={refLastName}
+                  placeholder="Last Name"
+                  placeholderTextColor={theme.colors.textPlaceholder}
+                  value={formik.values.lastName}
+                  errorText={
+                    formik.values.lastName !== formik.initialValues.lastName
+                      ? formik.errors.lastName
+                      : undefined
+                  }
+                  errorColor={theme.colors.error}
+                  autoCapitalize={'none'}
+                  autoCorrect={false}
+                  onBlur={() => {
+                    formik.handleBlur('lastName');
+                    setEditorState({ focusedField: undefined });
+                  }}
+                  onChangeText={formik.handleChange('lastName')}
+                  onFocus={() =>
+                    setEditorState({ focusedField: Fields.lastName })
+                  }
+                />
                 <ListItemInput
                   refInner={refEmail}
                   placeholder="Email"
@@ -181,13 +240,6 @@ const EmailSignInScreen = ({ navigation }: Props) => {
                   loading={editorState.isSubmitting}
                   onPress={formikRef.current?.submitForm}
                 />
-                <Button
-                  title={'Forgot Password?'}
-                  titleStyle={s.forgotPassword}
-                  buttonStyle={theme.styles.buttonClear}
-                  containerStyle={s.forgotPasswordButtonContainer}
-                  onPress={() => navigation.navigate('ForgotPasswordScreen')}
-                />
                 <Text style={s.footer}>
                   {'By signing up you agree to our Terms and Privacy Policy'}
                 </Text>
@@ -236,4 +288,4 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   },
 }));
 
-export default EmailSignInScreen;
+export default CreateAccountScreen;

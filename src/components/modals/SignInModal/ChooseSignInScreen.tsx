@@ -1,14 +1,14 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppTheme, useTheme } from 'theme';
-import { Text, View } from 'react-native';
+import { Platform, Text, View } from 'react-native';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@rneui/themed';
 import { Button } from '@rneui/base';
 import { SvgXml } from 'react-native-svg';
 import { getSvg } from '@react-native-ajp-elements/ui';
 import { appConfig } from 'config';
-import { signInWithGoogle, signOut } from 'lib/userAuthentication';
+import { signInWithGoogle } from 'lib/userAuthentication';
 import { SignInNavigatorParamList } from './types';
 
 export type Props = NativeStackScreenProps<
@@ -20,11 +20,15 @@ const ChooseSignInScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
+  const [signInAction, setSignInAction] = useState(true);
+
   return (
     <View style={theme.styles.viewAlt}>
-      <Text style={s.title}>{appConfig.businessName}</Text>
+      <Text style={s.title}>{appConfig.appName}</Text>
       <Text style={s.description}>{'Sign in to take notes.'}</Text>
-      <Text style={s.subtitle}>{'Create Account'}</Text>
+      <Text style={s.subtitle}>
+        {signInAction ? 'Sign In' : 'Create Account'}
+      </Text>
       <Text style={s.footer}>
         {'By signing up you agree to our Terms and Privacy Policy'}
       </Text>
@@ -71,39 +75,39 @@ const ChooseSignInScreen = ({ navigation }: Props) => {
           />
         }
       />
-      <Button
-        title={'Continue with Apple'}
-        titleStyle={theme.styles.buttonOutlineTitle}
-        buttonStyle={theme.styles.buttonOutline}
-        containerStyle={s.signInButtonContainer}
-        icon={
-          <SvgXml
-            width={28}
-            height={28}
-            style={{ position: 'absolute', left: 5 }}
-            xml={getSvg('appleIcon')}
-          />
-        }
-      />
+      {Platform.OS === 'ios' && (
+        <Button
+          title={'Continue with Apple'}
+          titleStyle={theme.styles.buttonOutlineTitle}
+          buttonStyle={theme.styles.buttonOutline}
+          containerStyle={s.signInButtonContainer}
+          icon={
+            <SvgXml
+              width={28}
+              height={28}
+              style={{ position: 'absolute', left: 5 }}
+              xml={getSvg('appleIcon')}
+            />
+          }
+        />
+      )}
       <Button
         title={'Continue with Email'}
         titleStyle={theme.styles.buttonOutlineTitle}
         buttonStyle={theme.styles.buttonOutline}
         containerStyle={s.signInButtonContainer}
-        onPress={() => navigation.navigate('EmailSignInScreen')}
+        onPress={() =>
+          signInAction
+            ? navigation.navigate('EmailSignInScreen')
+            : navigation.navigate('CreateAccountScreen')
+        }
       />
       <Button
-        title={'OR SIGN IN'}
+        title={signInAction ? 'or Create Account' : 'Have an Account? Sign In'}
         titleStyle={theme.styles.buttonClearTitle}
         buttonStyle={theme.styles.buttonClear}
         containerStyle={s.signInButtonContainer}
-      />
-      <Button
-        title={'SIGN OUT'}
-        titleStyle={theme.styles.buttonClearTitle}
-        buttonStyle={theme.styles.buttonClear}
-        containerStyle={s.signInButtonContainer}
-        onPress={signOut}
+        onPress={() => setSignInAction(!signInAction)}
       />
     </View>
   );

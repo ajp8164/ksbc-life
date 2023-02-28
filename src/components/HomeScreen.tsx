@@ -8,15 +8,22 @@ import Card from 'components/molecules/Card';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { openURL } from '@react-native-ajp-elements/core';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { HomeNavigatorParamList } from 'types/navigation';
+import {
+  HomeNavigatorParamList,
+  MoreNavigatorParamList,
+} from 'types/navigation';
 import { Button, Icon, Image } from '@rneui/base';
 import { SignInModal } from 'components/modals/SignInModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveUser } from 'store/slices/userProfile';
 import { selectUser } from 'store/selectors/userProfileSelectors';
 import auth from '@react-native-firebase/auth';
+import { CompositeScreenProps } from '@react-navigation/core';
 
-type Props = NativeStackScreenProps<HomeNavigatorParamList, 'Home'>;
+type Props = CompositeScreenProps<
+  NativeStackScreenProps<HomeNavigatorParamList, 'Home'>,
+  NativeStackScreenProps<MoreNavigatorParamList>
+>;
 
 const HomeScreen = ({ navigation }: Props) => {
   const theme = useTheme();
@@ -58,7 +65,8 @@ const HomeScreen = ({ navigation }: Props) => {
                 />
               )
             }
-            onPress={signInModalRef.current?.present}
+            // onPress={signInModalRef.current?.present}
+            onPress={doAccountAction}
           />
         </>
       ),
@@ -74,6 +82,14 @@ const HomeScreen = ({ navigation }: Props) => {
     return unsubscribe;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const doAccountAction = () => {
+    if (user) {
+      navigation.navigate('More', { subNav: 'UserProfile' });
+    } else {
+      signInModalRef.current?.present();
+    }
+  };
 
   return (
     <SafeAreaView edges={['left', 'right']} style={theme.styles.view}>

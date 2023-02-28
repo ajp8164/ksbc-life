@@ -59,12 +59,6 @@ const AboutScreen = ({ navigation }: Props) => {
         <Text style={s.version}>
           {`App Version ${VersionNumber.appVersion}.${VersionNumber.buildVersion}`}
         </Text>
-        {/* <Divider />
-        <ListItem
-          title={'Theme'}
-          position={['first', 'last']}
-          onPress={async () => navigation.navigate('Theme')}
-        /> */}
       </ScrollView>
     </SafeAreaView>
   );

@@ -12,6 +12,7 @@ import ChooseSignInScreen from './ChooseSignInScreen';
 import EmailSignInScreen from './EmailSignInScreen';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ForgotPasswordScreen from './ForgotPasswordScreen';
+import CreateAccountScreen from './CreateAccountScreen';
 
 const Stack = createNativeStackNavigator<SignInNavigatorParamList>();
 
@@ -60,6 +61,15 @@ const SignInModal = React.forwardRef<SignInModal, SignInModalProps>(
               component={ForgotPasswordScreen}
               options={{
                 headerTitle: 'Forgot Password?',
+                headerBackTitle: 'Back',
+                headerShadowVisible: false,
+              }}
+            />
+            <Stack.Screen
+              name="CreateAccountScreen"
+              component={CreateAccountScreen}
+              options={{
+                headerTitle: 'Create Account',
                 headerBackTitle: 'Back',
                 headerShadowVisible: false,
               }}

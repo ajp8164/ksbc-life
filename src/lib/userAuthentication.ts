@@ -25,7 +25,10 @@ export const signInWithApple = async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     if (!e.message.includes('canceled')) {
-      log.error(`Sign in error: ${e.message}`);
+      log.error(`Apple sign in error: ${e.message}`);
+      throw new Error(
+        'An internal error occurred while trying to sign in. Please try again.',
+      );
     }
   }
 };
@@ -50,7 +53,10 @@ export const signInWithFacebook = async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     if (!e.message.includes('canceled')) {
-      log.error(`Sign in error: ${e.message}`);
+      log.error(`Facebook sign in error: ${e.message}`);
+      throw new Error(
+        'An internal error occurred while trying to sign in. Please try again.',
+      );
     }
   }
 };
@@ -64,7 +70,10 @@ export const signInWithGoogle = async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     if (!e.message.includes('canceled')) {
-      log.error(`Sign in error: ${e.message}`);
+      log.error(`Google sign in error: ${e.message}`);
+      throw new Error(
+        'An internal error occurred while trying to sign in. Please try again.',
+      );
     }
   }
 };
@@ -76,11 +85,14 @@ export const signInWithTwitter = async () => {
       authToken,
       authTokenSecret,
     );
-    return auth().signInWithCredential(twitterCredential);
+    return await auth().signInWithCredential(twitterCredential);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     if (!e.message.includes('canceled')) {
-      log.error(`Sign in error: ${e.message}`);
+      log.error(`Twitter sign in error: ${e.message}`);
+      throw new Error(
+        'An internal error occurred while trying to sign in. Please try again.',
+      );
     }
   }
 };
@@ -89,21 +101,23 @@ export const signInwithEmailAndPassword = async (
   email: string,
   password: string,
 ) => {
-  auth()
-    .createUserWithEmailAndPassword(email, password)
+  return await auth()
+    .signInWithEmailAndPassword(email, password)
     .then(() => {
-      console.log('User account created & signed in!');
+      // Success
     })
-    .catch(error => {
-      if (error.code === 'auth/email-already-in-use') {
-        console.log('That email address is already in use!');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .catch((e: any) => {
+      if (e.code === 'auth/email-already-in-use') {
+        throw new Error('This email address is already in use.');
       }
-
-      if (error.code === 'auth/invalid-email') {
-        console.log('That email address is invalid!');
+      if (e.code === 'auth/invalid-email') {
+        throw new Error('This email address is invalid.');
       }
-
-      console.error(error);
+      log.error(`Email/password sign in error: ${e.message}`);
+      throw new Error(
+        'An internal error occurred while trying to sign in. Please try again.',
+      );
     });
 };
 
@@ -124,9 +138,40 @@ export const sendPasswordResetEmail = async (email: string) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     if (e.message.includes('auth/user-not-found')) {
-      throw e;
-    } else {
-      log.error(`Password reset error: ${e.message}`);
+      throw new Error('There is no existing user for this email address.');
     }
+    log.error(`Password reset error: ${e.message}`);
+    throw new Error(
+      'An internal error occurred while trying to send a reset password email. Please try again.',
+    );
+  }
+};
+
+export const createUserWithEmailAndPassword = async (
+  firstName: string,
+  lastName: string,
+  email: string,
+  password: string,
+) => {
+  try {
+    return await auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then(async user => {
+        console.log(user);
+        await user.user.updateProfile({
+          displayName: `${firstName} ${lastName}`,
+        });
+      });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
+    if (e.message.includes('auth/email-already-exists')) {
+      throw new Error(
+        'The provided email is already in use by an existing user.',
+      );
+    }
+    log.error(`Create account error: ${e.message}`);
+    throw new Error(
+      'An internal error occurred while creating your account. Please try again.',
+    );
   }
 };
