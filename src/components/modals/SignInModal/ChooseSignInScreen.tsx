@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppTheme, useTheme } from 'theme';
-import { Platform, Text, View } from 'react-native';
+import { Alert, Platform, Text, View } from 'react-native';
 
 import React, { useState } from 'react';
 import { makeStyles } from '@rneui/themed';
@@ -8,7 +8,12 @@ import { Button } from '@rneui/base';
 import { SvgXml } from 'react-native-svg';
 import { getSvg } from '@react-native-ajp-elements/ui';
 import { appConfig } from 'config';
-import { signInWithGoogle } from 'lib/userAuthentication';
+import {
+  signInWithApple,
+  signInWithFacebook,
+  signInWithGoogle,
+  signInWithTwitter,
+} from 'lib/userAuthentication';
 import { SignInNavigatorParamList } from './types';
 
 export type Props = NativeStackScreenProps<
@@ -45,7 +50,14 @@ const ChooseSignInScreen = ({ navigation }: Props) => {
             xml={getSvg('googleIcon')}
           />
         }
-        onPress={signInWithGoogle}
+        onPress={() => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          signInWithGoogle().catch((e: any) => {
+            Alert.alert('Sign In Error', e.message, [{ text: 'OK' }], {
+              cancelable: false,
+            });
+          });
+        }}
       />
       <Button
         title={'Continue with Facebook'}
@@ -60,6 +72,14 @@ const ChooseSignInScreen = ({ navigation }: Props) => {
             xml={getSvg('facebookIcon')}
           />
         }
+        onPress={() => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          signInWithFacebook().catch((e: any) => {
+            Alert.alert('Sign In Error', e.message, [{ text: 'OK' }], {
+              cancelable: false,
+            });
+          });
+        }}
       />
       <Button
         title={'Continue with Twitter'}
@@ -74,6 +94,14 @@ const ChooseSignInScreen = ({ navigation }: Props) => {
             xml={getSvg('twitterIcon')}
           />
         }
+        onPress={() => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          signInWithTwitter().catch((e: any) => {
+            Alert.alert('Sign In Error', e.message, [{ text: 'OK' }], {
+              cancelable: false,
+            });
+          });
+        }}
       />
       {Platform.OS === 'ios' && (
         <Button
@@ -89,6 +117,14 @@ const ChooseSignInScreen = ({ navigation }: Props) => {
               xml={getSvg('appleIcon')}
             />
           }
+          onPress={() => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            signInWithApple().catch((e: any) => {
+              Alert.alert('Sign In Error', e.message, [{ text: 'OK' }], {
+                cancelable: false,
+              });
+            });
+          }}
         />
       )}
       <Button

@@ -40,11 +40,30 @@
 				<string>com.googleusercontent.apps.85125896421-u2psomm2metko5dsb7eetdsi6cirfci7</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb908393693832337</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>FacebookAppID</key>
+	<string>908393693832337</string>
+	<key>FacebookClientToken</key>
+	<string>f4b93e044ba73152e4a67e51bb9fa604</string>
+	<key>FacebookDisplayName</key>
+	<string>KSBC Life</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<string>NO</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>fbapi</string>
+		<string>fb-messenger-share-api</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>

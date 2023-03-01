@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">KSBC Life</string>
+    <string name="facebook_app_id">908393693832337</string>
+    <string name="facebook_client_token">f4b93e044ba73152e4a67e51bb9fa604</string>
 </resources>

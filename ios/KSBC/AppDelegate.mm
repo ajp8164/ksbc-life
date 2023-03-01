@@ -4,12 +4,15 @@
 #import <React/RCTLinkingManager.h>
 
 #import "RNBootSplash.h" 
+#import <FBSDKCoreKit/FBSDKCoreKit-swift.h>
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   [FIRApp configure];
+  [[FBSDKApplicationDelegate sharedInstance] application:application
+                       didFinishLaunchingWithOptions:launchOptions];
 
   self.moduleName = @"KSBC";
   // You can add your custom initial props in the dictionary below.
@@ -46,7 +49,15 @@
    openURL:(NSURL *)url
    options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
 {
-  return [RCTLinkingManager application:application openURL:url options:options];
+  if ([[FBSDKApplicationDelegate sharedInstance] application:application openURL:url options:options]) {
+    return YES;
+  }
+
+  if ([RCTLinkingManager application:application openURL:url options:options]) {
+    return YES;
+  }
+
+  return NO;
 }
 
 // React navigation deep linking - universal links

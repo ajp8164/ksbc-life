@@ -40,16 +40,16 @@ export const signInWithFacebook = async () => {
       'email',
     ]);
     if (result.isCancelled) {
-      throw 'User canceled the login process';
+      throw new Error('User canceled the login process');
     }
     const data = await AccessToken.getCurrentAccessToken();
     if (!data) {
-      throw 'Something went wrong obtaining access token';
+      throw new Error('Something went wrong obtaining access token');
     }
     const facebookCredential = auth.FacebookAuthProvider.credential(
       data.accessToken,
     );
-    return auth().signInWithCredential(facebookCredential);
+    return await auth().signInWithCredential(facebookCredential);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     if (!e.message.includes('canceled')) {
@@ -124,6 +124,8 @@ export const signInwithEmailAndPassword = async (
 export const signOut = async () => {
   try {
     return await auth().signOut();
+    // return LoginManager.logOut();
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     if (!e.message.includes('auth/no-current-user')) {
