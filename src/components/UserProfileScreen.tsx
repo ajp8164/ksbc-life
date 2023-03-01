@@ -3,7 +3,7 @@ import {
   MoreNavigatorParamList,
   MainNavigatorParamList,
 } from 'types/navigation';
-import { Alert, ScrollView, View } from 'react-native';
+import { Alert, ScrollView, Text, View } from 'react-native';
 import React, { useEffect } from 'react';
 import { makeStyles } from '@rneui/themed';
 import { CompositeScreenProps } from '@react-navigation/core';
@@ -28,7 +28,8 @@ const UserProfileScreen = ({ navigation }: Props) => {
 
   useEffect(() => {
     navigation.setOptions({
-      headerTitle: user?.displayName || '',
+      // headerTitle: user?.displayName || 'My  Profile',
+      headerTitle: 'My  Profile',
     });
   });
 
@@ -56,14 +57,9 @@ const UserProfileScreen = ({ navigation }: Props) => {
   };
 
   const doSignOut = () => {
-    signOut()
-      .then(() => {
-        navigation.goBack();
-      })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch((e: any) => {
-        console.log(e.message);
-      });
+    signOut().then(() => {
+      navigation.goBack();
+    });
   };
 
   return (
@@ -79,9 +75,14 @@ const UserProfileScreen = ({ navigation }: Props) => {
             name="account-circle"
             type={'material-community'}
             color={theme.colors.brandSecondary}
-            size={28}
+            size={100}
+            style={{ marginTop: 15 }}
           />
         )}
+        {user?.displayName && (
+          <Text style={s.profileName}>{user.displayName}</Text>
+        )}
+        {user?.email && <Text style={s.profileEmail}>{user.email}</Text>}
         <Divider />
         <ListItem
           title={'Sign Out'}
@@ -102,6 +103,16 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
     borderRadius: 100,
     alignSelf: 'center',
     marginTop: 15,
+    marginBottom: 15,
+  },
+  profileName: {
+    ...theme.styles.textNormal,
+    ...theme.styles.textBold,
+    textAlign: 'center',
+  },
+  profileEmail: {
+    ...theme.styles.textSmall,
+    textAlign: 'center',
   },
   signInButtonContainer: {
     width: '80%',

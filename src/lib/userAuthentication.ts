@@ -11,21 +11,34 @@ export const signInWithApple = async () => {
   try {
     const appleAuthRequestResponse = await appleAuth.performRequest({
       requestedOperation: appleAuth.Operation.LOGIN,
-      requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+      // It appears putting FULL_NAME first is important
+      // See https://github.com/invertase/react-native-apple-authentication/issues/293
+      requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
     });
     if (!appleAuthRequestResponse.identityToken) {
-      throw new Error('Apple Sign-In failed - no identify token returned');
+      throw new Error('No identify token returned');
     }
     const { identityToken, nonce } = appleAuthRequestResponse;
     const appleCredential = auth.AppleAuthProvider.credential(
       identityToken,
       nonce,
     );
-    return auth().signInWithCredential(appleCredential);
+    const userCredential = await auth().signInWithCredential(appleCredential);
+    const name = appleAuthRequestResponse.fullName;
+    userCredential.user = {
+      ...userCredential.user,
+      displayName: `${name?.givenName} ${name?.familyName}`,
+    };
+    return userCredential;
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
-    if (!e.message.includes('canceled')) {
-      log.error(`Apple sign in error: ${e.message}`);
+    // com.apple.AuthenticationServices.AuthorizationError is likely due to the user not being
+    // signed into their iOS device via the Settings app.  Don't throw error, just report it.
+    log.error(`Apple sign in error: ${e.message}`);
+    if (
+      !e.message.includes('com.apple.AuthenticationServices.AuthorizationError')
+    ) {
       throw new Error(
         'An internal error occurred while trying to sign in. Please try again.',
       );
@@ -123,8 +136,8 @@ export const signInwithEmailAndPassword = async (
 
 export const signOut = async () => {
   try {
+    LoginManager.logOut();
     return await auth().signOut();
-    // return LoginManager.logOut();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
@@ -159,7 +172,6 @@ export const createUserWithEmailAndPassword = async (
     return await auth()
       .createUserWithEmailAndPassword(email, password)
       .then(async user => {
-        console.log(user);
         await user.user.updateProfile({
           displayName: `${firstName} ${lastName}`,
         });

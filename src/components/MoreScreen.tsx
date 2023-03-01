@@ -41,6 +41,7 @@ const MoreScreen = ({ navigation, route }: Props) => {
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(user => {
+      console.log('ASC', user);
       // Remove non-serializable properties (functions).
       dispatch(saveUser({ user: JSON.parse(JSON.stringify(user)) }));
       signInModalRef.current?.dismiss();
@@ -55,15 +56,20 @@ const MoreScreen = ({ navigation, route }: Props) => {
         style={[theme.styles.view, s.view]}
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior={'automatic'}>
-        {user && user.displayName && user.photoURL ? (
+        {user ? (
           <ListItem
-            title={user.displayName}
+            title={user.displayName || user.email || 'My Profile'}
             leftImage={
-              <Image
-                source={{ uri: user.photoURL }}
-                containerStyle={s.avatar}
-              />
+              user.photoURL ? (
+                <Image
+                  source={{ uri: user.photoURL }}
+                  containerStyle={s.avatar}
+                />
+              ) : (
+                'account-circle-outline'
+              )
             }
+            leftImageType={'material-community'}
             position={['first', 'last']}
             onPress={() => navigation.navigate('UserProfile')}
           />
