@@ -8,6 +8,8 @@ import SystemNavigationBar from 'react-native-system-navigation-bar';
 import { TabNavigatorParamList } from 'types/navigation';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTheme } from 'theme';
+import ServicesNavigator from './ServicesNavigator';
+import GivingNavigator from './GivingNavigator';
 
 const Tab = createBottomTabNavigator<TabNavigatorParamList>();
 
@@ -67,6 +69,38 @@ const TabNavigator = () => {
           tabBarIcon: ({ color }) => (
             <Icon
               name={'home-circle'}
+              type={'material-community'}
+              color={color}
+              size={28}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="ServicesTab"
+        component={ServicesNavigator}
+        options={{
+          tabBarLabel: 'Services',
+          // eslint-disable-next-line react/no-unstable-nested-components
+          tabBarIcon: ({ color }) => (
+            <Icon
+              name={'television-play'}
+              type={'material-community'}
+              color={color}
+              size={28}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="GivingTab"
+        component={GivingNavigator}
+        options={{
+          tabBarLabel: 'Giving',
+          // eslint-disable-next-line react/no-unstable-nested-components
+          tabBarIcon: ({ color }) => (
+            <Icon
+              name={'heart-circle'}
               type={'material-community'}
               color={color}
               size={28}

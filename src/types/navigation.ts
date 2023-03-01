@@ -7,6 +7,10 @@ export enum StartupScreen {
   Welcome = 'Welcome',
 }
 
+export type GivingNavigatorParamList = {
+  Giving: undefined;
+};
+
 export type MoreNavigatorParamList = {
   About: undefined;
   AppSettings: undefined;
@@ -28,6 +32,10 @@ export type HomeNavigatorParamList = {
   Home: undefined;
 };
 
+export type ServicesNavigatorParamList = {
+  Services: undefined;
+};
+
 export type StartupNavigatorParamList = {
   Welcome: undefined;
 };
@@ -35,4 +43,5 @@ export type StartupNavigatorParamList = {
 export type TabNavigatorParamList = {
   HomeTab: undefined;
   MoreTab: undefined;
+  ServicesTab: undefined;
 };
