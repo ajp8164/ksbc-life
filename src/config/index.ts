@@ -9,6 +9,7 @@ export interface AppConfig
   deepLinkScheme: string;
   environment: string;
   firebaseOauthClientId: string;
+  givingUrl: string;
   persistStoreVersion: string;
   privacyUrl: string;
   sentryEndpoint: string;
@@ -27,6 +28,7 @@ export const appConfig: AppConfig = {
   deepLinkScheme: Config.DEEP_LINK_SCHEME || '',
   environment: Config.ENVIRONMENT || '',
   firebaseOauthClientId: Config.FIREBASE_OAUTH_CLIENT_ID || '',
+  givingUrl: Config.GIVING_URL || '',
   persistStoreVersion: Config.PERSIST_STORE_VERSION || '',
   privacyUrl: Config.PRIVACY_URL || '',
   sentryEndpoint: Config.SENTRY_ENDPOINT || '',

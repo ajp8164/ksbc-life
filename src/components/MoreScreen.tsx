@@ -1,21 +1,22 @@
-import {
-  MoreNavigatorParamList,
-  MainNavigatorParamList,
-} from 'types/navigation';
-import { ScrollView, View } from 'react-native';
 import { AppTheme, useTheme } from 'theme';
-import { Image } from '@rneui/base';
-import { makeStyles } from '@rneui/themed';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
+import {
+  MainNavigatorParamList,
+  MoreNavigatorParamList,
+} from 'types/navigation';
 import React, { useEffect, useRef } from 'react';
-import { CompositeScreenProps } from '@react-navigation/core';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { appConfig } from 'config';
+import { ScrollView, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectUser } from 'store/selectors/userProfileSelectors';
+
+import { CompositeScreenProps } from '@react-navigation/core';
+import { Image } from '@rneui/base';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SignInModal } from 'components/modals/SignInModal';
+import { appConfig } from 'config';
 import auth from '@react-native-firebase/auth';
+import { makeStyles } from '@rneui/themed';
 import { saveUser } from 'store/slices/userProfile';
+import { selectUser } from 'store/selectors/userProfileSelectors';
 
 type Props = CompositeScreenProps<
   NativeStackScreenProps<MoreNavigatorParamList, 'More'>,
@@ -53,9 +54,10 @@ const MoreScreen = ({ navigation, route }: Props) => {
   return (
     <View>
       <ScrollView
-        style={[theme.styles.view, s.view]}
+        style={theme.styles.view}
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior={'automatic'}>
+        <Divider />
         {user ? (
           <ListItem
             title={user.displayName || user.email || 'My Profile'}
@@ -104,9 +106,6 @@ const MoreScreen = ({ navigation, route }: Props) => {
 };
 
 const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
-  view: {
-    paddingTop: 15,
-  },
   avatar: {
     width: 30,
     height: 30,

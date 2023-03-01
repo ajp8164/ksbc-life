@@ -506,6 +506,8 @@ PODS:
     - React
   - react-native-view-shot (3.5.0):
     - React-Core
+  - react-native-webview (11.26.1):
+    - React-Core
   - React-perflogger (0.71.3)
   - React-RCTActionSheet (0.71.3):
     - React-Core/RCTActionSheetHeaders (= 0.71.3)
@@ -740,6 +742,7 @@ DEPENDENCIES:
   - react-native-udp (from `../node_modules/react-native-udp`)
   - react-native-version-number (from `../node_modules/react-native-version-number`)
   - react-native-view-shot (from `../node_modules/react-native-view-shot`)
+  - react-native-webview (from `../node_modules/react-native-webview`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -885,6 +888,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-version-number"
   react-native-view-shot:
     :path: "../node_modules/react-native-view-shot"
+  react-native-webview:
+    :path: "../node_modules/react-native-webview"
   React-perflogger:
     :path: "../node_modules/react-native/ReactCommon/reactperflogger"
   React-RCTActionSheet:
@@ -1028,6 +1033,7 @@ SPEC CHECKSUMS:
   react-native-udp: df79c3cb72c4e71240cd3ce4687bfb8a137140d5
   react-native-version-number: b415bbec6a13f2df62bf978e85bc0d699462f37f
   react-native-view-shot: 792829857bbb23a9c8acdad9a640554bdee397a3
+  react-native-webview: 9f111dfbcfc826084d6c507f569e5e03342ee1c1
   React-perflogger: af8a3d31546077f42d729b949925cc4549f14def
   React-RCTActionSheet: 57cc5adfefbaaf0aae2cf7e10bccd746f2903673
   React-RCTAnimation: 11c61e94da700c4dc915cf134513764d87fc5e2b

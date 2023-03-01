@@ -9,6 +9,7 @@ export enum StartupScreen {
 
 export type GivingNavigatorParamList = {
   Giving: undefined;
+  GivingBrowser: undefined;
 };
 
 export type MoreNavigatorParamList = {

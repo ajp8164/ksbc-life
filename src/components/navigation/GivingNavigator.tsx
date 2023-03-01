@@ -1,8 +1,9 @@
+import GivingBrowserScreen from 'components/GivingBrowserScreen';
+import { GivingNavigatorParamList } from 'types/navigation';
+import GivingScreen from 'components/GivingScreen';
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from 'theme';
-import { GivingNavigatorParamList } from 'types/navigation';
-import GivingScreen from 'components/GivingScreen';
 
 const GivingStack = createNativeStackNavigator<GivingNavigatorParamList>();
 
@@ -32,6 +33,14 @@ const GivingNavigator = () => {
           title: 'Giving',
           headerLeft: () => null,
           headerLargeTitle: true,
+        }}
+      />
+      <GivingStack.Screen
+        name="GivingBrowser"
+        component={GivingBrowserScreen}
+        options={{
+          title: '',
+          headerLeft: () => null,
         }}
       />
     </GivingStack.Navigator>

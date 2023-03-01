@@ -1,15 +1,16 @@
 import { AppTheme, useTheme } from 'theme';
-import { ScrollView, Text } from 'react-native';
+import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 
 import { GivingNavigatorParamList } from 'types/navigation';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScrollView } from 'react-native';
 import { makeStyles } from '@rneui/themed';
 
 export type Props = NativeStackScreenProps<GivingNavigatorParamList, 'Giving'>;
 
-const GivingScreen = () => {
+const GivingScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
@@ -18,7 +19,14 @@ const GivingScreen = () => {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior={'automatic'}>
-        <Text>{'hello'}</Text>
+        <Divider />
+        <ListItem
+          title={'Give Online'}
+          leftImage={'hand-heart-outline'}
+          leftImageType={'material-community'}
+          position={['first', 'last']}
+          onPress={() => navigation.navigate('GivingBrowser')}
+        />
       </ScrollView>
     </SafeAreaView>
   );

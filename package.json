@@ -96,6 +96,7 @@
     "react-native-vector-icons": "^9.2.0",
     "react-native-version-number": "^0.3.6",
     "react-native-view-shot": "^3.4.0",
+    "react-native-webview": "^11.26.1",
     "react-redux": "^8.0.2",
     "readable-stream": "^4.2.0",
     "redux": "^4.2.1",
