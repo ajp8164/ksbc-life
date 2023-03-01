@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { makeStyles } from '@rneui/themed';
 import { Button } from '@rneui/base';
 import { SvgXml } from 'react-native-svg';
-import { getSvg } from '@react-native-ajp-elements/ui';
+import { getColoredSvg, getSvg } from '@react-native-ajp-elements/ui';
 import { appConfig } from 'config';
 import {
   signInWithApple,
@@ -66,9 +66,9 @@ const ChooseSignInScreen = ({ navigation }: Props) => {
         containerStyle={s.signInButtonContainer}
         icon={
           <SvgXml
-            width={28}
-            height={28}
-            style={{ position: 'absolute', left: 5 }}
+            width={45}
+            height={45}
+            style={{ position: 'absolute', left: -3 }}
             xml={getSvg('facebookIcon')}
           />
         }
@@ -111,10 +111,11 @@ const ChooseSignInScreen = ({ navigation }: Props) => {
           containerStyle={s.signInButtonContainer}
           icon={
             <SvgXml
-              width={28}
-              height={28}
-              style={{ position: 'absolute', left: 5 }}
-              xml={getSvg('appleIcon')}
+              width={30}
+              height={30}
+              style={{ position: 'absolute', left: 3, top: 2 }}
+              color={theme.colors.black}
+              xml={getColoredSvg('appleIcon')}
             />
           }
           onPress={() => {

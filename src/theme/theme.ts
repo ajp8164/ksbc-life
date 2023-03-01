@@ -7,10 +7,12 @@ export const theme = createTheme(
     darkColors: {
       brandPrimary: '#194E6A',
       brandSecondary: '#80BFE1',
+      cardBackground: '#202020',
     },
     lightColors: {
       brandPrimary: '#194E6A',
       brandSecondary: '#80BFE1',
+      cardBackground: '#FFFFFF',
     },
   }),
 );

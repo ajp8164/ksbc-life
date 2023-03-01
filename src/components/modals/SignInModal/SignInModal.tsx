@@ -13,6 +13,7 @@ import EmailSignInScreen from './EmailSignInScreen';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ForgotPasswordScreen from './ForgotPasswordScreen';
 import CreateAccountScreen from './CreateAccountScreen';
+import { useTheme } from 'theme';
 
 const Stack = createNativeStackNavigator<SignInNavigatorParamList>();
 
@@ -20,6 +21,7 @@ type SignInModal = SignInModalMethods;
 
 const SignInModal = React.forwardRef<SignInModal, SignInModalProps>(
   (_props, ref) => {
+    const theme = useTheme();
     const innerRef = useRef<BottomSheetModalMethods>(null);
 
     useImperativeHandle(ref, () => ({
@@ -37,7 +39,10 @@ const SignInModal = React.forwardRef<SignInModal, SignInModalProps>(
     };
 
     return (
-      <Modal ref={innerRef}>
+      <Modal
+        ref={innerRef}
+        backgroundStyle={{ backgroundColor: theme.colors.viewAltBackground }}
+        handleIndicatorStyle={{ backgroundColor: theme.colors.black }}>
         <NavigationContainer independent={true}>
           <Stack.Navigator screenOptions={{}}>
             <Stack.Screen

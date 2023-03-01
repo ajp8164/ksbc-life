@@ -98,7 +98,7 @@ const HomeScreen = ({ navigation }: Props) => {
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior={'automatic'}>
         <Card
-          title={"You're Invited"}
+          title={'Welcome'}
           body={'Worship 11:00 am\nLife Groups 9:30 am'}
           imageSource={require('img/ksbc-front.jpg')}
           imageHeight={300}
@@ -136,13 +136,18 @@ const HomeScreen = ({ navigation }: Props) => {
           <Card
             imageSource={require('img/life-kids.jpg')}
             flexBasis={viewport.width / 2 - 23}
+            cardStyle={{ backgroundColor: theme.colors.stickyWhite }}
           />
           <Card
             imageSource={require('img/life-kids.jpg')}
             flexBasis={viewport.width / 2 - 23}
+            cardStyle={{ backgroundColor: theme.colors.stickyWhite }}
           />
         </View>
-        <Card imageSource={require('img/life-kids.jpg')} />
+        <Card
+          imageSource={require('img/life-kids.jpg')}
+          cardStyle={{ backgroundColor: theme.colors.stickyWhite }}
+        />
       </ScrollView>
       <SignInModal ref={signInModalRef} />
     </SafeAreaView>
