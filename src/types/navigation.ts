@@ -41,6 +41,7 @@ export type StartupNavigatorParamList = {
 };
 
 export type TabNavigatorParamList = {
+  GivingTab: undefined;
   HomeTab: undefined;
   MoreTab: undefined;
   ServicesTab: undefined;
