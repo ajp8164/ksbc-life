@@ -35,6 +35,9 @@ export type HomeNavigatorParamList = {
 
 export type SermonsNavigatorParamList = {
   Sermons: undefined;
+  SermonDetail: {
+    id: string;
+  };
 };
 
 export type StartupNavigatorParamList = {

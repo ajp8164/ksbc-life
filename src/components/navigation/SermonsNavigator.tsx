@@ -1,4 +1,5 @@
 import React from 'react';
+import SermonDetailScreen from 'components/SermonDetailScreen';
 import { SermonsNavigatorParamList } from 'types/navigation';
 import SermonsScreen from 'components/SermonsScreen';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -30,6 +31,15 @@ const SermonsNavigator = () => {
         component={SermonsScreen}
         options={{
           title: 'Sermons',
+          headerLeft: () => null,
+          headerLargeTitle: true,
+        }}
+      />
+      <SermonsStack.Screen
+        name="SermonDetail"
+        component={SermonDetailScreen}
+        options={{
+          title: '',
           headerLeft: () => null,
           headerLargeTitle: true,
         }}

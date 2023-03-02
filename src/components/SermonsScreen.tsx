@@ -19,7 +19,7 @@ export type Props = NativeStackScreenProps<
   'Sermons'
 >;
 
-const SermonsScreen = () => {
+const SermonsScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
   const dispatch = useDispatch();
@@ -123,9 +123,8 @@ const SermonsScreen = () => {
               label: 'About this sermon',
               icon: 'information-outline',
               iconType: 'material-community',
-              onPress: () => {
-                console.log('about');
-              },
+              onPress: () =>
+                navigation.navigate('SermonDetail', { id: item.id.videoId }),
             },
           ]}
         />
