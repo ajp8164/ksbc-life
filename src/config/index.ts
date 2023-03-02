@@ -18,6 +18,9 @@ export interface AppConfig
   supportEmail: string;
   supportUrl: string;
   websiteUrl: string;
+  youTubeApiKey: string;
+  youTubeApiUrl: string;
+  youTubeChannelId: string;
 }
 
 export const appConfig: AppConfig = {
@@ -37,4 +40,7 @@ export const appConfig: AppConfig = {
   supportEmail: Config.SUPPORT_EMAIL || '',
   supportUrl: Config.SUPPORT_URL || '',
   websiteUrl: Config.WEBSITE_URL || '',
+  youTubeApiKey: Config.YOUTUBE_API_KEY || '',
+  youTubeApiUrl: Config.YOUTUBE_API_URL || '',
+  youTubeChannelId: Config.YOUTUBE_CHANNEL_ID || '',
 };
