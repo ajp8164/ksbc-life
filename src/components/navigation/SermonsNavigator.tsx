@@ -1,17 +1,17 @@
 import React from 'react';
+import { SermonsNavigatorParamList } from 'types/navigation';
+import SermonsScreen from 'components/SermonsScreen';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from 'theme';
-import { ServicesNavigatorParamList } from 'types/navigation';
-import ServicesScreen from 'components/ServicesScreen';
 
-const ServicesStack = createNativeStackNavigator<ServicesNavigatorParamList>();
+const SermonsStack = createNativeStackNavigator<SermonsNavigatorParamList>();
 
-const ServicesNavigator = () => {
+const SermonsNavigator = () => {
   const theme = useTheme();
 
   return (
-    <ServicesStack.Navigator
-      initialRouteName="Services"
+    <SermonsStack.Navigator
+      initialRouteName="Sermons"
       screenOptions={{
         headerLargeTitleShadowVisible: theme.mode === 'light',
         headerLargeStyle: {
@@ -25,17 +25,17 @@ const ServicesNavigator = () => {
         },
         headerTintColor: theme.colors.screenHeaderBackButton,
       }}>
-      <ServicesStack.Screen
-        name="Services"
-        component={ServicesScreen}
+      <SermonsStack.Screen
+        name="Sermons"
+        component={SermonsScreen}
         options={{
-          title: 'Services',
+          title: 'Sermons',
           headerLeft: () => null,
           headerLargeTitle: true,
         }}
       />
-    </ServicesStack.Navigator>
+    </SermonsStack.Navigator>
   );
 };
 
-export default ServicesNavigator;
+export default SermonsNavigator;

@@ -33,8 +33,8 @@ export type HomeNavigatorParamList = {
   Home: undefined;
 };
 
-export type ServicesNavigatorParamList = {
-  Services: undefined;
+export type SermonsNavigatorParamList = {
+  Sermons: undefined;
 };
 
 export type StartupNavigatorParamList = {
@@ -45,5 +45,5 @@ export type TabNavigatorParamList = {
   GivingTab: undefined;
   HomeTab: undefined;
   MoreTab: undefined;
-  ServicesTab: undefined;
+  SermonsTab: undefined;
 };

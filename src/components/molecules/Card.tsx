@@ -1,15 +1,16 @@
-import { makeStyles } from '@rneui/themed';
 import { AppTheme, useTheme } from 'theme';
-import React from 'react';
-import { Card as RNULCard } from 'react-native-ui-lib';
-import { ImageSource } from 'react-native-vector-icons/Icon';
+import { Button, Icon } from '@rneui/base';
 import {
   GestureResponderEvent,
   TextStyle,
   View,
   ViewStyle,
 } from 'react-native';
-import { Button, Icon } from '@rneui/base';
+
+import { ImageSource } from 'react-native-vector-icons/Icon';
+import { Card as RNULCard } from 'react-native-ui-lib';
+import React from 'react';
+import { makeStyles } from '@rneui/themed';
 
 interface CardInterface {
   body?: string;
@@ -26,9 +27,9 @@ interface CardInterface {
   footerStyle?: TextStyle | TextStyle[];
   imageHeight?: number;
   imageSource?: ImageSource;
+  imageWidth?: number | string;
   title?: string;
   titleStyle?: TextStyle | TextStyle[];
-  width?: number | string;
 }
 
 const Card = ({
@@ -41,9 +42,9 @@ const Card = ({
   footerStyle,
   imageHeight = 100,
   imageSource,
+  imageWidth = '100%',
   title,
   titleStyle,
-  width = '100%',
 }: CardInterface) => {
   const theme = useTheme();
   const s = useStyles(theme);
@@ -96,7 +97,7 @@ const Card = ({
       <RNULCard.Section
         imageSource={imageSource}
         imageStyle={{
-          width,
+          width: imageWidth,
           height: imageHeight,
           resizeMode: hasText ? 'cover' : 'contain',
         }}

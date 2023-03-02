@@ -1,15 +1,15 @@
 import { Platform, StatusBar, Text } from 'react-native';
 import React, { useEffect } from 'react';
 
-import MoreNavigator from './MoreNavigator';
+import GivingNavigator from './GivingNavigator';
 import HomeNavigator from './HomeNavigator';
 import { Icon } from '@rneui/base';
+import MoreNavigator from './MoreNavigator';
+import SermonsNavigator from './SermonsNavigator';
 import SystemNavigationBar from 'react-native-system-navigation-bar';
 import { TabNavigatorParamList } from 'types/navigation';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTheme } from 'theme';
-import ServicesNavigator from './ServicesNavigator';
-import GivingNavigator from './GivingNavigator';
 
 const Tab = createBottomTabNavigator<TabNavigatorParamList>();
 
@@ -77,10 +77,10 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="ServicesTab"
-        component={ServicesNavigator}
+        name="SermonsTab"
+        component={SermonsNavigator}
         options={{
-          tabBarLabel: 'Services',
+          tabBarLabel: 'Sermons',
           // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({ color }) => (
             <Icon

@@ -1,31 +1,28 @@
 import { Alert, FlatList, ListRenderItem, Text, View } from 'react-native';
 import { AppTheme, useTheme } from 'theme';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Button } from '@rneui/base';
+import { DateTime } from 'luxon';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ServicesNavigatorParamList } from 'types/navigation';
-import YoutubePlayer from 'react-native-youtube-iframe';
+import { SermonsNavigatorParamList } from 'types/navigation';
+import VideoCard from 'components/molecules/VideoCard';
+// import YoutubePlayer from 'react-native-youtube-iframe';
 import { makeStyles } from '@rneui/themed';
 import { saveSermonVideos } from 'store/slices/videos';
 import { selectSermonVideos } from 'store/selectors/videos';
-import { viewport } from '@react-native-ajp-elements/ui';
 import { youTubeBroadcastVideos } from 'lib/youTube';
 
 export type Props = NativeStackScreenProps<
-  ServicesNavigatorParamList,
-  'Services'
+  SermonsNavigatorParamList,
+  'Sermons'
 >;
 
-const ServicesScreen = () => {
+const SermonsScreen = () => {
   const theme = useTheme();
   const s = useStyles(theme);
   const dispatch = useDispatch();
-
-  const playerWidth = viewport.width - 30;
-  const playerHeight = (playerWidth * 9) / 16;
 
   const storedVideos = useSelector(selectSermonVideos);
 
@@ -33,20 +30,8 @@ const ServicesScreen = () => {
   const nextPageToken = useRef('');
   const [videos, setVideos] =
     useState<GoogleApiYouTubeSearchResource[]>(storedVideos);
-  console.log('videos', videos);
-
-  const [playing, setPlaying] = useState(false);
-
-  const onStateChange = useCallback((state: string) => {
-    if (state === 'ended') {
-      setPlaying(false);
-      Alert.alert('video has finished playing!');
-    }
-  }, []);
-
-  const togglePlaying = useCallback(() => {
-    setPlaying(prev => !prev);
-  }, []);
+  const [showVideo, setShowVideo] = useState<string | undefined>(undefined);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
     fetchVideos();
@@ -70,7 +55,6 @@ const ServicesScreen = () => {
     if (!allLoaded.current) {
       youTubeBroadcastVideos(nextPageToken.current)
         .then(data => {
-          console.log(data);
           if (
             data.pageInfo.totalResults !== videos.length &&
             data.nextPageToken
@@ -97,20 +81,56 @@ const ServicesScreen = () => {
   const renderVideo: ListRenderItem<GoogleApiYouTubeSearchResource> = ({
     item,
   }) => {
-    return <Text>{item.snippet.title}</Text>;
-    // return (
-    //   <View>
-    //     <YoutubePlayer
-    //       height={playerHeight}
-    //       width={playerWidth}
-    //       play={playing}
-    //       videoId={'iee2TATGMyI'}
-    //       onChangeState={onStateChange}
-    //       webViewStyle={{ borderRadius: 15, borderWidth: 1 }}
-    //     />
-    //     <Button title={playing ? 'pause' : 'play'} onPress={togglePlaying} />
-    //   </View>
-    // );
+    const date = DateTime.fromISO(item.snippet.publishedAt)
+      .minus({ day: 1 }) // Videos posted 1 day after recording
+      .toFormat('MMM d, yyyy');
+    const videoShown = showVideo === item.id.videoId;
+    return (
+      <View style={s.playerContainer}>
+        <VideoCard
+          header={'John 3 | Jamie Auton'}
+          title={'Plan Ahead'}
+          footer={`${date} | Series: Book of John`}
+          imageSource={{ uri: item.snippet.thumbnails.high.url }}
+          videoId={item.id.videoId}
+          onPressVideo={() => setShowVideo(item.id.videoId)}
+          showVideo={videoShown}
+          playing={!paused}
+          onPlayerStateChange={event => {
+            setPaused(event === 'paused');
+          }}
+          buttons={[
+            ...(videoShown
+              ? [
+                  {
+                    label: paused ? 'Play' : 'Pause',
+                    icon: paused ? 'play' : 'pause',
+                    iconType: 'material-community',
+                    onPress: () => setPaused(!paused),
+                  },
+                  {
+                    label: 'Stop',
+                    icon: 'stop',
+                    iconType: 'material-community',
+                    onPress: () => {
+                      setShowVideo(undefined);
+                      setPaused(false);
+                    },
+                  },
+                ]
+              : []),
+            {
+              label: 'About this sermon',
+              icon: 'information-outline',
+              iconType: 'material-community',
+              onPress: () => {
+                console.log('about');
+              },
+            },
+          ]}
+        />
+      </View>
+    );
   };
 
   const renderListEmptyComponent = () => {
@@ -141,6 +161,9 @@ const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
   emptyListContainer: {
     alignItems: 'center',
   },
+  playerContainer: {
+    marginBottom: 10,
+  },
 }));
 
-export default ServicesScreen;
+export default SermonsScreen;
