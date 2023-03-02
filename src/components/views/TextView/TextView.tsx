@@ -1,21 +1,22 @@
 import { AppTheme, useTheme } from 'theme';
 import { Platform, StatusBar, View } from 'react-native';
+import React, { useImperativeHandle } from 'react';
+import { TextViewMethods, TextViewProps } from './types';
 
 import { Input } from '@rneui/base';
-import React from 'react';
 import { makeStyles } from '@rneui/themed';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { viewport } from '@react-native-ajp-elements/ui';
 
-interface TextViewInterface {
-  placeholder?: string;
-  viewableHeightPercentage?: number;
-}
+type TextView = TextViewMethods;
 
-const TextView = ({
-  placeholder = 'Enter text here',
-  viewableHeightPercentage = 1,
-}: TextViewInterface) => {
+const TextView = React.forwardRef<TextView, TextViewProps>((props, ref) => {
+  const {
+    onTextChanged,
+    placeholder = 'Enter text here',
+    viewableHeightPercentage = 1,
+  } = props;
+
   const theme = useTheme();
   const s = useStyles(theme);
 
@@ -26,7 +27,16 @@ const TextView = ({
     insets.bottom -
     (Platform.OS === 'android' ? StatusBar.currentHeight || 0 : 0);
 
-  const [text, onChangeText] = React.useState('');
+  const [text, setText] = React.useState('');
+
+  useImperativeHandle(ref, () => ({
+    //  These functions exposed to the parent component through the ref.
+    getText,
+  }));
+
+  const getText = () => {
+    return text;
+  };
 
   return (
     <View style={[theme.styles.viewAlt, { paddingHorizontal: 0 }]}>
@@ -36,11 +46,14 @@ const TextView = ({
         multiline={true}
         placeholder={placeholder}
         value={text}
-        onChangeText={onChangeText}
+        onChangeText={t => {
+          setText(t);
+          onTextChanged(t);
+        }}
       />
     </View>
   );
-};
+});
 
 const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   text: {

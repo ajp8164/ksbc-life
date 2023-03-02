@@ -25,6 +25,8 @@ interface CardInterface {
   flexBasis?: number | string;
   footer?: string;
   footerStyle?: TextStyle | TextStyle[];
+  header?: string;
+  headerStyle?: TextStyle | TextStyle[];
   imageHeight?: number;
   imageSource?: ImageSource;
   imageWidth?: number | string;
@@ -40,6 +42,8 @@ const Card = ({
   flexBasis = '100%',
   footer,
   footerStyle,
+  header,
+  headerStyle,
   imageHeight = 100,
   imageSource,
   imageWidth = '100%',
@@ -61,6 +65,7 @@ const Card = ({
       {hasText && (
         <RNULCard.Section
           content={[
+            { text: header, style: { ...s.cardHeader, ...headerStyle } },
             { text: title, style: { ...s.cardTitle, ...titleStyle } },
             { text: body, style: { ...s.cardBody, ...bodyStyle } },
             { text: footer, style: { ...s.cardFooter, ...footerStyle } },
@@ -125,6 +130,10 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
     ...theme.styles.textSmall,
     ...theme.styles.textDim,
     paddingTop: 10,
+  },
+  cardHeader: {
+    ...theme.styles.textNormal,
+    alignSelf: 'center',
   },
   cardButtonContainer: {
     flexDirection: 'row',
