@@ -88,8 +88,8 @@ const SermonsScreen = ({ navigation }: Props) => {
     return (
       <View style={s.playerContainer}>
         <VideoCard
-          header={'John 3 | Jamie Auton'}
-          title={'Plan Ahead'}
+          header={'John 2:13-25 | Jamie Auton'}
+          title={'Spring Cleaning'}
           footer={`${date} | Series: Book of John`}
           imageSource={{ uri: item.snippet.thumbnails.high.url }}
           videoId={item.id.videoId}
@@ -120,8 +120,8 @@ const SermonsScreen = ({ navigation }: Props) => {
                 ]
               : []),
             {
-              label: 'About this sermon',
-              icon: 'information-outline',
+              label: 'Notes',
+              icon: 'note-edit-outline',
               iconType: 'material-community',
               onPress: () =>
                 navigation.navigate('SermonDetail', { id: item.id.videoId }),
@@ -141,7 +141,9 @@ const SermonsScreen = ({ navigation }: Props) => {
   };
 
   return (
-    <SafeAreaView edges={['left', 'right', 'top']} style={theme.styles.view}>
+    <SafeAreaView
+      edges={['left', 'right', 'top']}
+      style={[theme.styles.view, { paddingHorizontal: 0 }]}>
       <FlatList
         data={videos}
         renderItem={renderVideo}
@@ -149,7 +151,10 @@ const SermonsScreen = ({ navigation }: Props) => {
         keyExtractor={item => item.etag}
         onEndReachedThreshold={0.2}
         onEndReached={fetchVideos}
-        contentContainerStyle={{ paddingVertical: 15 }}
+        contentContainerStyle={{
+          paddingVertical: 15,
+          ...theme.styles.viewWidth,
+        }}
         contentInsetAdjustmentBehavior={'automatic'}
       />
     </SafeAreaView>

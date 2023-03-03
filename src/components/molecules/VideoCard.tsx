@@ -80,7 +80,9 @@ const VideoCard = ({
       : 300;
 
   return (
-    <RNULCard style={[s.card, cardStyle]}>
+    <RNULCard
+      containerStyle={{ shadowColor: theme.colors.shadowColor }}
+      style={[s.card, cardStyle]}>
       {showVideo ? (
         <View style={s.player}>
           <YoutubePlayer

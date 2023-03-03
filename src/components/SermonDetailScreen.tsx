@@ -1,10 +1,11 @@
-import { Alert, ScrollView } from 'react-native';
+import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { AppTheme, useTheme } from 'theme';
 import {
-  Divider,
-  ListItem,
+  BulletList,
   openShareSheet,
+  viewport,
 } from '@react-native-ajp-elements/ui';
+import { Button, Icon } from '@rneui/base';
 import React, { useEffect, useRef } from 'react';
 
 import Card from 'components/molecules/Card';
@@ -15,6 +16,7 @@ import { SermonsNavigatorParamList } from 'types/navigation';
 import { TextModal } from 'components/modals/TextModal';
 import { biometricAuthentication } from 'lib/biometricAuthentication';
 import { makeStyles } from '@rneui/themed';
+import { openURL } from '@react-native-ajp-elements/core';
 
 export type Props = NativeStackScreenProps<
   SermonsNavigatorParamList,
@@ -43,7 +45,7 @@ const SermonDetailScreen = ({ navigation, route }: Props) => {
 
   useEffect(() => {
     navigation.setOptions({
-      title: 'Be Patient',
+      title: 'Spring Cleaning',
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -60,10 +62,7 @@ const SermonDetailScreen = ({ navigation, route }: Props) => {
               onPress: () => doDeleteNote(id),
               style: 'destructive',
             },
-            {
-              text: 'No',
-              style: 'cancel',
-            },
+            { text: 'No', style: 'cancel' },
           ],
           { cancelable: false },
         );
@@ -79,60 +78,153 @@ const SermonDetailScreen = ({ navigation, route }: Props) => {
     console.log('save note', text);
   };
 
+  const date = DateTime.fromISO('2023-01-30T05:51:01Z')
+    .minus({ day: 1 }) // Videos posted 1 day after recording
+    .toFormat('MMM d, yyyy');
+
+  const lifeApplication = ['He is our Passover', 'Hearts are the priority'];
+
+  const renderDescriptionItem = (args: {
+    iconName: string;
+    iconType?: string;
+    text: string;
+    url?: string;
+  }) => {
+    return (
+      <TouchableOpacity
+        onPress={() => args.url && openURL(args.url)}
+        activeOpacity={args.url ? 0.2 : 1}>
+        <View style={s.descriptionItemContainer}>
+          <Icon
+            name={args.iconName}
+            type={args.iconType || 'material-community'}
+            color={theme.colors.brandSecondary}
+            size={28}
+          />
+          <Text style={s.descriptionItemText}>{args.text}</Text>
+          {args.url && (
+            <Icon
+              name={'open-in-new'}
+              type={'material-community'}
+              color={theme.colors.text}
+              size={12}
+              containerStyle={{ left: 15, top: 8 }}
+            />
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   return (
-    <SafeAreaView edges={['left', 'right']} style={theme.styles.view}>
+    <SafeAreaView
+      edges={['left', 'right']}
+      style={[theme.styles.view, { paddingHorizontal: 0 }]}>
       <ScrollView
+        contentContainerStyle={{ paddingBottom: 20 }}
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior={'automatic'}>
-        <Divider />
-        <ListItem
-          title={'Add New Notes'}
-          position={['first', 'last']}
-          onPress={() => textModalRef.current?.present()}
-        />
-        <Divider text={'SERMON NOTES'} />
-        {notes.map(note => {
-          return (
-            <Card
-              key={note.id}
-              body={note.text}
-              footer={`Updated: ${DateTime.fromISO(note.lastUpdated).toFormat(
-                'MMM dd, yyyy',
-              )}`}
-              footerStyle={{
-                ...theme.styles.textNormal,
-                alignSelf: 'flex-start',
-              }}
-              buttons={[
-                {
-                  label: 'Share',
-                  icon: 'share-variant',
-                  onPress: () => {
-                    openShareSheet({
-                      title: 'John 3:16 CSB',
-                      message:
-                        'For God loved the world in this way: He gave his one and only Son, so that everyone who believes in him will not perish but have eternal life.',
-                    });
+        <Text style={s.sermonTitle}>{'Spring Cleaning'}</Text>
+        <View style={{ paddingTop: 20 }}>
+          <View style={{ alignItems: 'center' }}>
+            <View>
+              {renderDescriptionItem({
+                iconName: 'book-open-page-variant-outline',
+                text: 'John 2:13-25',
+                url: 'https://bible.com/bible/1713/jhn.2.13.CSB',
+              })}
+              {renderDescriptionItem({
+                iconName: 'sunny',
+                iconType: 'ionicon',
+                text: 'Series: Book of John',
+              })}
+              {renderDescriptionItem({
+                iconName: 'account-circle-outline',
+                text: 'Jamie Auton',
+              })}
+              {renderDescriptionItem({
+                iconName: 'calendar-today',
+                text: date,
+              })}
+            </View>
+          </View>
+          <Card
+            header={'Life Application'}
+            headerStyle={s.laHeader}
+            title={'The cleansing of the temple by Jesus revealed...'}
+            titleStyle={s.laTitle}
+            BodyComponent={
+              <View style={{ alignItems: 'center' }}>
+                <BulletList
+                  containerStyle={{ marginTop: -10 }}
+                  bulletStyle={s.laBullet}
+                  type={'ordered'}
+                  items={lifeApplication.map(b => {
+                    return <Text style={s.laBulletText}>{b}</Text>;
+                  })}
+                />
+              </View>
+            }
+            cardStyle={s.laCardStyle}
+          />
+        </View>
+        <View style={s.sectionHeaderContainer}>
+          <Text style={s.sectionHeaderTitle}>{'SERMON NOTES'}</Text>
+          <Button
+            type={'clear'}
+            title={'Add Note'}
+            titleStyle={theme.styles.buttonClearTitle}
+            buttonStyle={s.addNoteButton}
+            containerStyle={s.addNoteButtonContainer}
+            onPress={() => textModalRef.current?.present()}
+          />
+        </View>
+        {notes.length > 0 ? (
+          notes.map(note => {
+            return (
+              <Card
+                key={note.id}
+                cardStyle={s.noteCard}
+                body={note.text}
+                footer={`Updated: ${DateTime.fromISO(note.lastUpdated).toFormat(
+                  'MMM dd, yyyy',
+                )}`}
+                footerStyle={s.noteFooter}
+                buttons={[
+                  {
+                    label: 'Share',
+                    icon: 'share-variant',
+                    onPress: () => {
+                      openShareSheet({
+                        title: 'John 3:16 CSB',
+                        message:
+                          'For God loved the world in this way: He gave his one and only Son, so that everyone who believes in him will not perish but have eternal life.',
+                      });
+                    },
                   },
-                },
-                {
-                  label: 'Edit',
-                  icon: 'note-edit-outline',
-                  onPress: () => {
-                    console.log('edit');
+                  {
+                    label: 'Edit',
+                    icon: 'note-edit-outline',
+                    onPress: () => {
+                      console.log('edit');
+                    },
                   },
-                },
-                {
-                  label: 'Delete',
-                  icon: 'trash-can-outline',
-                  onPress: () => {
-                    confirmDeleteNote(note.id);
+                  {
+                    label: 'Delete',
+                    icon: 'trash-can-outline',
+                    onPress: () => {
+                      confirmDeleteNote(note.id);
+                    },
                   },
-                },
-              ]}
-            />
-          );
-        })}
+                ]}
+              />
+            );
+          })
+        ) : (
+          <Text style={s.noNotesText}>
+            {'Hey! How about writing\nsome notes about this sermon?'}
+          </Text>
+        )}
       </ScrollView>
       <TextModal
         ref={textModalRef}
@@ -143,8 +235,85 @@ const SermonDetailScreen = ({ navigation, route }: Props) => {
   );
 };
 
-const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
-  text: {},
+const useStyles = makeStyles((_theme, theme: AppTheme) => ({
+  sectionHeaderContainer: {
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'space-between',
+    height: 40,
+    marginHorizontal: 5,
+    paddingTop: 20,
+    backgroundColor: theme.colors.listHeaderBackground,
+    width: viewport.width - 40,
+    alignSelf: 'center',
+  },
+  sectionHeaderTitle: {
+    ...theme.styles.textSmall,
+    ...theme.styles.textBold,
+    color: theme.colors.textDim,
+  },
+  addNoteButtonContainer: {},
+  addNoteButton: {
+    ...theme.styles.buttonClear,
+    minWidth: 0,
+    paddingRight: 0,
+    justifyContent: 'flex-end',
+    top: -12,
+  },
+  descriptionItemContainer: {
+    flexDirection: 'row',
+    marginBottom: 5,
+  },
+  descriptionItemText: {
+    ...theme.styles.textNormal,
+    top: 4,
+    left: 10,
+  },
+  sermonTitle: {
+    ...theme.styles.textHeading4,
+    ...theme.styles.textBold,
+    color: theme.colors.brandSecondary,
+    alignSelf: 'center',
+    paddingTop: 20,
+  },
+  laHeader: {
+    ...theme.styles.textSmall,
+    color: theme.colors.whiteTransparentDark,
+  },
+  laTitle: {
+    ...theme.styles.textHeading5,
+    color: theme.colors.stickyWhite,
+    marginTop: 15,
+  },
+  laBullet: {
+    ...theme.styles.textNormal,
+    ...theme.styles.textBold,
+    color: theme.colors.stickyWhite,
+  },
+  laBulletText: {
+    ...theme.styles.textNormal,
+    color: theme.colors.stickyWhite,
+  },
+  laCardStyle: {
+    paddingBottom: 20,
+    marginTop: 35,
+    marginBottom: 30,
+    backgroundColor: theme.colors.brandPrimary,
+    ...theme.styles.viewWidth,
+  },
+  noteCard: {
+    marginTop: 25,
+    ...theme.styles.viewWidth,
+  },
+  noteFooter: {
+    ...theme.styles.textSmall,
+    alignSelf: 'flex-start',
+  },
+  noNotesText: {
+    ...theme.styles.textNormal,
+    textAlign: 'center',
+    marginTop: 30,
+  },
 }));
 
 export default SermonDetailScreen;

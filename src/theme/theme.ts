@@ -8,11 +8,13 @@ export const theme = createTheme(
       brandPrimary: '#194E6A',
       brandSecondary: '#80BFE1',
       cardBackground: '#202020',
+      shadowColor: '#00000000',
     },
     lightColors: {
       brandPrimary: '#194E6A',
       brandSecondary: '#80BFE1',
       cardBackground: '#FFFFFF',
+      shadowColor: '#000000',
     },
   }),
 );

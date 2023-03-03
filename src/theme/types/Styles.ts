@@ -1,5 +1,6 @@
-import { TextStyle } from 'react-native';
+import { TextStyle, ViewStyle } from 'react-native';
 
 export type Styles = {
   example: TextStyle;
+  viewWidth: ViewStyle;
 };

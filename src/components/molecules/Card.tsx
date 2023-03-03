@@ -6,15 +6,16 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import React, { ReactNode } from 'react';
 
 import { ImageSource } from 'react-native-vector-icons/Icon';
 import { Card as RNULCard } from 'react-native-ui-lib';
-import React from 'react';
 import { makeStyles } from '@rneui/themed';
 
 interface CardInterface {
   body?: string;
   bodyStyle?: TextStyle | TextStyle[];
+  BodyComponent?: ReactNode;
   buttons?: {
     label?: string;
     icon?: string;
@@ -37,6 +38,7 @@ interface CardInterface {
 const Card = ({
   body,
   bodyStyle,
+  BodyComponent,
   buttons = [],
   cardStyle,
   flexBasis = '100%',
@@ -73,6 +75,7 @@ const Card = ({
           style={s.cardContent}
         />
       )}
+      {BodyComponent}
       {buttons.length > 0 && (
         <View style={s.cardButtonContainer}>
           {buttons.map(b => {
