@@ -7,6 +7,10 @@ export const selectUserProfile = createSelector(selectAppState, appState => {
   return appState.userProfile;
 });
 
+export const selectRoles = createSelector(selectAppState, appState => {
+  return appState.userProfile?.roles;
+});
+
 export const selectUser = createSelector(selectAppState, appState => {
   return appState.userProfile?.user;
 });

@@ -7,6 +7,10 @@ export enum StartupScreen {
   Welcome = 'Welcome',
 }
 
+export type AdminNavigatorParamList = {
+  AdminHome: undefined;
+};
+
 export type GivingNavigatorParamList = {
   Giving: undefined;
   GivingBrowser: undefined;
@@ -49,4 +53,6 @@ export type TabNavigatorParamList = {
   HomeTab: undefined;
   MoreTab: undefined;
   SermonsTab: undefined;
+  // Admin Tabs
+  AdminTab: undefined;
 };

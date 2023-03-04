@@ -5,12 +5,14 @@ import { Tou } from 'types/tou';
 import { revertAll } from 'store/actions';
 
 export interface AppSettingsState {
+  adminMode: boolean;
   biometrics: boolean;
   themeSettings: ThemeSettings;
   tou: Tou;
 }
 
 export const initialAppSettingsState = Object.freeze<AppSettingsState>({
+  adminMode: false,
   biometrics: true,
   themeSettings: {
     followDevice: true,
@@ -20,6 +22,16 @@ export const initialAppSettingsState = Object.freeze<AppSettingsState>({
     accepted: undefined,
   },
 });
+
+const handleSaveAdminMode: CaseReducer<
+  AppSettingsState,
+  PayloadAction<{ value: boolean }>
+> = (state, { payload }) => {
+  return {
+    ...state,
+    adminMode: payload.value,
+  };
+};
 
 const handleSaveBiometrics: CaseReducer<
   AppSettingsState,
@@ -58,6 +70,7 @@ const appSettingsSlice = createSlice({
     builder.addCase(revertAll, () => initialAppSettingsState),
   reducers: {
     saveAcceptTou: handleSaveAcceptTou,
+    saveAdminMode: handleSaveAdminMode,
     saveBiometrics: handleSaveBiometrics,
     saveThemeSettings: handleSaveThemeSettings,
   },
@@ -65,5 +78,6 @@ const appSettingsSlice = createSlice({
 
 export const appSettingsReducer = appSettingsSlice.reducer;
 export const saveAcceptTou = appSettingsSlice.actions.saveAcceptTou;
+export const saveAdminMode = appSettingsSlice.actions.saveAdminMode;
 export const saveBiometrics = appSettingsSlice.actions.saveBiometrics;
 export const saveThemeSettings = appSettingsSlice.actions.saveThemeSettings;

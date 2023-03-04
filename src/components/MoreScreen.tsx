@@ -1,26 +1,30 @@
 import { AppTheme, useTheme } from 'theme';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import {
-  MainNavigatorParamList,
   MoreNavigatorParamList,
+  TabNavigatorParamList,
 } from 'types/navigation';
 import React, { useEffect, useRef } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { Button } from '@rneui/base';
 import { CompositeScreenProps } from '@react-navigation/core';
 import { Image } from '@rneui/base';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SignInModal } from 'components/modals/SignInModal';
+import { UserRole } from 'types/user';
 import { appConfig } from 'config';
 import auth from '@react-native-firebase/auth';
 import { makeStyles } from '@rneui/themed';
+import { saveAdminMode } from 'store/slices/appSettings';
 import { saveUser } from 'store/slices/userProfile';
+import { selectRoles } from 'store/selectors/userProfileSelectors';
 import { selectUser } from 'store/selectors/userProfileSelectors';
 
-type Props = CompositeScreenProps<
+export type Props = CompositeScreenProps<
   NativeStackScreenProps<MoreNavigatorParamList, 'More'>,
-  NativeStackScreenProps<MainNavigatorParamList>
+  NativeStackScreenProps<TabNavigatorParamList>
 >;
 
 const MoreScreen = ({ navigation, route }: Props) => {
@@ -30,6 +34,7 @@ const MoreScreen = ({ navigation, route }: Props) => {
 
   const signInModalRef = useRef<SignInModal>(null);
   const user = useSelector(selectUser);
+  const userRoles = useSelector(selectRoles);
 
   useEffect(() => {
     if (route.params?.subNav) {
@@ -48,6 +53,28 @@ const MoreScreen = ({ navigation, route }: Props) => {
       signInModalRef.current?.dismiss();
     });
     return unsubscribe;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    navigation.setOptions({
+      // eslint-disable-next-line react/no-unstable-nested-components
+      headerRight: () => (
+        <>
+          {userRoles.includes(UserRole.admin) && (
+            <Button
+              type={'clear'}
+              title={'Enter Admin'}
+              titleStyle={{ color: theme.colors.assertive }}
+              onPress={() => {
+                dispatch(saveAdminMode({ value: true }));
+                navigation.navigate('AdminTab');
+              }}
+            />
+          )}
+        </>
+      ),
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -113,10 +140,10 @@ const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
     left: -3,
     top: 1,
   },
-  signInButtonContainer: {
+  adminButtonContainer: {
     width: '80%',
     alignSelf: 'center',
-    marginBottom: 15,
+    marginTop: 30,
   },
 }));
 

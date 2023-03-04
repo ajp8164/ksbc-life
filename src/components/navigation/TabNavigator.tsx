@@ -1,6 +1,7 @@
 import { Platform, StatusBar, Text } from 'react-native';
 import React, { useEffect } from 'react';
 
+import AdminNavigator from './AdminNavigator';
 import GivingNavigator from './GivingNavigator';
 import HomeNavigator from './HomeNavigator';
 import { Icon } from '@rneui/base';
@@ -9,12 +10,16 @@ import SermonsNavigator from './SermonsNavigator';
 import SystemNavigationBar from 'react-native-system-navigation-bar';
 import { TabNavigatorParamList } from 'types/navigation';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { selectAdminMode } from 'store/selectors/appSettingsSelectors';
+import { useSelector } from 'react-redux';
 import { useTheme } from 'theme';
 
 const Tab = createBottomTabNavigator<TabNavigatorParamList>();
 
 const TabNavigator = () => {
   const theme = useTheme();
+
+  const adminMode = useSelector(selectAdminMode);
 
   useEffect(() => {
     StatusBar.setBarStyle(
@@ -64,6 +69,7 @@ const TabNavigator = () => {
         name="HomeTab"
         component={HomeNavigator}
         options={{
+          tabBarButton: adminMode ? () => null : undefined,
           tabBarLabel: 'Home',
           // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({ color }) => (
@@ -80,6 +86,7 @@ const TabNavigator = () => {
         name="SermonsTab"
         component={SermonsNavigator}
         options={{
+          tabBarButton: adminMode ? () => null : undefined,
           tabBarLabel: 'Sermons',
           // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({ color }) => (
@@ -96,6 +103,7 @@ const TabNavigator = () => {
         name="GivingTab"
         component={GivingNavigator}
         options={{
+          tabBarButton: adminMode ? () => null : undefined,
           tabBarLabel: 'Giving',
           // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({ color }) => (
@@ -112,11 +120,30 @@ const TabNavigator = () => {
         name="MoreTab"
         component={MoreNavigator}
         options={{
+          tabBarButton: adminMode ? () => null : undefined,
           tabBarLabel: 'More',
           // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({ color }) => (
             <Icon
               name={'microsoft-xbox-controller-menu'}
+              type={'material-community'}
+              color={color}
+              size={28}
+            />
+          ),
+        }}
+      />
+      {/* Admin Tabs */}
+      <Tab.Screen
+        name="AdminTab"
+        component={AdminNavigator}
+        options={{
+          tabBarButton: adminMode ? undefined : () => null,
+          tabBarLabel: 'Admin',
+          // eslint-disable-next-line react/no-unstable-nested-components
+          tabBarIcon: ({ color }) => (
+            <Icon
+              name={'cloud-upload'}
               type={'material-community'}
               color={color}
               size={28}
