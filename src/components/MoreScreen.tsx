@@ -61,7 +61,7 @@ const MoreScreen = ({ navigation, route }: Props) => {
       // eslint-disable-next-line react/no-unstable-nested-components
       headerRight: () => (
         <>
-          {userRoles.includes(UserRole.admin) && (
+          {!userRoles.includes(UserRole.admin) && ( // TODO: remove ! - TESTING
             <Button
               type={'clear'}
               title={'Enter Admin'}

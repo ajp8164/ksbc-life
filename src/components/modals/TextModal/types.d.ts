@@ -4,7 +4,7 @@ export declare type TextModal = ModalMethods;
 
 declare const LegalModal: React.MemoExoticComponent<
   React.ForwardRefExoticComponent<
-    ModalProps & React.RefAttributes<ModalMethods>
+    TextModalProps & React.RefAttributes<TextModalMethods>
   >
 >;
 

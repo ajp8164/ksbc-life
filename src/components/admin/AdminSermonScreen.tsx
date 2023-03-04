@@ -3,42 +3,31 @@ import {
   TabNavigatorParamList,
 } from 'types/navigation';
 import { AppTheme, useTheme } from 'theme';
-import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import React, { useEffect } from 'react';
 
-import { Button } from '@rneui/base';
 import { CompositeScreenProps } from '@react-navigation/core';
+import { Divider } from '@react-native-ajp-elements/ui';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
-import { dispatch } from 'store';
 import { makeStyles } from '@rneui/themed';
-import { saveAdminMode } from 'store/slices/appSettings';
+import { selectSermon } from 'store/selectors/adminSelectors';
+import { useSelector } from 'react-redux';
 
 type Props = CompositeScreenProps<
-  NativeStackScreenProps<AdminNavigatorParamList, 'AdminHome'>,
+  NativeStackScreenProps<AdminNavigatorParamList, 'AdminSermon'>,
   NativeStackScreenProps<TabNavigatorParamList>
 >;
 
-const AdminHomeScreen = ({ navigation }: Props) => {
+const AdminSermonScreen = ({ navigation, route }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
+  const sermon = useSelector(selectSermon(route.params?.sermonId));
+
   useEffect(() => {
     navigation.setOptions({
-      // eslint-disable-next-line react/no-unstable-nested-components
-      headerRight: () => (
-        <>
-          <Button
-            type={'clear'}
-            title={'Exit Admin'}
-            onPress={() => {
-              dispatch(saveAdminMode({ value: false }));
-              navigation.navigate('MoreTab');
-            }}
-          />
-        </>
-      ),
+      title: sermon?.title || '',
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -49,13 +38,6 @@ const AdminHomeScreen = ({ navigation }: Props) => {
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior={'automatic'}>
         <Divider />
-        <ListItem
-          title={'Sermons'}
-          position={['first', 'last']}
-          leftImage={'cross-outline'}
-          leftImageType={'material-community'}
-          onPress={() => navigation.navigate('AdminSermons')}
-        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -67,4 +49,4 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   },
 }));
 
-export default AdminHomeScreen;
+export default AdminSermonScreen;

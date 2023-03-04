@@ -9,6 +9,10 @@ export enum StartupScreen {
 
 export type AdminNavigatorParamList = {
   AdminHome: undefined;
+  AdminSermon: {
+    sermonId: string;
+  };
+  AdminSermons: undefined;
 };
 
 export type GivingNavigatorParamList = {

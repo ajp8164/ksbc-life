@@ -1,3 +1,4 @@
+import { AdminState, initialAdminState } from 'store/slices/admin';
 import {
   AppSettingsState,
   initialAppSettingsState,
@@ -14,6 +15,7 @@ import {
 import { VideosState, initialVideosState } from 'store/slices/videos';
 
 export interface StoreState {
+  admin: AdminState;
   app: AppState;
   appSettings: AppSettingsState;
   networkStatus: NetworkStatusState;
@@ -22,6 +24,7 @@ export interface StoreState {
 }
 
 export const initialStoreState = Object.freeze<StoreState>({
+  admin: initialAdminState,
   app: initialAppState,
   appSettings: initialAppSettingsState,
   networkStatus: initialNetworkStatusState,
