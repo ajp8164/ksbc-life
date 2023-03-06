@@ -1,13 +1,13 @@
-import { NewSermonModalMethods, NewSermonModalProps } from './types';
+import { AddSermonModalMethods, AddSermonModalProps } from './types';
 import React, { useImperativeHandle, useRef } from 'react';
 
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { Modal } from '@react-native-ajp-elements/ui';
-import NewSermonView from 'components/admin/views/NewSermonView';
+import SermonEditorView from 'components/admin/views/SermonEditorView';
 
-type NewSermonModal = NewSermonModalMethods;
+type AddSermonModal = AddSermonModalMethods;
 
-const NewSermonModal = React.forwardRef<NewSermonModal, NewSermonModalProps>(
+const AddSermonModal = React.forwardRef<AddSermonModal, AddSermonModalProps>(
   (_props, ref) => {
     const innerRef = useRef<BottomSheetModalMethods>(null);
 
@@ -27,10 +27,10 @@ const NewSermonModal = React.forwardRef<NewSermonModal, NewSermonModalProps>(
 
     return (
       <Modal ref={innerRef}>
-        <NewSermonView />
+        <SermonEditorView />
       </Modal>
     );
   },
 );
 
-export { NewSermonModal };
+export { AddSermonModal };

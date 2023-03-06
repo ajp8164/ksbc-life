@@ -54,7 +54,7 @@ const AdminHomeScreen = ({ navigation }: Props) => {
           position={['first', 'last']}
           leftImage={'cross-outline'}
           leftImageType={'material-community'}
-          onPress={() => navigation.navigate('AdminSermons')}
+          onPress={() => navigation.navigate('AdminSermonsList')}
         />
       </ScrollView>
     </SafeAreaView>

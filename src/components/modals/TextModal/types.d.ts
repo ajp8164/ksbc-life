@@ -1,6 +1,6 @@
 import React from 'react';
 
-export declare type TextModal = ModalMethods;
+export declare type TextModal = TextModalMethods;
 
 declare const LegalModal: React.MemoExoticComponent<
   React.ForwardRefExoticComponent<

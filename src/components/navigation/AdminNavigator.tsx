@@ -1,7 +1,7 @@
 import AdminHomeScreen from 'components/admin/AdminHomeScreen';
 import { AdminNavigatorParamList } from 'types/navigation';
 import AdminSermonScreen from 'components/admin/AdminSermonScreen';
-import AdminSermonsScreen from 'components/admin/AdminSermonsScreen';
+import AdminSermonsListScreen from 'components/admin/AdminSermonsListScreen';
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from 'theme';
@@ -37,8 +37,8 @@ const AdminNavigator = () => {
         }}
       />
       <AdminStack.Screen
-        name="AdminSermons"
-        component={AdminSermonsScreen}
+        name="AdminSermonsList"
+        component={AdminSermonsListScreen}
         options={{
           title: 'Sermons',
           headerLeft: () => null,

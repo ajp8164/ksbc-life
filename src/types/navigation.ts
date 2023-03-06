@@ -12,7 +12,7 @@ export type AdminNavigatorParamList = {
   AdminSermon: {
     sermonId: string;
   };
-  AdminSermons: undefined;
+  AdminSermonsList: undefined;
 };
 
 export type GivingNavigatorParamList = {

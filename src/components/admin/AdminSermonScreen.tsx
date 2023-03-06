@@ -6,10 +6,10 @@ import { AppTheme, useTheme } from 'theme';
 import React, { useEffect } from 'react';
 
 import { CompositeScreenProps } from '@react-navigation/core';
-import { Divider } from '@react-native-ajp-elements/ui';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
+import SermonEditorView from 'components/admin/views/SermonEditorView';
 import { makeStyles } from '@rneui/themed';
 import { selectSermon } from 'store/selectors/adminSelectors';
 import { useSelector } from 'react-redux';
@@ -37,7 +37,7 @@ const AdminSermonScreen = ({ navigation, route }: Props) => {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior={'automatic'}>
-        <Divider />
+        <SermonEditorView />
       </ScrollView>
     </SafeAreaView>
   );

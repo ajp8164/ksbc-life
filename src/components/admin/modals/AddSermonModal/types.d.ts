@@ -1,17 +1,17 @@
 import React from 'react';
 
-export declare type NewSermonModal = ModalMethods;
+export declare type AddSermonModal = AddSermonModalMethods;
 
 declare const LegalModal: React.MemoExoticComponent<
   React.ForwardRefExoticComponent<
-    NewSermonModalProps & React.RefAttributes<NewSermonModalMethods>
+    AddSermonModalProps & React.RefAttributes<AddSermonModalMethods>
   >
 >;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface NewSermonModalProps {}
+export interface AddSermonModalProps {}
 
-export interface NewSermonModalMethods {
+export interface AddSermonModalMethods {
   dismiss: () => void;
   present: () => void;
 }

@@ -7,9 +7,9 @@ import { Button, Icon } from '@rneui/base';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import React, { useEffect, useRef } from 'react';
 
+import { AddSermonModal } from 'components/admin/modals/AddSermonModal';
 import { CompositeScreenProps } from '@react-navigation/core';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { NewSermonModal } from 'components/admin/modals/NewSermonModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
 import { makeStyles } from '@rneui/themed';
@@ -17,15 +17,15 @@ import { selectSermons } from 'store/selectors/adminSelectors';
 import { useSelector } from 'react-redux';
 
 type Props = CompositeScreenProps<
-  NativeStackScreenProps<AdminNavigatorParamList, 'AdminSermons'>,
+  NativeStackScreenProps<AdminNavigatorParamList, 'AdminSermonsList'>,
   NativeStackScreenProps<TabNavigatorParamList>
 >;
 
-const AdminSermonsScreen = ({ navigation }: Props) => {
+const AdminSermonsListScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
-  const newSermonModalRef = useRef<NewSermonModal>(null);
+  const addSermonModalRef = useRef<AddSermonModal>(null);
   const sermons = useSelector(selectSermons);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const AdminSermonsScreen = ({ navigation }: Props) => {
                 size={28}
               />
             }
-            onPress={() => newSermonModalRef.current?.present()}
+            onPress={() => addSermonModalRef.current?.present()}
           />
         </>
       ),
@@ -78,7 +78,7 @@ const AdminSermonsScreen = ({ navigation }: Props) => {
           );
         })}
       </ScrollView>
-      <NewSermonModal ref={newSermonModalRef} />
+      <AddSermonModal ref={addSermonModalRef} />
     </SafeAreaView>
   );
 };
@@ -89,4 +89,4 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   },
 }));
 
-export default AdminSermonsScreen;
+export default AdminSermonsListScreen;
