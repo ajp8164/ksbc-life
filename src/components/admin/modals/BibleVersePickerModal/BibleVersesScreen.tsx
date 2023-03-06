@@ -1,9 +1,10 @@
 import { AppTheme, useTheme } from 'theme';
-import { BibleVerse, BibleVersePickerNavigatorParamList } from './types';
 import React, { useContext, useEffect, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 
+import { BibleVerse } from 'types/bible';
 import { BibleVerseContext } from './BibleVersePickerModal';
+import { BibleVersePickerNavigatorParamList } from './types';
 import { Button } from '@rneui/base';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { makeStyles } from '@rneui/themed';

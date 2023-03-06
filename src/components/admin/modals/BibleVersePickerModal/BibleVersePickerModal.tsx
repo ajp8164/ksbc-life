@@ -1,5 +1,4 @@
 import {
-  BibleVerse,
   BibleVersePickerModalMethods,
   BibleVersePickerModalProps,
   BibleVersePickerNavigatorParamList,
@@ -12,6 +11,7 @@ import React, {
 } from 'react';
 
 import BibleBookChaptersScreen from './BibleBookChaptersScreen';
+import { BibleVerse } from 'types/bible';
 import BibleVersesScreen from './BibleVersesScreen';
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { Modal } from '@react-native-ajp-elements/ui';

@@ -1,3 +1,4 @@
+import { BibleVerse } from 'types/bible';
 import React from 'react';
 
 export declare type BibleVersePickerModal = BibleVersePickerModalMethods;
@@ -24,14 +25,5 @@ export type BibleVersePickerNavigatorParamList = {
     book: string;
     chapter: string;
     verseCount: number;
-  };
-};
-
-export type BibleVerse = {
-  book: string;
-  chapter: string;
-  verse: {
-    start: string;
-    end: string;
   };
 };

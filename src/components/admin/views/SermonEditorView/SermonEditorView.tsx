@@ -7,6 +7,7 @@ import { ListItem, ListItemInput } from '@react-native-ajp-elements/ui';
 import React, { useRef } from 'react';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
+import { BibleVerse } from 'types/bible';
 import { BibleVersePickerModal } from 'components/admin/modals/BibleVersePickerModal';
 import { DatePickerModal } from 'components/modals/DatePickerModal';
 import { DateTime } from 'luxon';
@@ -149,6 +150,10 @@ const SermonEditorView = () => {
     console.log('pasteur', pasteur);
   };
 
+  const onBibleVerseChange = (bibleVerse: BibleVerse): void => {
+    console.log('bibleVerse', bibleVerse);
+  };
+
   return (
     <>
       <AvoidSoftInputView style={{ flex: 1 }}>
@@ -184,9 +189,27 @@ const SermonEditorView = () => {
                   title={'Paster'}
                   onPress={() => pasteurPickerModalRef.current?.present()}
                 />
-                <ListItem
-                  title={'Bible Reference'}
-                  onPress={() => bibleVersePickerModalRef.current?.present()}
+                <ListItemInput
+                  refInner={refPasteur}
+                  placeholder={'Guest Pasteur Name'}
+                  placeholderTextColor={theme.colors.textPlaceholder}
+                  value={formik.values.pasteur}
+                  errorText={
+                    formik.values.pasteur !== formik.initialValues.pasteur
+                      ? formik.errors.pasteur
+                      : undefined
+                  }
+                  errorColor={theme.colors.error}
+                  autoCapitalize={'none'}
+                  autoCorrect={false}
+                  onBlur={() => {
+                    formik.handleBlur('pasteur');
+                    setEditorState({ focusedField: undefined });
+                  }}
+                  onChangeText={formik.handleChange('pasteur')}
+                  onFocus={() =>
+                    setEditorState({ focusedField: Fields.pasteur })
+                  }
                 />
                 <ListItemInput
                   refInner={refTitle}
@@ -207,28 +230,6 @@ const SermonEditorView = () => {
                   }}
                   onChangeText={formik.handleChange('title')}
                   onFocus={() => setEditorState({ focusedField: Fields.title })}
-                />
-                <ListItemInput
-                  refInner={refPasteur}
-                  placeholder={'Pasteur Name'}
-                  placeholderTextColor={theme.colors.textPlaceholder}
-                  value={formik.values.pasteur}
-                  errorText={
-                    formik.values.pasteur !== formik.initialValues.pasteur
-                      ? formik.errors.pasteur
-                      : undefined
-                  }
-                  errorColor={theme.colors.error}
-                  autoCapitalize={'none'}
-                  autoCorrect={false}
-                  onBlur={() => {
-                    formik.handleBlur('pasteur');
-                    setEditorState({ focusedField: undefined });
-                  }}
-                  onChangeText={formik.handleChange('pasteur')}
-                  onFocus={() =>
-                    setEditorState({ focusedField: Fields.pasteur })
-                  }
                 />
                 <ListItemInput
                   refInner={refSeriesTitle}
@@ -253,27 +254,9 @@ const SermonEditorView = () => {
                     setEditorState({ focusedField: Fields.seriesTitle })
                   }
                 />
-                <ListItemInput
-                  refInner={refBibleRef}
-                  placeholder={'Bible Reference'}
-                  placeholderTextColor={theme.colors.textPlaceholder}
-                  value={formik.values.bibleRef}
-                  errorText={
-                    formik.values.bibleRef !== formik.initialValues.bibleRef
-                      ? formik.errors.bibleRef
-                      : undefined
-                  }
-                  errorColor={theme.colors.error}
-                  autoCapitalize={'none'}
-                  autoCorrect={false}
-                  onBlur={() => {
-                    formik.handleBlur('bibleRef');
-                    setEditorState({ focusedField: undefined });
-                  }}
-                  onChangeText={formik.handleChange('bibleRef')}
-                  onFocus={() =>
-                    setEditorState({ focusedField: Fields.bibleRef })
-                  }
+                <ListItem
+                  title={'Bible Reference'}
+                  onPress={() => bibleVersePickerModalRef.current?.present()}
                 />
                 <ListItemInput
                   refInner={refVideoId}
@@ -453,7 +436,7 @@ const SermonEditorView = () => {
       />
       <BibleVersePickerModal
         ref={bibleVersePickerModalRef}
-        onDismiss={bibleVerse => console.log('final', bibleVerse)}
+        onDismiss={onBibleVerseChange}
       />
       {/* This isn't working inside bottomsheet.
       {Platform.OS === 'ios' && (
