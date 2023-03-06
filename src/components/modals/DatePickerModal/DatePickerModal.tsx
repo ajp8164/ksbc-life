@@ -11,7 +11,7 @@ type DatePickerModal = DatePickerModalMethods;
 
 const DatePickerModal = React.forwardRef<DatePickerModal, DatePickerModalProps>(
   (props, ref) => {
-    const { onValueChange, title } = props;
+    const { onValueChange, title, value } = props;
     const theme = useTheme();
     const s = useStyles(theme);
 
@@ -44,7 +44,7 @@ const DatePickerModal = React.forwardRef<DatePickerModal, DatePickerModalProps>(
         {title && <Text style={s.title}>{title}</Text>}
         <Picker
           useDatePicker={true}
-          value={new Date()}
+          value={value || new Date()}
           onValueChange={onChange}
         />
       </Modal>

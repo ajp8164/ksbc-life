@@ -29,6 +29,7 @@ const BibleBookChaptersScreen = ({ navigation }: Props) => {
       {bible.map(book => {
         return (
           <ListItemAccordian
+            key={book.name}
             title={book.name}
             titleStyle={theme.styles.textNormal}
             containerStyle={{
@@ -40,6 +41,7 @@ const BibleBookChaptersScreen = ({ navigation }: Props) => {
               {book.chapters.map((_chapter, chapterIndex) => {
                 return (
                   <Button
+                    key={chapterIndex}
                     title={(chapterIndex + 1).toString()}
                     titleStyle={{ color: theme.colors.text }}
                     buttonStyle={s.button}

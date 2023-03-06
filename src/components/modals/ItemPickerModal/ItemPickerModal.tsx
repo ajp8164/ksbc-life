@@ -11,8 +11,15 @@ type ItemPickerModal = ItemPickerModalMethods;
 
 const ItemPickerModal = React.forwardRef<ItemPickerModal, ItemPickerModalProps>(
   (props, ref) => {
-    const { items, itemWidth, labels, onValueChange, placeholder, title } =
-      props;
+    const {
+      items,
+      itemWidth,
+      labels,
+      onValueChange,
+      placeholder,
+      title,
+      value,
+    } = props;
     const theme = useTheme();
     const s = useStyles(theme);
 
@@ -48,7 +55,7 @@ const ItemPickerModal = React.forwardRef<ItemPickerModal, ItemPickerModalProps>(
           itemWidth={itemWidth}
           labels={labels}
           placeholder={placeholder}
-          value={new Date()}
+          value={value || ''}
           onValueChange={onChange}
         />
       </Modal>

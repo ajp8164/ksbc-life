@@ -15,6 +15,7 @@ export interface ItemPickerModalProps {
   onValueChange: (value: string) => void;
   placeholder?: string | PickerItem | PickerItem[];
   title?: string;
+  value?: string | string[] | undefined;
 }
 
 export interface ItemPickerModalMethods {

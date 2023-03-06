@@ -90,6 +90,7 @@ const BibleVersesScreen = ({ route }: Props) => {
         {verses.map((_verse, verseIndex) => {
           return (
             <Button
+              key={verseIndex}
               title={(verseIndex + 1).toString()}
               titleStyle={{ color: theme.colors.text }}
               buttonStyle={[

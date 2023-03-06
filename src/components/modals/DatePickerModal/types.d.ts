@@ -11,6 +11,7 @@ declare const DatePickerModal: React.MemoExoticComponent<
 export interface DatePickerModalProps {
   onValueChange: (date: Date) => void;
   title?: string;
+  value?: Date;
 }
 
 export interface DatePickerModalMethods {
