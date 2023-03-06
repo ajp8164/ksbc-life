@@ -19,7 +19,7 @@ const buttonSize = 65;
 const buttonPadding = 5;
 const viewPad = (viewport.width % (buttonSize + buttonPadding * 2)) / 2;
 
-const BibleVersesScreen = ({ route }: Props) => {
+const BibleVersesScreen = ({ navigation, route }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
@@ -42,6 +42,20 @@ const BibleVersesScreen = ({ route }: Props) => {
       end: endVerse,
     },
   } as BibleVerse;
+
+  navigation.setOptions({
+    // eslint-disable-next-line react/no-unstable-nested-components
+    headerRight: () => (
+      <>
+        <Button
+          type={'clear'}
+          title={'Single Verse'}
+          disabled={result.verse.start === ''}
+          onPress={() => dismiss.dismiss(result)}
+        />
+      </>
+    ),
+  });
 
   useEffect(() => {
     let vs = '';
