@@ -43,19 +43,20 @@ const BibleVersesScreen = ({ navigation, route }: Props) => {
     },
   } as BibleVerse;
 
-  navigation.setOptions({
-    // eslint-disable-next-line react/no-unstable-nested-components
-    headerRight: () => (
-      <>
+  useEffect(() => {
+    navigation.setOptions({
+      // eslint-disable-next-line react/no-unstable-nested-components
+      headerRight: () => (
         <Button
           type={'clear'}
           title={'Single Verse'}
           disabled={result.verse.start === ''}
           onPress={() => dismiss.dismiss(result)}
         />
-      </>
-    ),
-  });
+      ),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result]);
 
   useEffect(() => {
     let vs = '';
