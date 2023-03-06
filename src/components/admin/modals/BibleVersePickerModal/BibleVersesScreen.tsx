@@ -60,7 +60,7 @@ const BibleVersesScreen = ({ navigation, route }: Props) => {
   useEffect(() => {
     let vs = '';
     if (startVerse) {
-      vs = `: ${startVerse}`;
+      vs = `:${startVerse}`;
     }
     if (endVerse) {
       vs = `${vs}-${endVerse}`;
