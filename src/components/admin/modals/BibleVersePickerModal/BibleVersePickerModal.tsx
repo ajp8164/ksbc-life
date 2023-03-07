@@ -86,7 +86,3 @@ const BibleVersePickerModal = React.forwardRef<
 });
 
 export { BibleVersePickerModal };
-
-// export function useBibleVerse() {
-//   return useContext(BibleVerseContext);
-// }

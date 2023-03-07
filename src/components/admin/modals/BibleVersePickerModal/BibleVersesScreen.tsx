@@ -23,7 +23,7 @@ const BibleVersesScreen = ({ navigation, route }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
-  const dismiss = useContext(BibleVerseContext);
+  const bibleVerseModal = useContext(BibleVerseContext);
 
   const [startVerse, setStartVerse] = useState('');
   const [endVerse, setEndVerse] = useState('');
@@ -51,7 +51,7 @@ const BibleVersesScreen = ({ navigation, route }: Props) => {
           type={'clear'}
           title={'Single Verse'}
           disabled={result.verse.start === ''}
-          onPress={() => dismiss.dismiss(result)}
+          onPress={() => bibleVerseModal.dismiss(result)}
         />
       ),
     });
@@ -85,7 +85,7 @@ const BibleVersesScreen = ({ navigation, route }: Props) => {
           setEndVerse(verse.toString());
           result.verse.end = verse.toString();
           setTimeout(() => {
-            dismiss.dismiss(result);
+            bibleVerseModal.dismiss(result);
           }, 750); // A bit of time to get visual feedback on selection before dismissal.
         }
       }
