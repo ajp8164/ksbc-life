@@ -18,7 +18,8 @@
     "metro:clean": "rm -fr $TMPDIR/metro-cache",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "firebase:start": "firebase emulators:start"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^4.4.5",

@@ -1,10 +1,13 @@
+import '@react-native-firebase/app';
+
 import { AJPElements, log } from '@react-native-ajp-elements/core';
-import { svgImages } from 'theme';
 
 import { AppError } from 'lib/errors';
 import { BackHandler } from 'react-native';
-import { appConfig } from 'config';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { appConfig } from 'config';
+import firestore from '@react-native-firebase/firestore';
+import { svgImages } from 'theme';
 
 export enum InitStatus {
   NotAuthorized = 'NotAuthorized',
@@ -15,6 +18,12 @@ export enum InitStatus {
 
 export const initApp = async (): Promise<InitStatus> => {
   try {
+    // Initialize firestore for dev as necessary.
+    if (__DEV__) {
+      firestore().useEmulator('localhost', 8080);
+      console.log('Firestore emulator running at localhost:8080');
+    }
+
     // Disable Android hardware back button.
     BackHandler.addEventListener('hardwareBackPress', () => {
       return true;
