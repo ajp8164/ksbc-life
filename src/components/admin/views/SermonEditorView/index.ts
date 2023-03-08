@@ -1,2 +1,6 @@
 export { default } from './SermonEditorView';
-export type { SermonEditorViewProps, SermonEditorViewMethods } from './types';
+export type {
+  EditorState,
+  SermonEditorViewProps,
+  SermonEditorViewMethods,
+} from './types';

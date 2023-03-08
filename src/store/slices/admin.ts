@@ -1,6 +1,7 @@
 import { CaseReducer, PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-import { Sermon } from 'types/admin';
+import { BibleVerse } from 'types/bible';
+import { Sermon } from 'types/church';
 import { revertAll } from 'store/actions';
 
 export interface AdminState {
@@ -11,14 +12,32 @@ export const initialAdminState = Object.freeze<AdminState>({
   // sermons: [],
   sermons: [
     {
-      id: '0',
       date: 'Mar 3, 2023',
       title: 'Spring Cleaning',
+      pasteur: '',
+      seriesTitle: '',
+      bibleRef: {} as BibleVerse,
+      videoId: '',
+      applicationTitle: '',
+      application1: '',
+      application2: '',
+      application3: '',
+      application4: '',
+      application5: '',
     },
     {
-      id: '1',
       date: 'Mar 10, 2023',
       title: 'Be Patient',
+      pasteur: '',
+      seriesTitle: '',
+      bibleRef: {} as BibleVerse,
+      videoId: '',
+      applicationTitle: '',
+      application1: '',
+      application2: '',
+      application3: '',
+      application4: '',
+      application5: '',
     },
   ],
 });

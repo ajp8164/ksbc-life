@@ -1,12 +1,12 @@
+import { BibleVerse } from 'types/bible';
 import { ISODateString } from './common';
 
 export type Sermon = {
-  id: string;
   date: ISODateString;
   title: string;
   pasteur: string;
   seriesTitle: string;
-  bibleRef: string;
+  bibleRef: BibleVerse | undefined;
   videoId: string;
   applicationTitle: string;
   application1: string;

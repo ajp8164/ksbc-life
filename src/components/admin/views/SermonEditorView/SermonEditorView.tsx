@@ -1,66 +1,86 @@
 import * as Yup from 'yup';
 
 import { AppTheme, useTheme } from 'theme';
+import { Button, Icon } from '@rneui/base';
+import {
+  Divider,
+  ListItem,
+  ListItemInput,
+} from '@react-native-ajp-elements/ui';
+import {
+  EditorState,
+  SermonEditorViewMethods,
+  SermonEditorViewProps,
+} from './types';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
-import { Keyboard, ScrollView, TextInput, View } from 'react-native';
-import { ListItem, ListItemInput } from '@react-native-ajp-elements/ui';
-import React, { useRef } from 'react';
+import {
+  Keyboard,
+  NativeSyntheticEvent,
+  ScrollView,
+  Text,
+  TextInput,
+  TextInputFocusEventData,
+  View,
+} from 'react-native';
+import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import { BibleVerse } from 'types/bible';
 import { BibleVersePickerModal } from 'components/admin/modals/BibleVersePickerModal';
 import { DatePickerModal } from 'components/modals/DatePickerModal';
 import { DateTime } from 'luxon';
+import FormikEffect from 'components/atoms/FormikEffect';
 import { ItemPickerModal } from 'components/modals/ItemPickerModal';
-import { SermonEditorViewMethods } from './types';
+import { Sermon } from 'types/church';
 import { makeStyles } from '@rneui/themed';
 import { useSetState } from '@react-native-ajp-elements/core';
 
 enum Fields {
-  date,
+  guestPasteur,
   title,
-  pasteur,
   seriesTitle,
-  bibleRef,
-  videoId,
   applicationTitle,
   application1,
   application2,
   application3,
   application4,
   application5,
+  videoId,
 }
 
 type FormValues = {
-  date: string;
+  guestPasteur: string;
   title: string;
-  pasteur: string;
   seriesTitle: string;
-  bibleRef: string;
-  videoId: string;
   applicationTitle: string;
   application1: string;
   application2: string;
   application3: string;
   application4: string;
   application5: string;
+  videoId: string;
 };
-
-export interface EditorState {
-  isSubmitting: boolean;
-  focusedField?: number;
-  fieldCount: number;
-}
 
 type SermonEditorView = SermonEditorViewMethods;
 
-const SermonEditorView = () => {
+const SermonEditorView = React.forwardRef<
+  SermonEditorView,
+  SermonEditorViewProps
+>((props, ref) => {
+  const { onChange } = props;
+
   const theme = useTheme();
   const s = useStyles(theme);
 
   const bibleVersePickerModalRef = useRef<ItemPickerModal>(null);
   const pasteurPickerModalRef = useRef<ItemPickerModal>(null);
   const sermonDatePickerModalRef = useRef<DatePickerModal>(null);
+
+  const [date, setDate] = useState<Date>(new Date());
+  const [pasteur, setPasteur] = useState<string>('Jamie Auton');
+  const [bibleVerse, setBibleVerse] = useState<BibleVerse>();
+  const [bibleVerseString, setBibleVerseString] = useState<string>();
+  const [lifeApplicationCount, setLifeApplicationCount] = useState(1);
 
   const pasteurItems = [
     { label: 'Jamie Auton', value: 'Jamie Auton' },
@@ -70,63 +90,74 @@ const SermonEditorView = () => {
   ];
 
   const formikRef = useRef<FormikProps<FormValues>>(null);
-  const refDate = useRef<TextInput>(null);
+  const refGuestPasteur = useRef<TextInput>(null);
   const refTitle = useRef<TextInput>(null);
-  const refPasteur = useRef<TextInput>(null);
   const refSeriesTitle = useRef<TextInput>(null);
-  const refBibleRef = useRef<TextInput>(null);
-  const refVideoId = useRef<TextInput>(null);
   const refApplicationTitle = useRef<TextInput>(null);
   const refApplication1 = useRef<TextInput>(null);
   const refApplication2 = useRef<TextInput>(null);
   const refApplication3 = useRef<TextInput>(null);
   const refApplication4 = useRef<TextInput>(null);
   const refApplication5 = useRef<TextInput>(null);
+  const refVideoId = useRef<TextInput>(null);
 
   // Same order as on form.
   const fieldRefs = [
-    refDate.current,
+    refGuestPasteur.current,
     refTitle.current,
-    refPasteur.current,
     refSeriesTitle.current,
-    refBibleRef.current,
-    refVideoId.current,
     refApplicationTitle.current,
     refApplication1.current,
     refApplication2.current,
     refApplication3.current,
     refApplication4.current,
     refApplication5.current,
+    refVideoId.current,
   ];
 
-  const [_editorState, setEditorState] = useSetState<EditorState>({
+  const [editorState, setEditorState] = useSetState<EditorState>({
     fieldCount: fieldRefs.length,
     focusedField: undefined,
     isSubmitting: false,
+    isValid: false,
   });
 
-  const validationSchema = Yup.object().shape({
-    date: Yup.string().required('Date is required'),
-    title: Yup.string().required('Title is required'),
-    pasteur: Yup.string().required('Pasteur is required'),
-    seriesTitle: Yup.string(),
-    bibleRef: Yup.string().required('Bible reference is required'),
-    videoId: Yup.string(),
-    applicationTitle: Yup.string(),
-    application1: Yup.string(),
-    application2: Yup.string(),
-    application3: Yup.string(),
-    application4: Yup.string(),
-    application5: Yup.string(),
-  });
+  useImperativeHandle(ref, () => ({
+    //  These functions exposed to the parent component through the ref.
+    saveSermon,
+  }));
 
-  const saveSermon = (
+  useEffect(() => {
+    onChange && onChange(editorState);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editorState]);
+
+  const saveSermon = async () => {
+    formikRef.current?.submitForm();
+  };
+
+  const save = (
     values: FormValues,
     { resetForm }: FormikHelpers<FormValues>,
   ) => {
     Keyboard.dismiss();
     setEditorState({ isSubmitting: true });
-    console.log('commit', values);
+    const sermon: Sermon = {
+      date: DateTime.fromJSDate(date).toISO(),
+      pasteur: pasteur === 'Guest' ? values.guestPasteur : pasteur,
+      title: values.title,
+      seriesTitle: values.seriesTitle,
+      bibleRef: bibleVerse,
+      videoId: values.videoId,
+      applicationTitle: values.applicationTitle,
+      application1: values.application1,
+      application2: values.application2,
+      application3: values.application3,
+      application4: values.application4,
+      application5: values.application5,
+    };
+    console.log('commit', sermon);
+
     resetForm({ values });
     // commitSermon(values)
     //   .then(() => {
@@ -143,89 +174,127 @@ const SermonEditorView = () => {
   };
 
   const onDateChange = (date: Date): void => {
-    console.log('date change', DateTime.fromJSDate(date).toISO());
+    setDate(date);
+    console.log(date);
   };
 
   const onPasteurChange = (pasteur: string): void => {
-    console.log('pasteur', pasteur);
+    setPasteur(pasteur);
+    setTimeout(() => {
+      formikRef.current?.validateForm();
+    }, 300); // Wait for pasteur value to update for yup validator.
   };
 
   const onBibleVerseChange = (bibleVerse: BibleVerse): void => {
-    console.log('bibleVerse', bibleVerse);
+    setBibleVerse(bibleVerse);
+    setBibleVerseString(
+      bibleVerse.verse.end.length > 0
+        ? `${bibleVerse.book} ${bibleVerse.chapter}:${bibleVerse.verse.start}-${bibleVerse.verse.end}`
+        : `${bibleVerse.book} ${bibleVerse.chapter}:${bibleVerse.verse.start}`,
+    );
   };
+
+  const validationSchema = Yup.object().shape({
+    guestPasteur: Yup.string().when([], {
+      is: () => pasteur === 'Guest',
+      then: Yup.string().required('Pasteur is required'),
+      otherwise: Yup.string().notRequired(),
+    }),
+    title: Yup.string().required('Title is required'),
+    seriesTitle: Yup.string(),
+    applicationTitle: Yup.string(),
+    application1: Yup.string(),
+    application2: Yup.string(),
+    application3: Yup.string(),
+    application4: Yup.string(),
+    application5: Yup.string(),
+    videoId: Yup.string(),
+  });
 
   return (
     <>
       <AvoidSoftInputView style={{ flex: 1 }}>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ height: '100%' }}>
+          contentContainerStyle={{ paddingBottom: 50 }}>
           <Formik
             innerRef={formikRef}
             initialValues={{
-              date: '',
+              guestPasteur: '',
               title: '',
-              pasteur: '',
               seriesTitle: '',
-              bibleRef: '',
-              videoId: '',
               applicationTitle: '',
               application1: '',
               application2: '',
               application3: '',
               application4: '',
               application5: '',
+              videoId: '',
             }}
+            validateOnChange={true}
             validateOnMount={true}
+            validateOnBlur={true}
             validationSchema={validationSchema}
-            onSubmit={saveSermon}>
+            onSubmit={save}>
             {formik => (
               <View style={[theme.styles.viewAlt, s.view]}>
+                <FormikEffect
+                  formik={formik}
+                  onChange={(currentFormikState, previousFormikState) => {
+                    if (
+                      currentFormikState?.isValid !==
+                      previousFormikState?.isValid
+                    ) {
+                      setEditorState({ isValid: currentFormikState.isValid });
+                    }
+                  }}
+                />
                 <ListItem
                   title={'Date'}
+                  value={DateTime.fromJSDate(date).toFormat('MMM d, yyyy')}
                   onPress={() => sermonDatePickerModalRef.current?.present()}
                 />
                 <ListItem
                   title={'Paster'}
+                  value={pasteur}
                   onPress={() => pasteurPickerModalRef.current?.present()}
                 />
-                <ListItemInput
-                  refInner={refPasteur}
-                  placeholder={'Guest Pasteur Name'}
-                  placeholderTextColor={theme.colors.textPlaceholder}
-                  value={formik.values.pasteur}
-                  errorText={
-                    formik.values.pasteur !== formik.initialValues.pasteur
-                      ? formik.errors.pasteur
-                      : undefined
-                  }
-                  errorColor={theme.colors.error}
-                  autoCapitalize={'none'}
-                  autoCorrect={false}
-                  onBlur={() => {
-                    formik.handleBlur('pasteur');
-                    setEditorState({ focusedField: undefined });
-                  }}
-                  onChangeText={formik.handleChange('pasteur')}
-                  onFocus={() =>
-                    setEditorState({ focusedField: Fields.pasteur })
-                  }
-                />
+                {pasteur === 'Guest' && (
+                  <ListItemInput
+                    refInner={refGuestPasteur}
+                    placeholder={'Guest Pasteur Name'}
+                    placeholderTextColor={theme.colors.textPlaceholder}
+                    value={formik.values.guestPasteur}
+                    errorText={formik.errors.guestPasteur}
+                    errorColor={theme.colors.error}
+                    autoCapitalize={'none'}
+                    autoCorrect={false}
+                    onBlur={(
+                      e: NativeSyntheticEvent<TextInputFocusEventData>,
+                    ) => {
+                      formik.handleBlur('guestPasteur')(e);
+                      setEditorState({ focusedField: undefined });
+                    }}
+                    onChangeText={formik.handleChange('guestPasteur')}
+                    onFocus={() =>
+                      setEditorState({ focusedField: Fields.guestPasteur })
+                    }
+                  />
+                )}
+                <Divider />
                 <ListItemInput
                   refInner={refTitle}
-                  placeholder="Title"
+                  placeholder={'Title'}
                   placeholderTextColor={theme.colors.textPlaceholder}
                   value={formik.values.title}
-                  errorText={
-                    formik.values.title !== formik.initialValues.title
-                      ? formik.errors.title
-                      : undefined
-                  }
+                  errorText={formik.errors.title}
                   errorColor={theme.colors.error}
                   autoCapitalize={'none'}
                   autoCorrect={false}
-                  onBlur={() => {
-                    formik.handleBlur('title');
+                  onBlur={(
+                    e: NativeSyntheticEvent<TextInputFocusEventData>,
+                  ) => {
+                    formik.handleBlur('title')(e);
                     setEditorState({ focusedField: undefined });
                   }}
                   onChangeText={formik.handleChange('title')}
@@ -236,17 +305,14 @@ const SermonEditorView = () => {
                   placeholder={'Series Title'}
                   placeholderTextColor={theme.colors.textPlaceholder}
                   value={formik.values.seriesTitle}
-                  errorText={
-                    formik.values.seriesTitle !==
-                    formik.initialValues.seriesTitle
-                      ? formik.errors.seriesTitle
-                      : undefined
-                  }
+                  errorText={formik.errors.seriesTitle}
                   errorColor={theme.colors.error}
                   autoCapitalize={'none'}
                   autoCorrect={false}
-                  onBlur={() => {
-                    formik.handleBlur('seriesTitle');
+                  onBlur={(
+                    e: NativeSyntheticEvent<TextInputFocusEventData>,
+                  ) => {
+                    formik.handleBlur('seriesTitle')(e);
                     setEditorState({ focusedField: undefined });
                   }}
                   onChangeText={formik.handleChange('seriesTitle')}
@@ -256,8 +322,226 @@ const SermonEditorView = () => {
                 />
                 <ListItem
                   title={'Bible Reference'}
+                  value={bibleVerseString}
                   onPress={() => bibleVersePickerModalRef.current?.present()}
                 />
+                <Divider text={'LIFE APPLICATION'} />
+                <ListItemInput
+                  refInner={refApplicationTitle}
+                  placeholder={'Title'}
+                  placeholderTextColor={theme.colors.textPlaceholder}
+                  value={formik.values.applicationTitle}
+                  errorText={formik.errors.applicationTitle}
+                  errorColor={theme.colors.error}
+                  autoCapitalize={'none'}
+                  autoCorrect={false}
+                  onBlur={(
+                    e: NativeSyntheticEvent<TextInputFocusEventData>,
+                  ) => {
+                    formik.handleBlur('applicatonTitle')(e);
+                    setEditorState({ focusedField: undefined });
+                  }}
+                  onChangeText={formik.handleChange('applicationTitle')}
+                  onFocus={() =>
+                    setEditorState({ focusedField: Fields.applicationTitle })
+                  }
+                />
+                <ListItemInput
+                  refInner={refApplication1}
+                  placeholder={'Application'}
+                  placeholderTextColor={theme.colors.textPlaceholder}
+                  value={formik.values.application1}
+                  errorText={formik.errors.application1}
+                  errorColor={theme.colors.error}
+                  autoCapitalize={'none'}
+                  autoCorrect={false}
+                  onBlur={(
+                    e: NativeSyntheticEvent<TextInputFocusEventData>,
+                  ) => {
+                    formik.handleBlur('application1')(e);
+                    setEditorState({ focusedField: undefined });
+                  }}
+                  onChangeText={formik.handleChange('application1')}
+                  onFocus={() =>
+                    setEditorState({ focusedField: Fields.application1 })
+                  }
+                />
+                {lifeApplicationCount >= 2 && (
+                  <ListItemInput
+                    refInner={refApplication2}
+                    placeholder={'Application'}
+                    placeholderTextColor={theme.colors.textPlaceholder}
+                    value={formik.values.application2}
+                    errorText={formik.errors.application2}
+                    errorColor={theme.colors.error}
+                    autoCapitalize={'none'}
+                    autoCorrect={false}
+                    onBlur={(
+                      e: NativeSyntheticEvent<TextInputFocusEventData>,
+                    ) => {
+                      formik.handleBlur('application2')(e);
+                      setEditorState({ focusedField: undefined });
+                    }}
+                    onChangeText={formik.handleChange('application2')}
+                    onFocus={() =>
+                      setEditorState({ focusedField: Fields.application2 })
+                    }
+                    rightImage={
+                      <Icon
+                        name={'close-circle'}
+                        type={'material-community'}
+                        color={theme.colors.assertive}
+                        size={28}
+                        containerStyle={{ left: 20 }}
+                        style={{ width: 30 }}
+                        onPress={() => {
+                          setLifeApplicationCount(lifeApplicationCount - 1);
+                          formik.setFieldValue('application2', '');
+                        }}
+                      />
+                    }
+                  />
+                )}
+                {lifeApplicationCount >= 3 && (
+                  <ListItemInput
+                    refInner={refApplication3}
+                    placeholder={'Application'}
+                    placeholderTextColor={theme.colors.textPlaceholder}
+                    value={formik.values.application3}
+                    errorText={formik.errors.application3}
+                    errorColor={theme.colors.error}
+                    autoCapitalize={'none'}
+                    autoCorrect={false}
+                    onBlur={(
+                      e: NativeSyntheticEvent<TextInputFocusEventData>,
+                    ) => {
+                      formik.handleBlur('application3')(e);
+                      setEditorState({ focusedField: undefined });
+                    }}
+                    onChangeText={formik.handleChange('application3')}
+                    onFocus={() =>
+                      setEditorState({ focusedField: Fields.application3 })
+                    }
+                    rightImage={
+                      <Icon
+                        name={'close-circle'}
+                        type={'material-community'}
+                        color={theme.colors.assertive}
+                        size={28}
+                        containerStyle={{ left: 20 }}
+                        style={{ width: 30 }}
+                        onPress={() => {
+                          setLifeApplicationCount(lifeApplicationCount - 1);
+                          formik.setFieldValue('application3', '');
+                        }}
+                      />
+                    }
+                  />
+                )}
+                {lifeApplicationCount >= 4 && (
+                  <ListItemInput
+                    refInner={refApplication4}
+                    placeholder={'Application'}
+                    placeholderTextColor={theme.colors.textPlaceholder}
+                    value={formik.values.application4}
+                    errorText={formik.errors.application4}
+                    errorColor={theme.colors.error}
+                    autoCapitalize={'none'}
+                    autoCorrect={false}
+                    onBlur={(
+                      e: NativeSyntheticEvent<TextInputFocusEventData>,
+                    ) => {
+                      formik.handleBlur('application4')(e);
+                      setEditorState({ focusedField: undefined });
+                    }}
+                    onChangeText={formik.handleChange('application4')}
+                    onFocus={() =>
+                      setEditorState({ focusedField: Fields.application4 })
+                    }
+                    rightImage={
+                      <Icon
+                        name={'close-circle'}
+                        type={'material-community'}
+                        color={theme.colors.assertive}
+                        size={28}
+                        containerStyle={{ left: 20 }}
+                        style={{ width: 30 }}
+                        onPress={() => {
+                          setLifeApplicationCount(lifeApplicationCount - 1);
+                          formik.setFieldValue('application4', '');
+                        }}
+                      />
+                    }
+                  />
+                )}
+                {lifeApplicationCount >= 5 && (
+                  <ListItemInput
+                    refInner={refApplication5}
+                    placeholder={'Application'}
+                    placeholderTextColor={theme.colors.textPlaceholder}
+                    value={formik.values.application5}
+                    errorText={formik.errors.application5}
+                    errorColor={theme.colors.error}
+                    autoCapitalize={'none'}
+                    autoCorrect={false}
+                    onBlur={(
+                      e: NativeSyntheticEvent<TextInputFocusEventData>,
+                    ) => {
+                      formik.handleBlur('application5')(e);
+                      setEditorState({ focusedField: undefined });
+                    }}
+                    onChangeText={formik.handleChange('application5')}
+                    onFocus={() =>
+                      setEditorState({ focusedField: Fields.application5 })
+                    }
+                    rightImage={
+                      <Icon
+                        name={'close-circle'}
+                        type={'material-community'}
+                        color={theme.colors.assertive}
+                        size={28}
+                        containerStyle={{ left: 20 }}
+                        style={{ width: 30 }}
+                        onPress={() => {
+                          setLifeApplicationCount(lifeApplicationCount - 1);
+                          formik.setFieldValue('application5', '');
+                        }}
+                      />
+                    }
+                  />
+                )}
+                <View style={{ flexDirection: 'row' }}>
+                  <Button
+                    type={'clear'}
+                    containerStyle={{ alignItems: 'flex-start' }}
+                    disabled={lifeApplicationCount >= 5}
+                    icon={
+                      <Icon
+                        name="plus"
+                        type={'material-community'}
+                        color={theme.colors.brandSecondary}
+                        size={28}
+                        style={
+                          lifeApplicationCount >= 5 ? { opacity: 0.2 } : {}
+                        }
+                      />
+                    }
+                    onPress={() =>
+                      setLifeApplicationCount(lifeApplicationCount + 1)
+                    }
+                  />
+                  {lifeApplicationCount >= 5 && (
+                    <Text
+                      style={[
+                        theme.styles.textSmall,
+                        theme.styles.textDim,
+                        { top: 15 },
+                      ]}>
+                      {'Maximum of 5 Life Applications allowed.'}
+                    </Text>
+                  )}
+                </View>
+                <Divider text={'VIDEO'} />
                 <ListItemInput
                   refInner={refVideoId}
                   placeholder={'Video Id'}
@@ -273,6 +557,7 @@ const SermonEditorView = () => {
                   autoCorrect={false}
                   onBlur={() => {
                     formik.handleBlur('videoId');
+                    formik.setTouched({ videoId: true });
                     setEditorState({ focusedField: undefined });
                   }}
                   onChangeText={formik.handleChange('videoId')}
@@ -280,143 +565,9 @@ const SermonEditorView = () => {
                     setEditorState({ focusedField: Fields.videoId })
                   }
                 />
-                <ListItemInput
-                  refInner={refApplicationTitle}
-                  placeholder={'Life Application Title'}
-                  placeholderTextColor={theme.colors.textPlaceholder}
-                  value={formik.values.applicationTitle}
-                  errorText={
-                    formik.values.applicationTitle !==
-                    formik.initialValues.applicationTitle
-                      ? formik.errors.applicationTitle
-                      : undefined
-                  }
-                  errorColor={theme.colors.error}
-                  autoCapitalize={'none'}
-                  autoCorrect={false}
-                  onBlur={() => {
-                    formik.handleBlur('applicationTitle');
-                    setEditorState({ focusedField: undefined });
-                  }}
-                  onChangeText={formik.handleChange('applicationTitle')}
-                  onFocus={() =>
-                    setEditorState({ focusedField: Fields.applicationTitle })
-                  }
-                />
-                <ListItemInput
-                  refInner={refApplication1}
-                  placeholder={'Life Application'}
-                  placeholderTextColor={theme.colors.textPlaceholder}
-                  value={formik.values.application1}
-                  errorText={
-                    formik.values.application1 !==
-                    formik.initialValues.application1
-                      ? formik.errors.application1
-                      : undefined
-                  }
-                  errorColor={theme.colors.error}
-                  autoCapitalize={'none'}
-                  autoCorrect={false}
-                  onBlur={() => {
-                    formik.handleBlur('application1');
-                    setEditorState({ focusedField: undefined });
-                  }}
-                  onChangeText={formik.handleChange('application1')}
-                  onFocus={() =>
-                    setEditorState({ focusedField: Fields.application1 })
-                  }
-                />
-                <ListItemInput
-                  refInner={refApplication2}
-                  placeholder={'Life Application'}
-                  placeholderTextColor={theme.colors.textPlaceholder}
-                  value={formik.values.application2}
-                  errorText={
-                    formik.values.application2 !==
-                    formik.initialValues.application2
-                      ? formik.errors.application2
-                      : undefined
-                  }
-                  errorColor={theme.colors.error}
-                  autoCapitalize={'none'}
-                  autoCorrect={false}
-                  onBlur={() => {
-                    formik.handleBlur('application2');
-                    setEditorState({ focusedField: undefined });
-                  }}
-                  onChangeText={formik.handleChange('application2')}
-                  onFocus={() =>
-                    setEditorState({ focusedField: Fields.application2 })
-                  }
-                />
-                <ListItemInput
-                  refInner={refApplication3}
-                  placeholder={'Life Application'}
-                  placeholderTextColor={theme.colors.textPlaceholder}
-                  value={formik.values.application3}
-                  errorText={
-                    formik.values.application3 !==
-                    formik.initialValues.application3
-                      ? formik.errors.application3
-                      : undefined
-                  }
-                  errorColor={theme.colors.error}
-                  autoCapitalize={'none'}
-                  autoCorrect={false}
-                  onBlur={() => {
-                    formik.handleBlur('application3');
-                    setEditorState({ focusedField: undefined });
-                  }}
-                  onChangeText={formik.handleChange('application3')}
-                  onFocus={() =>
-                    setEditorState({ focusedField: Fields.application3 })
-                  }
-                />
-                <ListItemInput
-                  refInner={refApplication4}
-                  placeholder={'Life Application'}
-                  placeholderTextColor={theme.colors.textPlaceholder}
-                  value={formik.values.application4}
-                  errorText={
-                    formik.values.application4 !==
-                    formik.initialValues.application4
-                      ? formik.errors.application4
-                      : undefined
-                  }
-                  errorColor={theme.colors.error}
-                  autoCapitalize={'none'}
-                  autoCorrect={false}
-                  onBlur={() => {
-                    formik.handleBlur('application4');
-                    setEditorState({ focusedField: undefined });
-                  }}
-                  onChangeText={formik.handleChange('application4')}
-                  onFocus={() =>
-                    setEditorState({ focusedField: Fields.application4 })
-                  }
-                />
-                <ListItemInput
-                  refInner={refApplication5}
-                  placeholder={'Life Application'}
-                  placeholderTextColor={theme.colors.textPlaceholder}
-                  value={formik.values.application5}
-                  errorText={
-                    formik.values.application5 !==
-                    formik.initialValues.application5
-                      ? formik.errors.application5
-                      : undefined
-                  }
-                  errorColor={theme.colors.error}
-                  autoCapitalize={'none'}
-                  autoCorrect={false}
-                  onBlur={() => {
-                    formik.handleBlur('application5');
-                    setEditorState({ focusedField: undefined });
-                  }}
-                  onChangeText={formik.handleChange('application5')}
-                  onFocus={() =>
-                    setEditorState({ focusedField: Fields.application5 })
-                  }
+                <Divider
+                  type={'note'}
+                  text={'Get the video id from YouTube.'}
                 />
               </View>
             )}
@@ -425,13 +576,14 @@ const SermonEditorView = () => {
       </AvoidSoftInputView>
       <DatePickerModal
         ref={sermonDatePickerModalRef}
-        title={'Sermon Date'}
+        value={date}
         onValueChange={onDateChange}
       />
       <ItemPickerModal
         ref={pasteurPickerModalRef}
-        placeholder={'Select Pasteur'}
+        placeholder={'none'}
         items={pasteurItems}
+        value={pasteur}
         onValueChange={onPasteurChange}
       />
       <BibleVersePickerModal
@@ -449,11 +601,11 @@ const SermonEditorView = () => {
       )} */}
     </>
   );
-};
+});
 
 const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
   view: {
-    paddingTop: 30,
+    // paddingTop: 30,
   },
 }));
 

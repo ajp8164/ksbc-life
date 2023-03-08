@@ -65,7 +65,6 @@ const HomeScreen = ({ navigation }: Props) => {
                 />
               )
             }
-            // onPress={signInModalRef.current?.present}
             onPress={doAccountAction}
           />
         </>

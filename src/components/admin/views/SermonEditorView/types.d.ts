@@ -8,8 +8,17 @@ declare const TextView: React.MemoExoticComponent<
   >
 >;
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface SermonEditorViewProps {}
+export interface SermonEditorViewProps {
+  onChange?: (editorState: EditorState) => void;
+}
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface SermonEditorViewMethods {}
+export interface SermonEditorViewMethods {
+  saveSermon: () => Promise<void>;
+}
+
+export interface EditorState {
+  fieldCount: number;
+  focusedField?: number;
+  isSubmitting: boolean;
+  isValid: boolean;
+}
