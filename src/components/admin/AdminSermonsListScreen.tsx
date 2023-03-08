@@ -7,8 +7,8 @@ import { Button, Icon } from '@rneui/base';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import React, { useEffect, useRef } from 'react';
 
-import { AddSermonModal } from 'components/admin/modals/AddSermonModal';
 import { CompositeScreenProps } from '@react-navigation/core';
+import { EditSermonModal } from 'components/admin/modals/EditSermonModal';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
@@ -25,7 +25,7 @@ const AdminSermonsListScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
-  const addSermonModalRef = useRef<AddSermonModal>(null);
+  const editSermonModalRef = useRef<EditSermonModal>(null);
   const sermons = useSelector(selectSermons);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const AdminSermonsListScreen = ({ navigation }: Props) => {
                 size={28}
               />
             }
-            onPress={() => addSermonModalRef.current?.present()}
+            onPress={() => editSermonModalRef.current?.present('Add Sermon')}
           />
         </>
       ),
@@ -71,14 +71,14 @@ const AdminSermonsListScreen = ({ navigation }: Props) => {
               leftImageType={'material-community'}
               onPress={() =>
                 navigation.navigate('AdminSermon', {
-                  sermonId: sermon.id,
+                  sermonId: sermon.date,
                 })
               }
             />
           );
         })}
       </ScrollView>
-      <AddSermonModal ref={addSermonModalRef} />
+      <EditSermonModal ref={editSermonModalRef} />
     </SafeAreaView>
   );
 };

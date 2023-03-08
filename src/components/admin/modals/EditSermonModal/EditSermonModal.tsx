@@ -1,4 +1,4 @@
-import { AddSermonModalMethods, AddSermonModalProps } from './types';
+import { EditSermonModalMethods, EditSermonModalProps } from './types';
 import React, { useImperativeHandle, useRef, useState } from 'react';
 import SermonEditorView, {
   EditorState,
@@ -8,14 +8,15 @@ import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/typ
 import { Modal } from '@react-native-ajp-elements/ui';
 import ModalHeader from 'components/molecules/ModalHeader';
 
-type AddSermonModal = AddSermonModalMethods;
+type EditSermonModal = EditSermonModalMethods;
 
-const AddSermonModal = React.forwardRef<AddSermonModal, AddSermonModalProps>(
+const EditSermonModal = React.forwardRef<EditSermonModal, EditSermonModalProps>(
   (_props, ref) => {
     const innerRef = useRef<BottomSheetModalMethods>(null);
     const sermonEditorViewRef = useRef<SermonEditorView>(null);
 
     const [editorState, setEditorState] = useState({} as EditorState);
+    const [title, setTitle] = useState('');
 
     useImperativeHandle(ref, () => ({
       //  These functions exposed to the parent component through the ref.
@@ -27,14 +28,15 @@ const AddSermonModal = React.forwardRef<AddSermonModal, AddSermonModalProps>(
       innerRef.current?.dismiss();
     };
 
-    const present = () => {
+    const present = (title: string) => {
+      setTitle(title);
       innerRef.current?.present();
     };
 
     return (
       <Modal ref={innerRef}>
         <ModalHeader
-          title={'Add Sermon'}
+          title={title}
           rightButtonText={'Save'}
           rightButtonDisabled={!editorState.isValid}
           onRightButtonPress={() => {
@@ -47,4 +49,4 @@ const AddSermonModal = React.forwardRef<AddSermonModal, AddSermonModalProps>(
   },
 );
 
-export { AddSermonModal };
+export { EditSermonModal };

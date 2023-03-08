@@ -3,9 +3,11 @@ import {
   TabNavigatorParamList,
 } from 'types/navigation';
 import { AppTheme, useTheme } from 'theme';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 
+import { Button } from '@rneui/base';
 import { CompositeScreenProps } from '@react-navigation/core';
+import { EditSermonModal } from 'components/admin/modals/EditSermonModal';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
@@ -23,11 +25,20 @@ const AdminSermonScreen = ({ navigation, route }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
+  const editSermonModalRef = useRef<EditSermonModal>(null);
   const sermon = useSelector(selectSermon(route.params?.sermonId));
 
   useEffect(() => {
     navigation.setOptions({
       title: sermon?.title || '',
+      // eslint-disable-next-line react/no-unstable-nested-components
+      headerRight: () => (
+        <Button
+          type={'clear'}
+          title={'Edit'}
+          onPress={() => editSermonModalRef.current?.present('Edit Sermon')}
+        />
+      ),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -39,6 +50,7 @@ const AdminSermonScreen = ({ navigation, route }: Props) => {
         contentInsetAdjustmentBehavior={'automatic'}>
         <SermonEditorView />
       </ScrollView>
+      <EditSermonModal ref={editSermonModalRef} />
     </SafeAreaView>
   );
 };
