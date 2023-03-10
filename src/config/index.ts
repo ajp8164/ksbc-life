@@ -12,6 +12,7 @@ export interface AppConfig
   givingUrl: string;
   persistStoreVersion: string;
   privacyUrl: string;
+  requireReAuthDays: number;
   sentryEndpoint: string;
   sentryLoggingEnabled: boolean;
   storageSchemaVersion: number;
@@ -34,6 +35,7 @@ export const appConfig: AppConfig = {
   givingUrl: Config.GIVING_URL || '',
   persistStoreVersion: Config.PERSIST_STORE_VERSION || '',
   privacyUrl: Config.PRIVACY_URL || '',
+  requireReAuthDays: Number(Config.REQUIRE_REAUTH_DAYS) || 0,
   sentryEndpoint: Config.SENTRY_ENDPOINT || '',
   sentryLoggingEnabled: Config.SENTRY_LOGGING_ENABLED === 'true' ? true : false,
   storageSchemaVersion: Number(Config.STORAGE_SCHEMA_VERSION) || 0,
