@@ -1,17 +1,16 @@
 import { Alert, FlatList, ListRenderItem, Text, View } from 'react-native';
 import { AppTheme, useTheme } from 'theme';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { AuthContext } from 'lib/auth';
 import { DateTime } from 'luxon';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SermonsNavigatorParamList } from 'types/navigation';
-import { SignInModal } from 'components/modals/SignInModal';
 import VideoCard from 'components/molecules/VideoCard';
 // import YoutubePlayer from 'react-native-youtube-iframe';
 import { makeStyles } from '@rneui/themed';
-import { requireUserAuthentication } from 'lib/auth/requireUserAuthentication';
 import { saveSermonVideos } from 'store/slices/videos';
 import { selectSermonVideos } from 'store/selectors/videos';
 import { youTubeBroadcastVideos } from 'lib/youTube';
@@ -26,7 +25,7 @@ const SermonsScreen = ({ navigation }: Props) => {
   const s = useStyles(theme);
   const dispatch = useDispatch();
 
-  const signInModalRef = useRef<SignInModal>(null);
+  const auth = useContext(AuthContext);
   const storedVideos = useSelector(selectSermonVideos);
 
   const allLoaded = useRef(false);
@@ -128,21 +127,13 @@ const SermonsScreen = ({ navigation }: Props) => {
               iconType: 'material-community',
               onPress: () => {
                 // Require user authentication for this feature.
-                requireUserAuthentication()
-                  .then((authenticated: boolean) => {
-                    if (authenticated) {
-                      navigation.navigate('SermonDetail', {
-                        id: item.id.videoId,
-                      });
-                    } else {
-                      signInModalRef.current?.present();
-                    }
-                  })
-                  .catch(() => {
-                    //
+                if (auth.userIsAuthenticated) {
+                  navigation.navigate('SermonDetail', {
+                    id: item.id.videoId,
                   });
-
-                // navigation.navigate('SermonDetail', { id: item.id.videoId });
+                } else {
+                  auth.presentSignInModal();
+                }
               },
             },
           ]}
@@ -178,7 +169,6 @@ const SermonsScreen = ({ navigation }: Props) => {
           contentInsetAdjustmentBehavior={'automatic'}
         />
       </SafeAreaView>
-      <SignInModal ref={signInModalRef} />
     </>
   );
 };

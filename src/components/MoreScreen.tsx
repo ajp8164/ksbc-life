@@ -8,11 +8,11 @@ import React, { useContext, useEffect } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { AuthContext } from 'lib/auth';
 import { Button } from '@rneui/base';
 import { CompositeScreenProps } from '@react-navigation/core';
 import { Image } from '@rneui/base';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { SignInContext } from 'components/AppMain';
 import { UserRole } from 'types/user';
 import { appConfig } from 'config';
 import { makeStyles } from '@rneui/themed';
@@ -29,7 +29,7 @@ const MoreScreen = ({ navigation, route }: Props) => {
   const s = useStyles(theme);
   const dispatch = useDispatch();
 
-  const signInModal = useContext(SignInContext);
+  const auth = useContext(AuthContext);
   const userProfile = useSelector(selectUserProfile);
 
   useEffect(() => {
@@ -93,7 +93,7 @@ const MoreScreen = ({ navigation, route }: Props) => {
             leftImage={'account-circle-outline'}
             leftImageType={'material-community'}
             position={['first', 'last']}
-            onPress={() => signInModal.present()}
+            onPress={() => auth.presentSignInModal()}
           />
         )}
         <Divider />

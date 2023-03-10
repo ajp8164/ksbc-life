@@ -8,11 +8,11 @@ import React, { useContext, useEffect } from 'react';
 import { ScrollView, View } from 'react-native';
 import { openShareSheet, viewport } from '@react-native-ajp-elements/ui';
 
+import { AuthContext } from 'lib/auth';
 import Card from 'components/molecules/Card';
 import { CompositeScreenProps } from '@react-navigation/core';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { SignInContext } from 'components/AppMain';
 import { makeStyles } from '@rneui/themed';
 import { openURL } from '@react-native-ajp-elements/core';
 import { selectUserProfile } from 'store/selectors/userSelectors';
@@ -27,7 +27,7 @@ const HomeScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
-  const signInModal = useContext(SignInContext);
+  const auth = useContext(AuthContext);
   const userProfile = useSelector(selectUserProfile);
 
   useEffect(() => {
@@ -73,7 +73,7 @@ const HomeScreen = ({ navigation }: Props) => {
     if (userProfile) {
       navigation.navigate('More', { subNav: 'UserProfile' });
     } else {
-      signInModal.present();
+      auth.presentSignInModal();
     }
   };
 
