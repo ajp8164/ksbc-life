@@ -32,7 +32,6 @@ module.exports = {
           components: './src/components/',
           img: './src/theme/img/',
           lib: './src/lib/',
-          libsdk: './src/libsdk/',
           store: './src/store/',
           theme: './src/theme/',
           types: './src/types/',
