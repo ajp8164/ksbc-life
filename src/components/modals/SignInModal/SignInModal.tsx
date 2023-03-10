@@ -1,18 +1,18 @@
+import React, { useImperativeHandle, useRef } from 'react';
 import {
   SignInModalMethods,
   SignInModalProps,
   SignInNavigatorParamList,
 } from './types';
-import React, { useImperativeHandle, useRef } from 'react';
 
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
+import ChooseSignInScreen from './ChooseSignInScreen';
+import CreateAccountScreen from './CreateAccountScreen';
+import EmailSignInScreen from './EmailSignInScreen';
+import ForgotPasswordScreen from './ForgotPasswordScreen';
 import { Modal } from '@react-native-ajp-elements/ui';
 import { NavigationContainer } from '@react-navigation/native';
-import ChooseSignInScreen from './ChooseSignInScreen';
-import EmailSignInScreen from './EmailSignInScreen';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import ForgotPasswordScreen from './ForgotPasswordScreen';
-import CreateAccountScreen from './CreateAccountScreen';
 import { useTheme } from 'theme';
 
 const Stack = createNativeStackNavigator<SignInNavigatorParamList>();

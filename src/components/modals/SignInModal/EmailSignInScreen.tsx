@@ -8,19 +8,18 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { AppTheme, useTheme } from 'theme';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import React, { useRef, useState } from 'react';
+
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
-
-import { ListItemInput } from '@react-native-ajp-elements/ui';
-import { useSetState } from '@react-native-ajp-elements/core';
-import { AppTheme, useTheme } from 'theme';
-
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { makeStyles } from '@rneui/themed';
-import { SignInNavigatorParamList } from './types';
 import { Button } from '@rneui/base';
-import { signInwithEmailAndPassword } from 'lib/userAuthentication';
+import { ListItemInput } from '@react-native-ajp-elements/ui';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { SignInNavigatorParamList } from './types';
+import { makeStyles } from '@rneui/themed';
+import { signInwithEmailAndPassword } from 'lib/auth';
+import { useSetState } from '@react-native-ajp-elements/core';
 
 enum Fields {
   email,

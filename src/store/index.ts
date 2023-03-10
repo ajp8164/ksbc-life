@@ -22,7 +22,7 @@ const ignoredActions = [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER];
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['app', 'appSettings', 'networkStatus', 'userProfile', 'videos'],
+  whitelist: ['app', 'appSettings', 'networkStatus', 'user', 'videos'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

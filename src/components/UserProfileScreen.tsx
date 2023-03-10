@@ -1,19 +1,20 @@
-import { AppTheme, useTheme } from 'theme';
-import {
-  MoreNavigatorParamList,
-  MainNavigatorParamList,
-} from 'types/navigation';
 import { Alert, ScrollView, Text, View } from 'react-native';
+import { AppTheme, useTheme } from 'theme';
+import { Divider, ListItem } from '@react-native-ajp-elements/ui';
+import { Icon, Image } from '@rneui/base';
+import {
+  MainNavigatorParamList,
+  MoreNavigatorParamList,
+} from 'types/navigation';
 import React, { useEffect } from 'react';
-import { makeStyles } from '@rneui/themed';
+import { signOut, useUnauthorizeUser } from 'lib/auth';
+
 import { CompositeScreenProps } from '@react-navigation/core';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useSelector } from 'react-redux';
-import { selectUser } from 'store/selectors/userProfileSelectors';
-import { Icon, Image } from '@rneui/base';
-import { signOut } from 'lib/userAuthentication';
-import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import { biometricAuthentication } from 'lib/biometricAuthentication';
+import { makeStyles } from '@rneui/themed';
+import { selectUserProfile } from 'store/selectors/userSelectors';
+import { useSelector } from 'react-redux';
 
 type Props = CompositeScreenProps<
   NativeStackScreenProps<MoreNavigatorParamList, 'UserProfile'>,
@@ -24,7 +25,8 @@ const UserProfileScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
-  const user = useSelector(selectUser);
+  const unauthorizeUser = useUnauthorizeUser();
+  const userProfile = useSelector(selectUserProfile);
 
   useEffect(() => {
     navigation.setOptions({
@@ -58,6 +60,7 @@ const UserProfileScreen = ({ navigation }: Props) => {
 
   const doSignOut = () => {
     signOut().then(() => {
+      unauthorizeUser();
       navigation.goBack();
     });
   };
@@ -68,8 +71,11 @@ const UserProfileScreen = ({ navigation }: Props) => {
         style={theme.styles.view}
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior={'automatic'}>
-        {user?.photoURL ? (
-          <Image source={{ uri: user?.photoURL }} containerStyle={s.avatar} />
+        {userProfile?.photoUrl ? (
+          <Image
+            source={{ uri: userProfile?.photoUrl }}
+            containerStyle={s.avatar}
+          />
         ) : (
           <Icon
             name="account-circle"
@@ -79,10 +85,12 @@ const UserProfileScreen = ({ navigation }: Props) => {
             style={{ marginTop: 15 }}
           />
         )}
-        {user?.displayName && (
-          <Text style={s.profileName}>{user.displayName}</Text>
+        {userProfile?.name && (
+          <Text style={s.profileName}>{userProfile.name}</Text>
         )}
-        {user?.email && <Text style={s.profileEmail}>{user.email}</Text>}
+        {userProfile?.email && (
+          <Text style={s.profileEmail}>{userProfile.email}</Text>
+        )}
         <Divider />
         <ListItem
           title={'Sign Out'}

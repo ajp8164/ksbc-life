@@ -1,20 +1,20 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppTheme, useTheme } from 'theme';
 import { Alert, Platform, Text, View } from 'react-native';
-
+import { AppTheme, useTheme } from 'theme';
 import React, { useState } from 'react';
-import { makeStyles } from '@rneui/themed';
-import { Button } from '@rneui/base';
-import { SvgXml } from 'react-native-svg';
 import { getColoredSvg, getSvg } from '@react-native-ajp-elements/ui';
-import { appConfig } from 'config';
 import {
   signInWithApple,
   signInWithFacebook,
   signInWithGoogle,
   signInWithTwitter,
-} from 'lib/userAuthentication';
+} from 'lib/auth';
+
+import { Button } from '@rneui/base';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SignInNavigatorParamList } from './types';
+import { SvgXml } from 'react-native-svg';
+import { appConfig } from 'config';
+import { makeStyles } from '@rneui/themed';
 
 export type Props = NativeStackScreenProps<
   SignInNavigatorParamList,

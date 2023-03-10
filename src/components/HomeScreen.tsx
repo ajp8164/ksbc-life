@@ -1,3 +1,4 @@
+import { Alert, ScrollView, View } from 'react-native';
 import { AppTheme, useTheme } from 'theme';
 import { Button, Icon, Image } from '@rneui/base';
 import {
@@ -5,9 +6,7 @@ import {
   MoreNavigatorParamList,
 } from 'types/navigation';
 import React, { useEffect, useRef } from 'react';
-import { ScrollView, View } from 'react-native';
 import { openShareSheet, viewport } from '@react-native-ajp-elements/ui';
-import { useDispatch, useSelector } from 'react-redux';
 
 import Card from 'components/molecules/Card';
 import { CompositeScreenProps } from '@react-navigation/core';
@@ -15,10 +14,12 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SignInModal } from 'components/modals/SignInModal';
 import auth from '@react-native-firebase/auth';
+import lodash from 'lodash';
 import { makeStyles } from '@rneui/themed';
 import { openURL } from '@react-native-ajp-elements/core';
-import { saveUser } from 'store/slices/userProfile';
-import { selectUser } from 'store/selectors/userProfileSelectors';
+import { selectUserProfile } from 'store/selectors/userSelectors';
+import { useAuthorizeUser } from 'lib/auth';
+import { useSelector } from 'react-redux';
 
 type Props = CompositeScreenProps<
   NativeStackScreenProps<HomeNavigatorParamList, 'Home'>,
@@ -28,10 +29,12 @@ type Props = CompositeScreenProps<
 const HomeScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
-  const dispatch = useDispatch();
 
+  const authorizeUser = useAuthorizeUser();
+  const authorizeUserDebounced = useRef(lodash.debounce(authorizeUser, 200));
   const signInModalRef = useRef<SignInModal>(null);
-  const user = useSelector(selectUser);
+  const signInModalPresentedRef = useRef(false);
+  const userProfile = useSelector(selectUserProfile);
 
   useEffect(() => {
     setAvatar();
@@ -41,7 +44,24 @@ const HomeScreen = ({ navigation }: Props) => {
   useEffect(() => {
     setAvatar();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [userProfile]);
+
+  useEffect(() => {
+    const unsubscribe = auth().onAuthStateChanged(credentials => {
+      // This handler is called multiple times.
+      // See https://stackoverflow.com/a/40436769
+      if (signInModalPresentedRef.current) {
+        authorizeUserDebounced.current(credentials, {
+          onError: onAuthError,
+          onAuthorized: () => {
+            signInModalRef.current?.dismiss();
+            signInModalPresentedRef.current = false;
+          },
+        });
+      }
+    });
+    return unsubscribe;
+  }, []);
 
   const setAvatar = () => {
     navigation.setOptions({
@@ -51,9 +71,9 @@ const HomeScreen = ({ navigation }: Props) => {
           <Button
             type={'clear'}
             icon={
-              user && user.photoURL ? (
+              userProfile && userProfile.photoUrl ? (
                 <Image
-                  source={{ uri: user.photoURL }}
+                  source={{ uri: userProfile.photoUrl }}
                   containerStyle={s.avatar}
                 />
               ) : (
@@ -72,21 +92,21 @@ const HomeScreen = ({ navigation }: Props) => {
     });
   };
 
-  useEffect(() => {
-    const unsubscribe = auth().onAuthStateChanged(user => {
-      // Remove non-serializable properties (functions).
-      dispatch(saveUser({ user: JSON.parse(JSON.stringify(user)) }));
-      signInModalRef.current?.dismiss();
-    });
-    return unsubscribe;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const onAuthError = () => {
+    Alert.alert(
+      'Sign In Failed',
+      'There was a problem signing in. Please try again.',
+      [{ text: 'OK' }],
+      { cancelable: false },
+    );
+  };
 
   const doAccountAction = () => {
-    if (user) {
+    if (userProfile) {
       navigation.navigate('More', { subNav: 'UserProfile' });
     } else {
       signInModalRef.current?.present();
+      signInModalPresentedRef.current = true;
     }
   };
 
