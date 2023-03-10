@@ -16,3 +16,9 @@ export type Sermon = {
 };
 
 export type SermonVideo = GoogleApiYouTubeSearchResource;
+
+export type Pasteur = {
+  id: string;
+  firstName: string;
+  lastName: string;
+};

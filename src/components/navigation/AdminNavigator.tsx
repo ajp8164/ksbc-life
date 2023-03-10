@@ -1,5 +1,7 @@
 import AdminHomeScreen from 'components/admin/AdminHomeScreen';
 import { AdminNavigatorParamList } from 'types/navigation';
+import AdminPasteurScreen from 'components/admin/AdminPasteurScreen';
+import AdminPasteursListScreen from 'components/admin/AdminPasteursListScreen';
 import AdminSermonScreen from 'components/admin/AdminSermonScreen';
 import AdminSermonsListScreen from 'components/admin/AdminSermonsListScreen';
 import React from 'react';
@@ -32,6 +34,24 @@ const AdminNavigator = () => {
         component={AdminHomeScreen}
         options={{
           title: 'Administration',
+          headerLeft: () => null,
+          headerLargeTitle: true,
+        }}
+      />
+      <AdminStack.Screen
+        name="AdminPasteursList"
+        component={AdminPasteursListScreen}
+        options={{
+          title: 'Pasteurs',
+          headerLeft: () => null,
+          headerLargeTitle: true,
+        }}
+      />
+      <AdminStack.Screen
+        name="AdminPasteur"
+        component={AdminPasteurScreen}
+        options={{
+          title: 'Pasteur',
           headerLeft: () => null,
           headerLargeTitle: true,
         }}

@@ -138,7 +138,7 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   notFound: {
     ...theme.styles.textNormal,
     textAlign: 'center',
-    marginTop: '30%',
+    marginTop: 30,
   },
 }));
 

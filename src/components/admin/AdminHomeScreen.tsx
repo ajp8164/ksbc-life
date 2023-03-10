@@ -56,6 +56,14 @@ const AdminHomeScreen = ({ navigation }: Props) => {
           leftImageType={'material-community'}
           onPress={() => navigation.navigate('AdminSermonsList')}
         />
+        <Divider />
+        <ListItem
+          title={'Pasteurs'}
+          position={['first', 'last']}
+          leftImage={'account-outline'}
+          leftImageType={'material-community'}
+          onPress={() => navigation.navigate('AdminPasteursList')}
+        />
       </ScrollView>
     </SafeAreaView>
   );

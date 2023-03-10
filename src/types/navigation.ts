@@ -1,5 +1,6 @@
 import { ContentView } from 'types/content';
 import { NavigatorScreenParams } from '@react-navigation/core';
+import { Pasteur } from 'types/church';
 
 export enum StartupScreen {
   None = 'None',
@@ -9,6 +10,10 @@ export enum StartupScreen {
 
 export type AdminNavigatorParamList = {
   AdminHome: undefined;
+  AdminPasteur: {
+    pasteur: Pasteur;
+  };
+  AdminPasteursList: undefined;
   AdminSermon: {
     sermonId: string;
   };
