@@ -8,7 +8,6 @@ import React, { useEffect, useRef } from 'react';
 import { Button } from '@rneui/base';
 import { CompositeScreenProps } from '@react-navigation/core';
 import { EditPasteurModal } from 'components/admin/modals/EditPasteurModal';
-import { EditSermonModal } from 'components/admin/modals/EditSermonModal';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';

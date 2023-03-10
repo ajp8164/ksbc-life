@@ -5,10 +5,9 @@ import {
 import { AppTheme, useTheme } from 'theme';
 import { Button, Icon } from '@rneui/base';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { CompositeScreenProps } from '@react-navigation/core';
-// import { EditPasteurModal } from 'components/admin/modals/EditPasteurModal';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Pasteur } from 'types/church';
 import { SafeAreaView } from 'react-native-safe-area-context';
