@@ -1,4 +1,4 @@
-export type BibleVerse = {
+export type BibleReference = {
   book: string;
   chapter: string;
   verse: {

@@ -1,17 +1,18 @@
-import { BibleVerse } from 'types/bible';
+import { BibleReference } from 'types/bible';
 import { ISODateString } from './common';
 
 export type Sermon = {
+  id: string;
   date: ISODateString;
   title: string;
   pasteur: string;
   seriesTitle: string;
-  bibleRef: BibleVerse | undefined;
+  bibleReference: BibleReference | undefined;
   videoId: string;
-  applicationTitle: string;
-  application1: string;
-  application2: string;
-  application3: string;
-  application4: string;
-  application5: string;
+  lifeApplication: {
+    title: string;
+    items: string[];
+  };
 };
+
+export type SermonVideo = GoogleApiYouTubeSearchResource;

@@ -25,7 +25,7 @@ import {
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
-import { BibleVerse } from 'types/bible';
+import { BibleReference } from 'types/bible';
 import { BibleVersePickerModal } from 'components/admin/modals/BibleVersePickerModal';
 import { DatePickerModal } from 'components/modals/DatePickerModal';
 import { DateTime } from 'luxon';
@@ -34,17 +34,18 @@ import { ItemPickerModal } from 'components/modals/ItemPickerModal';
 import { Sermon } from 'types/church';
 import { makeStyles } from '@rneui/themed';
 import { useSetState } from '@react-native-ajp-elements/core';
+import { uuidv4 } from 'lib/uuid';
 
 enum Fields {
   guestPasteur,
   title,
   seriesTitle,
-  applicationTitle,
-  application1,
-  application2,
-  application3,
-  application4,
-  application5,
+  lifeApplicationTitle,
+  lifeApplication1,
+  lifeApplication2,
+  lifeApplication3,
+  lifeApplication4,
+  lifeApplication5,
   videoId,
 }
 
@@ -52,12 +53,12 @@ type FormValues = {
   guestPasteur: string;
   title: string;
   seriesTitle: string;
-  applicationTitle: string;
-  application1: string;
-  application2: string;
-  application3: string;
-  application4: string;
-  application5: string;
+  lifeApplicationTitle: string;
+  lifeApplication1: string;
+  lifeApplication2: string;
+  lifeApplication3: string;
+  lifeApplication4: string;
+  lifeApplication5: string;
   videoId: string;
 };
 
@@ -78,8 +79,8 @@ const SermonEditorView = React.forwardRef<
 
   const [date, setDate] = useState<Date>(new Date());
   const [pasteur, setPasteur] = useState<string>('Jamie Auton');
-  const [bibleVerse, setBibleVerse] = useState<BibleVerse>();
-  const [bibleVerseString, setBibleVerseString] = useState<string>();
+  const [bibleReference, setBibleReference] = useState<BibleReference>();
+  const [bibleReferenceStr, setBibleReferenceStr] = useState<string>();
   const [lifeApplicationCount, setLifeApplicationCount] = useState(1);
 
   const pasteurItems = [
@@ -93,12 +94,12 @@ const SermonEditorView = React.forwardRef<
   const refGuestPasteur = useRef<TextInput>(null);
   const refTitle = useRef<TextInput>(null);
   const refSeriesTitle = useRef<TextInput>(null);
-  const refApplicationTitle = useRef<TextInput>(null);
-  const refApplication1 = useRef<TextInput>(null);
-  const refApplication2 = useRef<TextInput>(null);
-  const refApplication3 = useRef<TextInput>(null);
-  const refApplication4 = useRef<TextInput>(null);
-  const refApplication5 = useRef<TextInput>(null);
+  const refLifeApplicationTitle = useRef<TextInput>(null);
+  const refLifeApplication1 = useRef<TextInput>(null);
+  const refLifeApplication2 = useRef<TextInput>(null);
+  const refLifeApplication3 = useRef<TextInput>(null);
+  const refLifeApplication4 = useRef<TextInput>(null);
+  const refLifeApplication5 = useRef<TextInput>(null);
   const refVideoId = useRef<TextInput>(null);
 
   // Same order as on form.
@@ -106,12 +107,12 @@ const SermonEditorView = React.forwardRef<
     refGuestPasteur.current,
     refTitle.current,
     refSeriesTitle.current,
-    refApplicationTitle.current,
-    refApplication1.current,
-    refApplication2.current,
-    refApplication3.current,
-    refApplication4.current,
-    refApplication5.current,
+    refLifeApplicationTitle.current,
+    refLifeApplication1.current,
+    refLifeApplication2.current,
+    refLifeApplication3.current,
+    refLifeApplication4.current,
+    refLifeApplication5.current,
     refVideoId.current,
   ];
 
@@ -143,18 +144,24 @@ const SermonEditorView = React.forwardRef<
     Keyboard.dismiss();
     setEditorState({ isSubmitting: true });
     const sermon: Sermon = {
+      id: uuidv4(),
       date: DateTime.fromJSDate(date).toISO(),
       pasteur: pasteur === 'Guest' ? values.guestPasteur : pasteur,
       title: values.title,
       seriesTitle: values.seriesTitle,
-      bibleRef: bibleVerse,
+      bibleReference,
       videoId: values.videoId,
-      applicationTitle: values.applicationTitle,
-      application1: values.application1,
-      application2: values.application2,
-      application3: values.application3,
-      application4: values.application4,
-      application5: values.application5,
+      lifeApplication: {
+        title: values.lifeApplicationTitle,
+        items: [
+          values.lifeApplication1,
+          values.lifeApplication1,
+          values.lifeApplication2,
+          values.lifeApplication3,
+          values.lifeApplication4,
+          values.lifeApplication5,
+        ],
+      },
     };
     console.log('commit', sermon);
 
@@ -185,12 +192,12 @@ const SermonEditorView = React.forwardRef<
     }, 300); // Wait for pasteur value to update for yup validator.
   };
 
-  const onBibleVerseChange = (bibleVerse: BibleVerse): void => {
-    setBibleVerse(bibleVerse);
-    setBibleVerseString(
-      bibleVerse.verse.end.length > 0
-        ? `${bibleVerse.book} ${bibleVerse.chapter}:${bibleVerse.verse.start}-${bibleVerse.verse.end}`
-        : `${bibleVerse.book} ${bibleVerse.chapter}:${bibleVerse.verse.start}`,
+  const onBibleVerseChange = (bibleReference: BibleReference): void => {
+    setBibleReference(bibleReference);
+    setBibleReferenceStr(
+      bibleReference.verse.end.length > 0
+        ? `${bibleReference.book} ${bibleReference.chapter}:${bibleReference.verse.start}-${bibleReference.verse.end}`
+        : `${bibleReference.book} ${bibleReference.chapter}:${bibleReference.verse.start}`,
     );
   };
 
@@ -202,12 +209,12 @@ const SermonEditorView = React.forwardRef<
     }),
     title: Yup.string().required('Title is required'),
     seriesTitle: Yup.string(),
-    applicationTitle: Yup.string(),
-    application1: Yup.string(),
-    application2: Yup.string(),
-    application3: Yup.string(),
-    application4: Yup.string(),
-    application5: Yup.string(),
+    lifeApplicationTitle: Yup.string(),
+    lifeApplication1: Yup.string(),
+    lifeApplication2: Yup.string(),
+    lifeApplication3: Yup.string(),
+    lifeApplication4: Yup.string(),
+    lifeApplication5: Yup.string(),
     videoId: Yup.string(),
   });
 
@@ -223,12 +230,12 @@ const SermonEditorView = React.forwardRef<
               guestPasteur: '',
               title: '',
               seriesTitle: '',
-              applicationTitle: '',
-              application1: '',
-              application2: '',
-              application3: '',
-              application4: '',
-              application5: '',
+              lifeApplicationTitle: '',
+              lifeApplication1: '',
+              lifeApplication2: '',
+              lifeApplication3: '',
+              lifeApplication4: '',
+              lifeApplication5: '',
               videoId: '',
             }}
             validateOnChange={true}
@@ -322,69 +329,71 @@ const SermonEditorView = React.forwardRef<
                 />
                 <ListItem
                   title={'Bible Reference'}
-                  value={bibleVerseString}
+                  value={bibleReferenceStr}
                   onPress={() => bibleVersePickerModalRef.current?.present()}
                 />
                 <Divider text={'LIFE APPLICATION'} />
                 <ListItemInput
-                  refInner={refApplicationTitle}
+                  refInner={refLifeApplicationTitle}
                   placeholder={'Title'}
                   placeholderTextColor={theme.colors.textPlaceholder}
-                  value={formik.values.applicationTitle}
-                  errorText={formik.errors.applicationTitle}
+                  value={formik.values.lifeApplicationTitle}
+                  errorText={formik.errors.lifeApplicationTitle}
                   errorColor={theme.colors.error}
                   autoCapitalize={'none'}
                   autoCorrect={false}
                   onBlur={(
                     e: NativeSyntheticEvent<TextInputFocusEventData>,
                   ) => {
-                    formik.handleBlur('applicatonTitle')(e);
+                    formik.handleBlur('lifeApplicationTitle')(e);
                     setEditorState({ focusedField: undefined });
                   }}
-                  onChangeText={formik.handleChange('applicationTitle')}
+                  onChangeText={formik.handleChange('lifeApplicationTitle')}
                   onFocus={() =>
-                    setEditorState({ focusedField: Fields.applicationTitle })
+                    setEditorState({
+                      focusedField: Fields.lifeApplicationTitle,
+                    })
                   }
                 />
                 <ListItemInput
-                  refInner={refApplication1}
-                  placeholder={'Application'}
+                  refInner={refLifeApplication1}
+                  placeholder={'Enter text'}
                   placeholderTextColor={theme.colors.textPlaceholder}
-                  value={formik.values.application1}
-                  errorText={formik.errors.application1}
+                  value={formik.values.lifeApplication1}
+                  errorText={formik.errors.lifeApplication1}
                   errorColor={theme.colors.error}
                   autoCapitalize={'none'}
                   autoCorrect={false}
                   onBlur={(
                     e: NativeSyntheticEvent<TextInputFocusEventData>,
                   ) => {
-                    formik.handleBlur('application1')(e);
+                    formik.handleBlur('lifeApplication1')(e);
                     setEditorState({ focusedField: undefined });
                   }}
-                  onChangeText={formik.handleChange('application1')}
+                  onChangeText={formik.handleChange('lifeApplication1')}
                   onFocus={() =>
-                    setEditorState({ focusedField: Fields.application1 })
+                    setEditorState({ focusedField: Fields.lifeApplication1 })
                   }
                 />
                 {lifeApplicationCount >= 2 && (
                   <ListItemInput
-                    refInner={refApplication2}
-                    placeholder={'Application'}
+                    refInner={refLifeApplication2}
+                    placeholder={'Enter text'}
                     placeholderTextColor={theme.colors.textPlaceholder}
-                    value={formik.values.application2}
-                    errorText={formik.errors.application2}
+                    value={formik.values.lifeApplication2}
+                    errorText={formik.errors.lifeApplication2}
                     errorColor={theme.colors.error}
                     autoCapitalize={'none'}
                     autoCorrect={false}
                     onBlur={(
                       e: NativeSyntheticEvent<TextInputFocusEventData>,
                     ) => {
-                      formik.handleBlur('application2')(e);
+                      formik.handleBlur('lifeApplication2')(e);
                       setEditorState({ focusedField: undefined });
                     }}
-                    onChangeText={formik.handleChange('application2')}
+                    onChangeText={formik.handleChange('lifeApplication2')}
                     onFocus={() =>
-                      setEditorState({ focusedField: Fields.application2 })
+                      setEditorState({ focusedField: Fields.lifeApplication2 })
                     }
                     rightImage={
                       <Icon
@@ -396,7 +405,7 @@ const SermonEditorView = React.forwardRef<
                         style={{ width: 30 }}
                         onPress={() => {
                           setLifeApplicationCount(lifeApplicationCount - 1);
-                          formik.setFieldValue('application2', '');
+                          formik.setFieldValue('lifeApplication2', '');
                         }}
                       />
                     }
@@ -404,23 +413,23 @@ const SermonEditorView = React.forwardRef<
                 )}
                 {lifeApplicationCount >= 3 && (
                   <ListItemInput
-                    refInner={refApplication3}
-                    placeholder={'Application'}
+                    refInner={refLifeApplication3}
+                    placeholder={'Enter text'}
                     placeholderTextColor={theme.colors.textPlaceholder}
-                    value={formik.values.application3}
-                    errorText={formik.errors.application3}
+                    value={formik.values.lifeApplication3}
+                    errorText={formik.errors.lifeApplication3}
                     errorColor={theme.colors.error}
                     autoCapitalize={'none'}
                     autoCorrect={false}
                     onBlur={(
                       e: NativeSyntheticEvent<TextInputFocusEventData>,
                     ) => {
-                      formik.handleBlur('application3')(e);
+                      formik.handleBlur('lifeApplication3')(e);
                       setEditorState({ focusedField: undefined });
                     }}
-                    onChangeText={formik.handleChange('application3')}
+                    onChangeText={formik.handleChange('lifeApplication3')}
                     onFocus={() =>
-                      setEditorState({ focusedField: Fields.application3 })
+                      setEditorState({ focusedField: Fields.lifeApplication3 })
                     }
                     rightImage={
                       <Icon
@@ -432,7 +441,7 @@ const SermonEditorView = React.forwardRef<
                         style={{ width: 30 }}
                         onPress={() => {
                           setLifeApplicationCount(lifeApplicationCount - 1);
-                          formik.setFieldValue('application3', '');
+                          formik.setFieldValue('lifeApplication3', '');
                         }}
                       />
                     }
@@ -440,23 +449,23 @@ const SermonEditorView = React.forwardRef<
                 )}
                 {lifeApplicationCount >= 4 && (
                   <ListItemInput
-                    refInner={refApplication4}
-                    placeholder={'Application'}
+                    refInner={refLifeApplication4}
+                    placeholder={'Enter text'}
                     placeholderTextColor={theme.colors.textPlaceholder}
-                    value={formik.values.application4}
-                    errorText={formik.errors.application4}
+                    value={formik.values.lifeApplication4}
+                    errorText={formik.errors.lifeApplication4}
                     errorColor={theme.colors.error}
                     autoCapitalize={'none'}
                     autoCorrect={false}
                     onBlur={(
                       e: NativeSyntheticEvent<TextInputFocusEventData>,
                     ) => {
-                      formik.handleBlur('application4')(e);
+                      formik.handleBlur('lifeApplication4')(e);
                       setEditorState({ focusedField: undefined });
                     }}
-                    onChangeText={formik.handleChange('application4')}
+                    onChangeText={formik.handleChange('lifeApplication4')}
                     onFocus={() =>
-                      setEditorState({ focusedField: Fields.application4 })
+                      setEditorState({ focusedField: Fields.lifeApplication4 })
                     }
                     rightImage={
                       <Icon
@@ -468,7 +477,7 @@ const SermonEditorView = React.forwardRef<
                         style={{ width: 30 }}
                         onPress={() => {
                           setLifeApplicationCount(lifeApplicationCount - 1);
-                          formik.setFieldValue('application4', '');
+                          formik.setFieldValue('lifeApplication4', '');
                         }}
                       />
                     }
@@ -476,23 +485,23 @@ const SermonEditorView = React.forwardRef<
                 )}
                 {lifeApplicationCount >= 5 && (
                   <ListItemInput
-                    refInner={refApplication5}
-                    placeholder={'Application'}
+                    refInner={refLifeApplication5}
+                    placeholder={'Enter text'}
                     placeholderTextColor={theme.colors.textPlaceholder}
-                    value={formik.values.application5}
-                    errorText={formik.errors.application5}
+                    value={formik.values.lifeApplication5}
+                    errorText={formik.errors.lifeApplication5}
                     errorColor={theme.colors.error}
                     autoCapitalize={'none'}
                     autoCorrect={false}
                     onBlur={(
                       e: NativeSyntheticEvent<TextInputFocusEventData>,
                     ) => {
-                      formik.handleBlur('application5')(e);
+                      formik.handleBlur('lifeApplication5')(e);
                       setEditorState({ focusedField: undefined });
                     }}
-                    onChangeText={formik.handleChange('application5')}
+                    onChangeText={formik.handleChange('lifeApplication5')}
                     onFocus={() =>
-                      setEditorState({ focusedField: Fields.application5 })
+                      setEditorState({ focusedField: Fields.lifeApplication5 })
                     }
                     rightImage={
                       <Icon
@@ -504,7 +513,7 @@ const SermonEditorView = React.forwardRef<
                         style={{ width: 30 }}
                         onPress={() => {
                           setLifeApplicationCount(lifeApplicationCount - 1);
-                          formik.setFieldValue('application5', '');
+                          formik.setFieldValue('lifeApplication5', '');
                         }}
                       />
                     }
