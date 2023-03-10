@@ -2,16 +2,16 @@ import { AppTheme, useTheme } from 'theme';
 import React, { useContext, useEffect, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 
-import { BibleVerse } from 'types/bible';
-import { BibleVerseContext } from './BibleVersePickerModal';
-import { BibleVersePickerNavigatorParamList } from './types';
+import { BibleReference } from 'types/bible';
+import { BibleReferenceContext } from './BibleReferencePickerModal';
+import { BibleReferencePickerNavigatorParamList } from './types';
 import { Button } from '@rneui/base';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { makeStyles } from '@rneui/themed';
 import { viewport } from '@react-native-ajp-elements/ui';
 
 type Props = NativeStackScreenProps<
-  BibleVersePickerNavigatorParamList,
+  BibleReferencePickerNavigatorParamList,
   'BibleVersesScreen'
 >;
 
@@ -23,7 +23,7 @@ const BibleVersesScreen = ({ navigation, route }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
-  const bibleVerseModal = useContext(BibleVerseContext);
+  const bibleReferenceModal = useContext(BibleReferenceContext);
 
   const [startVerse, setStartVerse] = useState('');
   const [endVerse, setEndVerse] = useState('');
@@ -41,7 +41,7 @@ const BibleVersesScreen = ({ navigation, route }: Props) => {
       start: startVerse,
       end: endVerse,
     },
-  } as BibleVerse;
+  } as BibleReference;
 
   useEffect(() => {
     navigation.setOptions({
@@ -51,7 +51,7 @@ const BibleVersesScreen = ({ navigation, route }: Props) => {
           type={'clear'}
           title={'Single Verse'}
           disabled={result.verse.start === ''}
-          onPress={() => bibleVerseModal.dismiss(result)}
+          onPress={() => bibleReferenceModal.dismiss(result)}
         />
       ),
     });
@@ -85,7 +85,7 @@ const BibleVersesScreen = ({ navigation, route }: Props) => {
           setEndVerse(verse.toString());
           result.verse.end = verse.toString();
           setTimeout(() => {
-            bibleVerseModal.dismiss(result);
+            bibleReferenceModal.dismiss(result);
           }, 750); // A bit of time to get visual feedback on selection before dismissal.
         }
       }

@@ -26,7 +26,7 @@ import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import { BibleReference } from 'types/bible';
-import { BibleVersePickerModal } from 'components/admin/modals/BibleVersePickerModal';
+import { BibleReferencePickerModal } from 'components/admin/modals/BibleReferencePickerModal';
 import { DatePickerModal } from 'components/modals/DatePickerModal';
 import { DateTime } from 'luxon';
 import FormikEffect from 'components/atoms/FormikEffect';
@@ -73,7 +73,7 @@ const SermonEditorView = React.forwardRef<
   const theme = useTheme();
   const s = useStyles(theme);
 
-  const bibleVersePickerModalRef = useRef<ItemPickerModal>(null);
+  const bibleReferencePickerModalRef = useRef<ItemPickerModal>(null);
   const pasteurPickerModalRef = useRef<ItemPickerModal>(null);
   const sermonDatePickerModalRef = useRef<DatePickerModal>(null);
 
@@ -192,7 +192,7 @@ const SermonEditorView = React.forwardRef<
     }, 300); // Wait for pasteur value to update for yup validator.
   };
 
-  const onBibleVerseChange = (bibleReference: BibleReference): void => {
+  const onBibleReferenceChange = (bibleReference: BibleReference): void => {
     setBibleReference(bibleReference);
     setBibleReferenceStr(
       bibleReference.verse.end.length > 0
@@ -330,7 +330,9 @@ const SermonEditorView = React.forwardRef<
                 <ListItem
                   title={'Bible Reference'}
                   value={bibleReferenceStr}
-                  onPress={() => bibleVersePickerModalRef.current?.present()}
+                  onPress={() =>
+                    bibleReferencePickerModalRef.current?.present()
+                  }
                 />
                 <Divider text={'LIFE APPLICATION'} />
                 <ListItemInput
@@ -595,9 +597,9 @@ const SermonEditorView = React.forwardRef<
         value={pasteur}
         onValueChange={onPasteurChange}
       />
-      <BibleVersePickerModal
-        ref={bibleVersePickerModalRef}
-        onDismiss={onBibleVerseChange}
+      <BibleReferencePickerModal
+        ref={bibleReferencePickerModalRef}
+        onDismiss={onBibleReferenceChange}
       />
       {/* This isn't working inside bottomsheet.
       {Platform.OS === 'ios' && (

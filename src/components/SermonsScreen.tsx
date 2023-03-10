@@ -7,9 +7,11 @@ import { DateTime } from 'luxon';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SermonsNavigatorParamList } from 'types/navigation';
+import { SignInModal } from 'components/modals/SignInModal';
 import VideoCard from 'components/molecules/VideoCard';
 // import YoutubePlayer from 'react-native-youtube-iframe';
 import { makeStyles } from '@rneui/themed';
+import { requireUserAuthentication } from 'lib/auth/requireUserAuthentication';
 import { saveSermonVideos } from 'store/slices/videos';
 import { selectSermonVideos } from 'store/selectors/videos';
 import { youTubeBroadcastVideos } from 'lib/youTube';
@@ -24,6 +26,7 @@ const SermonsScreen = ({ navigation }: Props) => {
   const s = useStyles(theme);
   const dispatch = useDispatch();
 
+  const signInModalRef = useRef<SignInModal>(null);
   const storedVideos = useSelector(selectSermonVideos);
 
   const allLoaded = useRef(false);
@@ -123,8 +126,24 @@ const SermonsScreen = ({ navigation }: Props) => {
               label: 'Notes',
               icon: 'note-edit-outline',
               iconType: 'material-community',
-              onPress: () =>
-                navigation.navigate('SermonDetail', { id: item.id.videoId }),
+              onPress: () => {
+                // Require user authentication for this feature.
+                requireUserAuthentication()
+                  .then((authenticated: boolean) => {
+                    if (authenticated) {
+                      navigation.navigate('SermonDetail', {
+                        id: item.id.videoId,
+                      });
+                    } else {
+                      signInModalRef.current?.present();
+                    }
+                  })
+                  .catch(() => {
+                    //
+                  });
+
+                // navigation.navigate('SermonDetail', { id: item.id.videoId });
+              },
             },
           ]}
         />
@@ -141,23 +160,26 @@ const SermonsScreen = ({ navigation }: Props) => {
   };
 
   return (
-    <SafeAreaView
-      edges={['left', 'right', 'top']}
-      style={[theme.styles.view, { paddingHorizontal: 0 }]}>
-      <FlatList
-        data={videos}
-        renderItem={renderVideo}
-        ListEmptyComponent={renderListEmptyComponent}
-        keyExtractor={item => item.etag}
-        onEndReachedThreshold={0.2}
-        onEndReached={fetchVideos}
-        contentContainerStyle={{
-          paddingVertical: 15,
-          ...theme.styles.viewWidth,
-        }}
-        contentInsetAdjustmentBehavior={'automatic'}
-      />
-    </SafeAreaView>
+    <>
+      <SafeAreaView
+        edges={['left', 'right', 'top']}
+        style={[theme.styles.view, { paddingHorizontal: 0 }]}>
+        <FlatList
+          data={videos}
+          renderItem={renderVideo}
+          ListEmptyComponent={renderListEmptyComponent}
+          keyExtractor={item => item.etag}
+          onEndReachedThreshold={0.2}
+          onEndReached={fetchVideos}
+          contentContainerStyle={{
+            paddingVertical: 15,
+            ...theme.styles.viewWidth,
+          }}
+          contentInsetAdjustmentBehavior={'automatic'}
+        />
+      </SafeAreaView>
+      <SignInModal ref={signInModalRef} />
+    </>
   );
 };
 

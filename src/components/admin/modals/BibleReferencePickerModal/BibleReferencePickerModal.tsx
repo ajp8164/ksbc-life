@@ -1,7 +1,7 @@
 import {
-  BibleVersePickerModalMethods,
-  BibleVersePickerModalProps,
-  BibleVersePickerNavigatorParamList,
+  BibleReferencePickerModalMethods,
+  BibleReferencePickerModalProps,
+  BibleReferencePickerNavigatorParamList,
 } from './types';
 import React, {
   createContext,
@@ -11,35 +11,36 @@ import React, {
 } from 'react';
 
 import BibleBookChaptersScreen from './BibleBookChaptersScreen';
-import { BibleVerse } from 'types/bible';
+import { BibleReference } from 'types/bible';
 import BibleVersesScreen from './BibleVersesScreen';
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { Modal } from '@react-native-ajp-elements/ui';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-type BibleVerseContext = {
-  dismiss: (bibleVerse?: BibleVerse) => void;
+type BibleReferenceContext = {
+  dismiss: (bibleVerse?: BibleReference) => void;
 };
 
-export const BibleVerseContext = createContext<BibleVerseContext>({
+export const BibleReferenceContext = createContext<BibleReferenceContext>({
   dismiss: () => {
     return;
   },
 });
 
-const Stack = createNativeStackNavigator<BibleVersePickerNavigatorParamList>();
+const Stack =
+  createNativeStackNavigator<BibleReferencePickerNavigatorParamList>();
 
-type BibleVersePickerModal = BibleVersePickerModalMethods;
+type BibleReferencePickerModal = BibleReferencePickerModalMethods;
 
-const BibleVersePickerModal = React.forwardRef<
-  BibleVersePickerModal,
-  BibleVersePickerModalProps
+const BibleReferencePickerModal = React.forwardRef<
+  BibleReferencePickerModal,
+  BibleReferencePickerModalProps
 >((props, ref) => {
   const { onDismiss } = props;
   const innerRef = useRef<BottomSheetModalMethods>(null);
 
-  const [bibleVerse, setBibleVerse] = useState({} as BibleVerse);
+  const [bibleReference, setBibleReference] = useState({} as BibleReference);
 
   useImperativeHandle(ref, () => ({
     //  These functions exposed to the parent component through the ref.
@@ -47,8 +48,8 @@ const BibleVersePickerModal = React.forwardRef<
     present,
   }));
 
-  const dismiss = (bibleVerse?: BibleVerse) => {
-    bibleVerse && setBibleVerse(bibleVerse);
+  const dismiss = (bibleReference?: BibleReference) => {
+    bibleReference && setBibleReference(bibleReference);
     innerRef.current?.dismiss();
   };
 
@@ -57,8 +58,8 @@ const BibleVersePickerModal = React.forwardRef<
   };
 
   return (
-    <Modal ref={innerRef} onDismiss={() => onDismiss(bibleVerse)}>
-      <BibleVerseContext.Provider value={{ dismiss }}>
+    <Modal ref={innerRef} onDismiss={() => onDismiss(bibleReference)}>
+      <BibleReferenceContext.Provider value={{ dismiss }}>
         <NavigationContainer independent={true}>
           <Stack.Navigator screenOptions={{}}>
             <Stack.Screen
@@ -80,9 +81,9 @@ const BibleVersePickerModal = React.forwardRef<
             />
           </Stack.Navigator>
         </NavigationContainer>
-      </BibleVerseContext.Provider>
+      </BibleReferenceContext.Provider>
     </Modal>
   );
 });
 
-export { BibleVersePickerModal };
+export { BibleReferencePickerModal };

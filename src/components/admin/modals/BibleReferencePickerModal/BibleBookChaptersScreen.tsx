@@ -2,7 +2,7 @@ import { AppTheme, useTheme } from 'theme';
 import { ListItemAccordian, viewport } from '@react-native-ajp-elements/ui';
 import { ScrollView, View } from 'react-native';
 
-import { BibleVersePickerNavigatorParamList } from './types';
+import { BibleReferencePickerNavigatorParamList } from './types';
 import { Button } from '@rneui/base';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React from 'react';
@@ -10,7 +10,7 @@ import { bible } from 'lib/content/bible';
 import { makeStyles } from '@rneui/themed';
 
 type Props = NativeStackScreenProps<
-  BibleVersePickerNavigatorParamList,
+  BibleReferencePickerNavigatorParamList,
   'BibleBookChaptersScreen'
 >;
 
