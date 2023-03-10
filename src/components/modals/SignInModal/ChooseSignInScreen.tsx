@@ -21,7 +21,7 @@ export type Props = NativeStackScreenProps<
   'ChooseSignInScreen'
 >;
 
-const ChooseSignInScreen = ({ navigation }: Props) => {
+const ChooseSignInScreen = ({ navigation, route }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
@@ -30,7 +30,9 @@ const ChooseSignInScreen = ({ navigation }: Props) => {
   return (
     <View style={theme.styles.viewAlt}>
       <Text style={s.title}>{appConfig.appName}</Text>
-      <Text style={s.description}>{'Sign in to take notes.'}</Text>
+      {route.params?.msg && (
+        <Text style={s.description}>{route.params?.msg}</Text>
+      )}
       <Text style={s.subtitle}>
         {signInAction ? 'Sign In' : 'Create Account'}
       </Text>

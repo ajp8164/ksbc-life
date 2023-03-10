@@ -1,4 +1,4 @@
-import React, { useImperativeHandle, useRef } from 'react';
+import React, { useImperativeHandle, useRef, useState } from 'react';
 import {
   SignInModalMethods,
   SignInModalProps,
@@ -24,6 +24,8 @@ const SignInModal = React.forwardRef<SignInModal, SignInModalProps>(
     const theme = useTheme();
     const innerRef = useRef<BottomSheetModalMethods>(null);
 
+    const [signInMsg, setSignInMsg] = useState<string>();
+
     useImperativeHandle(ref, () => ({
       //  These functions exposed to the parent component through the ref.
       dismiss,
@@ -34,7 +36,8 @@ const SignInModal = React.forwardRef<SignInModal, SignInModalProps>(
       innerRef.current?.dismiss();
     };
 
-    const present = () => {
+    const present = (msg?: string) => {
+      setSignInMsg(msg);
       innerRef.current?.present();
     };
 
@@ -48,6 +51,7 @@ const SignInModal = React.forwardRef<SignInModal, SignInModalProps>(
             <Stack.Screen
               name="ChooseSignInScreen"
               component={ChooseSignInScreen}
+              initialParams={{ msg: signInMsg }}
               options={{
                 headerShown: false,
               }}

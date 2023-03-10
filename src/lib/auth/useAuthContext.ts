@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux';
 
 type AuthContext = {
   dismissSignInModal: () => void;
-  presentSignInModal: () => void;
+  presentSignInModal: (msg?: string) => void;
   userIsAuthenticated: boolean;
 };
 
@@ -50,8 +50,8 @@ export const useAuthContext = (
     signInModalRef.current?.dismiss();
   };
 
-  const present = () => {
-    signInModalRef.current?.present();
+  const present = (msg?: string) => {
+    signInModalRef.current?.present(msg);
   };
 
   const onAuthError = () => {

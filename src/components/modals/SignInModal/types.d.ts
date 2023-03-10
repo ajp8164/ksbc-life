@@ -13,11 +13,13 @@ export interface SignInModalProps {}
 
 export interface SignInModalMethods {
   dismiss: () => void;
-  present: () => void;
+  present: (msg?: string) => void;
 }
 
 export type SignInNavigatorParamList = {
-  ChooseSignInScreen: undefined;
+  ChooseSignInScreen: {
+    msg?: string;
+  };
   CreateAccountScreen: undefined;
   EmailSignInScreen: undefined;
   ForgotPasswordScreen: undefined;

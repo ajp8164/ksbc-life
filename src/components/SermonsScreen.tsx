@@ -132,7 +132,7 @@ const SermonsScreen = ({ navigation }: Props) => {
                     id: item.id.videoId,
                   });
                 } else {
-                  auth.presentSignInModal();
+                  auth.presentSignInModal('Please sign in to take notes.');
                 }
               },
             },
