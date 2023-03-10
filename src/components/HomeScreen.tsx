@@ -70,7 +70,7 @@ const HomeScreen = ({ navigation }: Props) => {
   };
 
   const doAccountAction = () => {
-    if (userProfile) {
+    if (auth.userIsAuthenticated) {
       navigation.navigate('More', { subNav: 'UserProfile' });
     } else {
       auth.presentSignInModal();
