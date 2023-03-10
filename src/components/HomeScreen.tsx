@@ -1,24 +1,21 @@
-import { Alert, ScrollView, View } from 'react-native';
 import { AppTheme, useTheme } from 'theme';
 import { Button, Icon, Image } from '@rneui/base';
 import {
   HomeNavigatorParamList,
   MoreNavigatorParamList,
 } from 'types/navigation';
-import React, { useEffect, useRef } from 'react';
+import React, { useContext, useEffect } from 'react';
+import { ScrollView, View } from 'react-native';
 import { openShareSheet, viewport } from '@react-native-ajp-elements/ui';
 
 import Card from 'components/molecules/Card';
 import { CompositeScreenProps } from '@react-navigation/core';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { SignInModal } from 'components/modals/SignInModal';
-import auth from '@react-native-firebase/auth';
-import lodash from 'lodash';
+import { SignInContext } from 'components/AppMain';
 import { makeStyles } from '@rneui/themed';
 import { openURL } from '@react-native-ajp-elements/core';
 import { selectUserProfile } from 'store/selectors/userSelectors';
-import { useAuthorizeUser } from 'lib/auth';
 import { useSelector } from 'react-redux';
 
 type Props = CompositeScreenProps<
@@ -30,10 +27,7 @@ const HomeScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
-  const authorizeUser = useAuthorizeUser();
-  const authorizeUserDebounced = useRef(lodash.debounce(authorizeUser, 200));
-  const signInModalRef = useRef<SignInModal>(null);
-  const signInModalPresentedRef = useRef(false);
+  const signInModal = useContext(SignInContext);
   const userProfile = useSelector(selectUserProfile);
 
   useEffect(() => {
@@ -45,23 +39,6 @@ const HomeScreen = ({ navigation }: Props) => {
     setAvatar();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userProfile]);
-
-  useEffect(() => {
-    const unsubscribe = auth().onAuthStateChanged(credentials => {
-      // This handler is called multiple times.
-      // See https://stackoverflow.com/a/40436769
-      if (signInModalPresentedRef.current) {
-        authorizeUserDebounced.current(credentials, {
-          onError: onAuthError,
-          onAuthorized: () => {
-            signInModalRef.current?.dismiss();
-            signInModalPresentedRef.current = false;
-          },
-        });
-      }
-    });
-    return unsubscribe;
-  }, []);
 
   const setAvatar = () => {
     navigation.setOptions({
@@ -92,21 +69,11 @@ const HomeScreen = ({ navigation }: Props) => {
     });
   };
 
-  const onAuthError = () => {
-    Alert.alert(
-      'Sign In Failed',
-      'There was a problem signing in. Please try again.',
-      [{ text: 'OK' }],
-      { cancelable: false },
-    );
-  };
-
   const doAccountAction = () => {
     if (userProfile) {
       navigation.navigate('More', { subNav: 'UserProfile' });
     } else {
-      signInModalRef.current?.present();
-      signInModalPresentedRef.current = true;
+      signInModal.present();
     }
   };
 
@@ -171,7 +138,6 @@ const HomeScreen = ({ navigation }: Props) => {
           cardStyle={s.lightCard}
         />
       </ScrollView>
-      <SignInModal ref={signInModalRef} />
     </SafeAreaView>
   );
 };

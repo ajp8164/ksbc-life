@@ -1,3 +1,4 @@
+import { Alert, StatusBar } from 'react-native';
 import {
   DarkTheme,
   DefaultTheme,
@@ -5,7 +6,7 @@ import {
 } from '@react-navigation/native';
 import { InitStatus, initApp } from 'app';
 import { MainNavigatorParamList, StartupScreen } from 'types/navigation';
-import { useEffect, useState } from 'react';
+import { createContext, useEffect, useRef, useState } from 'react';
 
 import { AppError } from 'lib/errors';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
@@ -14,9 +15,12 @@ import ErrorBoundary from 'react-native-error-boundary';
 import { LinkingOptions } from '@react-navigation/native';
 import MainNavigator from 'components/navigation/MainNavigator';
 import RNBootSplash from 'react-native-bootsplash';
-import { StatusBar } from 'react-native';
+import { SignInModal } from 'components/modals/SignInModal';
+import auth from '@react-native-firebase/auth';
+import lodash from 'lodash';
 import { log } from '@react-native-ajp-elements/core';
 import { selectThemeSettings } from 'store/selectors/appSettingsSelectors';
+import { useAuthorizeUser } from 'lib/auth';
 import { useColorScheme } from 'react-native';
 import { useSelector } from 'react-redux';
 
@@ -28,9 +32,30 @@ const linking: LinkingOptions<MainNavigatorParamList> = {
   },
 };
 
+type SignInContext = {
+  isPresented: boolean;
+  dismiss: () => void;
+  present: () => void;
+};
+
+export const SignInContext = createContext<SignInContext>({
+  isPresented: false,
+  dismiss: () => {
+    return;
+  },
+  present: () => {
+    return;
+  },
+});
+
 const AppMain = () => {
   const themeSettings = useSelector(selectThemeSettings);
   const scheme = useColorScheme();
+
+  const signInModalRef = useRef<SignInModal>(null);
+  const signInModalPresentedRef = useRef(false);
+  const authorizeUser = useAuthorizeUser();
+  const authorizeUserDebounced = useRef(lodash.debounce(authorizeUser, 200));
 
   const [startupScreen, setStartupScreen] = useState<StartupScreen>(
     StartupScreen.None,
@@ -78,6 +103,44 @@ const AppMain = () => {
     })();
   }, []);
 
+  useEffect(() => {
+    const unsubscribe = auth().onAuthStateChanged(credentials => {
+      console.log('HERE', signInModalPresentedRef.current);
+      // This handler is called multiple times.
+      // See https://stackoverflow.com/a/40436769
+      if (signInModalPresentedRef.current) {
+        authorizeUserDebounced.current(credentials, {
+          onError: onAuthError,
+          onAuthorized: () => {
+            dismissSignInModal();
+          },
+        });
+      }
+    });
+    return unsubscribe;
+  }, []);
+
+  const dismissSignInModal = () => {
+    signInModalRef.current?.dismiss();
+    signInModalPresentedRef.current = false;
+    console.log('DISMISSED');
+  };
+
+  const presentSignInModal = () => {
+    signInModalRef.current?.present();
+    signInModalPresentedRef.current = true;
+    console.log('PRESENTED');
+  };
+
+  const onAuthError = () => {
+    Alert.alert(
+      'Sign In Failed',
+      'There was a problem signing in. Please try again.',
+      [{ text: 'OK' }],
+      { cancelable: false },
+    );
+  };
+
   if (fatal) {
     throw new AppError(fatal);
   }
@@ -94,7 +157,15 @@ const AppMain = () => {
       <BottomSheetModalProvider>
         <ColorModeSwitch themeSettings={themeSettings}>
           <ErrorBoundary onError={onError}>
-            <MainNavigator startupScreen={startupScreen} />
+            <SignInContext.Provider
+              value={{
+                isPresented: signInModalPresentedRef.current,
+                dismiss: dismissSignInModal,
+                present: presentSignInModal,
+              }}>
+              <MainNavigator startupScreen={startupScreen} />
+              <SignInModal ref={signInModalRef} />
+            </SignInContext.Provider>
           </ErrorBoundary>
         </ColorModeSwitch>
       </BottomSheetModalProvider>
