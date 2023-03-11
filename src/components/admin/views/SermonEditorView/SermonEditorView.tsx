@@ -244,7 +244,7 @@ const SermonEditorView = React.forwardRef<
             validationSchema={validationSchema}
             onSubmit={save}>
             {formik => (
-              <View style={[theme.styles.viewAlt, s.view]}>
+              <View style={theme.styles.viewAlt}>
                 <FormikEffect
                   formik={formik}
                   onChange={(currentFormikState, previousFormikState) => {
@@ -521,7 +521,7 @@ const SermonEditorView = React.forwardRef<
                     }
                   />
                 )}
-                <View style={{ flexDirection: 'row' }}>
+                <View style={s.addLifeApplication}>
                   <Button
                     type={'clear'}
                     containerStyle={{ alignItems: 'flex-start' }}
@@ -615,8 +615,8 @@ const SermonEditorView = React.forwardRef<
 });
 
 const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
-  view: {
-    // paddingTop: 30,
+  addLifeApplication: {
+    flexDirection: 'row',
   },
 }));
 
