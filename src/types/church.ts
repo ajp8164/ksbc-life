@@ -1,6 +1,11 @@
 import { BibleReference } from 'types/bible';
 import { ISODateString } from './common';
 
+export type Church = {
+  pasteurs: Pasteur[];
+  sermons: Sermon[];
+};
+
 export type Sermon = {
   id: string;
   date: ISODateString;
@@ -21,4 +26,9 @@ export type Pasteur = {
   id: string;
   firstName: string;
   lastName: string;
+  title: string;
+  email: string;
+  phone: string;
+  photoUrl: string;
+  bio: string;
 };

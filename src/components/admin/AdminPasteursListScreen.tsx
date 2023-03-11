@@ -13,7 +13,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Pasteur } from 'types/church';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
-import firestore from '@react-native-firebase/firestore';
+import { documentChangeListener } from 'firestore/events';
+import { getPasteurs } from 'firestore/church';
 import { makeStyles } from '@rneui/themed';
 
 type Props = CompositeScreenProps<
@@ -29,15 +30,13 @@ const AdminPasteursListScreen = ({ navigation }: Props) => {
   const [pasteurs, setPasteurs] = useState<Pasteur[]>([]);
 
   useEffect(() => {
-    firestore()
-      .collection('Church')
-      .doc('Church')
-      .get()
-      .then(documentSnapshot => {
-        const pasteurs = documentSnapshot.data()?.pasteurs as Pasteur[];
+    const subscription = documentChangeListener('Church', 'Church', () => {
+      getPasteurs().then(pasteurs => {
         setPasteurs(pasteurs);
-        console.log(documentSnapshot.data());
       });
+    });
+
+    return subscription;
   }, []);
 
   useEffect(() => {
@@ -62,7 +61,6 @@ const AdminPasteursListScreen = ({ navigation }: Props) => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  console.log('pasteurs', pasteurs);
 
   return (
     <SafeAreaView edges={['left', 'right']} style={theme.styles.view}>

@@ -9,6 +9,7 @@
       "app": ["./app/*", "./app/"],
       "components": ["./components/*", "./components/"],
       "config": ["./config/*", "./config"],
+      "firestore": ["./firestore/*", "./firestore/"],
       "img": ["./theme/img/*", "./theme/img/"],
       "lib": ["./lib/*", "./lib"],
       "store": ["./store/*", "./store"],

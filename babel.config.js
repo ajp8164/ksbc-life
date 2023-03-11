@@ -30,6 +30,7 @@ module.exports = {
           app: './src/app/',
           config: './src/config/',
           components: './src/components/',
+          firestore: './src/firestore/',
           img: './src/theme/img/',
           lib: './src/lib/',
           store: './src/store/',

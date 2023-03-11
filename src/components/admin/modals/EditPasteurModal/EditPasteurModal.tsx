@@ -43,14 +43,19 @@ const EditPasteurModal = React.forwardRef<
         title={title}
         rightButtonText={'Save'}
         rightButtonDisabled={!editorState.isValid}
-        onRightButtonPress={() => {
-          pasteurEditorViewRef.current?.savePasteur().then(() => dismiss());
-        }}
+        onRightButtonPress={() =>
+          pasteurEditorViewRef.current
+            ?.savePasteur()
+            .then(dismiss)
+            .catch(() => {
+              // Nothing to do. Prevent unhandled promise.
+            })
+        }
       />
       <PasteurEditorView
         ref={pasteurEditorViewRef}
-        onChange={setEditorState}
         pasteur={pasteur}
+        onChange={setEditorState}
       />
     </Modal>
   );
