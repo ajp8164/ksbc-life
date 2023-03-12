@@ -8,7 +8,6 @@ import { ScrollView, Text } from 'react-native';
 
 import { Button } from '@rneui/base';
 import { CompositeScreenProps } from '@react-navigation/core';
-import { Divider } from '@react-native-ajp-elements/ui';
 import { EditPasteurModal } from 'components/admin/modals/EditPasteurModal';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Pasteur } from 'types/church';
@@ -64,7 +63,7 @@ const AdminPasteurScreen = ({ navigation, route }: Props) => {
         <Text style={s.text}>{pasteur.email}</Text>
         <Text style={s.text}>{pasteur.phone}</Text>
         <Text style={s.text}>{pasteur.photoUrl}</Text>
-        <Text style={s.bioText}>{pasteur.bio}</Text>
+        <Text style={s.bioText}>{pasteur.biography}</Text>
       </ScrollView>
       <EditPasteurModal ref={editPasteurModalRef} pasteur={pasteur} />
     </SafeAreaView>

@@ -29,6 +29,6 @@ export type Pasteur = {
   title: string;
   email: string;
   phone: string;
+  biography: string;
   photoUrl: string;
-  bio: string;
 };
