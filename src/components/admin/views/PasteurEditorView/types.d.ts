@@ -22,5 +22,5 @@ export interface EditorState {
   fieldCount: number;
   focusedField?: number;
   isSubmitting: boolean;
-  isValid: boolean;
+  changed: boolean;
 }

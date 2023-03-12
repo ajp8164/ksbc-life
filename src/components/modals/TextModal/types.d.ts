@@ -9,8 +9,11 @@ declare const LegalModal: React.MemoExoticComponent<
 >;
 
 export interface TextModalProps {
+  headerTitle?: string;
   onDismiss: (text: string) => void;
   placeholder?: string;
+  textContainerStyle?: ViewStyle | ViewStyle[];
+  value?: string;
 }
 
 export interface TextModalMethods {

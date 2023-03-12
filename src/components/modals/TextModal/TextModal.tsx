@@ -4,11 +4,13 @@ import TextView, { TextViewMethods } from 'components/views/TextView';
 
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { Modal } from '@react-native-ajp-elements/ui';
+import ModalHeader from 'components/molecules/ModalHeader';
 
 type TextModal = TextModalMethods;
 
 const TextModal = React.forwardRef<TextModal, TextModalProps>((props, ref) => {
-  const { onDismiss, placeholder } = props;
+  const { headerTitle, onDismiss, placeholder, textContainerStyle, value } =
+    props;
 
   const innerRef = useRef<BottomSheetModalMethods>(null);
   const textViewRef = useRef<TextViewMethods>(null);
@@ -34,10 +36,19 @@ const TextModal = React.forwardRef<TextModal, TextModalProps>((props, ref) => {
       ref={innerRef}
       snapPoints={['92%']}
       onDismiss={() => onDismiss(text.current)}>
+      {headerTitle && (
+        <ModalHeader
+          title={headerTitle}
+          rightButtonText={'Done'}
+          onRightButtonPress={dismiss}
+        />
+      )}
       <TextView
         ref={textViewRef}
         placeholder={placeholder}
         viewableHeightPercentage={0.92}
+        containerStyle={textContainerStyle}
+        value={value}
         onTextChanged={(t: string) => {
           text.current = t;
         }}

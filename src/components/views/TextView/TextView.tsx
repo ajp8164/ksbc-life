@@ -12,8 +12,10 @@ type TextView = TextViewMethods;
 
 const TextView = React.forwardRef<TextView, TextViewProps>((props, ref) => {
   const {
+    containerStyle,
     onTextChanged,
     placeholder = 'Enter text here',
+    value,
     viewableHeightPercentage = 1,
   } = props;
 
@@ -27,7 +29,7 @@ const TextView = React.forwardRef<TextView, TextViewProps>((props, ref) => {
     insets.bottom -
     (Platform.OS === 'android' ? StatusBar.currentHeight || 0 : 0);
 
-  const [text, setText] = React.useState('');
+  const [text, setText] = React.useState(value);
 
   useImperativeHandle(ref, () => ({
     //  These functions exposed to the parent component through the ref.
@@ -39,7 +41,8 @@ const TextView = React.forwardRef<TextView, TextViewProps>((props, ref) => {
   };
 
   return (
-    <View style={[theme.styles.viewAlt, { paddingHorizontal: 0 }]}>
+    <View
+      style={[theme.styles.viewAlt, { paddingHorizontal: 5 }, containerStyle]}>
       <Input
         style={[s.text, { height: visibleHeight }]}
         inputContainerStyle={{ borderBottomWidth: 0 }}

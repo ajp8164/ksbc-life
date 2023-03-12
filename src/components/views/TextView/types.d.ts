@@ -1,4 +1,5 @@
 import React from 'react';
+import { ViewStyle } from 'react-native/types';
 
 export declare type TextView = TextViewMethods;
 
@@ -9,8 +10,10 @@ declare const TextView: React.MemoExoticComponent<
 >;
 
 export interface TextViewProps {
+  containerStyle?: ViewStyle | ViewStyle[];
   onTextChanged: (text: string) => void;
   placeholder?: string;
+  value?: string;
   viewableHeightPercentage?: number;
 }
 

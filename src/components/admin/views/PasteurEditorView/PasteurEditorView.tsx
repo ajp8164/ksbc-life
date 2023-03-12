@@ -10,18 +10,22 @@ import {
   View,
 } from 'react-native';
 import { AppTheme, useTheme } from 'theme';
-import { Divider, ListItemInput } from '@react-native-ajp-elements/ui';
+import {
+  Divider,
+  ListItem,
+  ListItemInput,
+} from '@react-native-ajp-elements/ui';
 import {
   EditorState,
   PasteurEditorViewMethods,
   PasteurEditorViewProps,
 } from './types';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
-import React, { useEffect, useImperativeHandle, useRef } from 'react';
+import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import FormikEffect from 'components/atoms/FormikEffect';
-import { Input } from '@rneui/base';
+import { TextModal } from 'components/modals/TextModal';
 import { makeStyles } from '@rneui/themed';
 import { putPasteur } from 'firestore/church';
 import { useSetState } from '@react-native-ajp-elements/core';
@@ -34,7 +38,6 @@ enum Fields {
   email,
   phone,
   photoUrl,
-  bio,
 }
 
 type FormValues = {
@@ -44,7 +47,6 @@ type FormValues = {
   email: string;
   phone: string;
   photoUrl: string;
-  bio: string;
 };
 
 type PasteurEditorView = PasteurEditorViewMethods;
@@ -58,6 +60,8 @@ const PasteurEditorView = React.forwardRef<
   const theme = useTheme();
   const s = useStyles(theme);
 
+  const [biography, setBiography] = useState<string>(pasteur?.bio || '');
+
   const formikRef = useRef<FormikProps<FormValues>>(null);
   const refFirstName = useRef<TextInput>(null);
   const refLastName = useRef<TextInput>(null);
@@ -65,7 +69,8 @@ const PasteurEditorView = React.forwardRef<
   const refEmail = useRef<TextInput>(null);
   const refPhone = useRef<TextInput>(null);
   const refPhotoUrl = useRef<TextInput>(null);
-  const refBio = useRef<TextInput & Input>(null);
+
+  const biographyModalRef = useRef<TextModal>(null);
 
   // Same order as on form.
   const fieldRefs = [
@@ -74,15 +79,17 @@ const PasteurEditorView = React.forwardRef<
     refTitle.current,
     refEmail.current,
     refPhone.current,
-    refBio.current,
     refPhotoUrl.current,
   ];
+
+  const [bioDirty, setBioDirty] = useState(false);
+  const [formDirty, setFormDirty] = useState(false);
 
   const [editorState, setEditorState] = useSetState<EditorState>({
     fieldCount: fieldRefs.length,
     focusedField: undefined,
     isSubmitting: false,
-    isValid: false,
+    changed: false,
   });
 
   useImperativeHandle(ref, () => ({
@@ -94,6 +101,11 @@ const PasteurEditorView = React.forwardRef<
     onChange && onChange(editorState);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorState]);
+
+  useEffect(() => {
+    setEditorState({ changed: bioDirty || formDirty });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bioDirty, formDirty]);
 
   const savePasteur = async () => {
     return formikRef.current?.submitForm();
@@ -112,7 +124,7 @@ const PasteurEditorView = React.forwardRef<
       title: values.title,
       email: values.email,
       phone: values.phone,
-      bio: values.bio,
+      bio: biography,
       photoUrl: values.photoUrl,
     })
       .then(() => {
@@ -131,6 +143,11 @@ const PasteurEditorView = React.forwardRef<
       });
   };
 
+  const saveBiography = (text: string) => {
+    setBiography(text);
+    setBioDirty(pasteur?.bio !== text);
+  };
+
   const validationSchema = Yup.object().shape({
     firstName: Yup.string().required('First name is required'),
     lastName: Yup.string().required('Last name is required'),
@@ -138,7 +155,6 @@ const PasteurEditorView = React.forwardRef<
     email: Yup.string().email('Must be a valid email address'),
     phone: Yup.string(),
     photoUrl: Yup.string(),
-    bio: Yup.string(),
   });
 
   return (
@@ -155,7 +171,6 @@ const PasteurEditorView = React.forwardRef<
               title: pasteur?.title || '',
               email: pasteur?.email || '',
               phone: pasteur?.phone || '',
-              bio: pasteur?.bio || '',
               photoUrl: pasteur?.photoUrl || '',
             }}
             validateOnChange={true}
@@ -172,9 +187,7 @@ const PasteurEditorView = React.forwardRef<
                       currentState?.dirty !== previousState?.dirty ||
                       currentState?.isValid !== previousState?.isValid
                     ) {
-                      setEditorState({
-                        isValid: currentState.dirty && currentState.isValid,
-                      });
+                      setFormDirty(currentState.dirty && currentState.isValid);
                     }
                   }}
                 />
@@ -273,23 +286,18 @@ const PasteurEditorView = React.forwardRef<
                   onChangeText={formik.handleChange('phone')}
                   onFocus={() => setEditorState({ focusedField: Fields.phone })}
                 />
-                <Divider text={'ABOUT'} />
-                <Input
-                  ref={refBio}
-                  style={{ height: 100 }}
-                  inputContainerStyle={{ borderBottomWidth: 0 }}
-                  containerStyle={s.bioContainer}
-                  multiline={true}
-                  placeholder={'Biography'}
-                  value={formik.values.bio}
-                  onChangeText={formik.handleChange('bio')}
-                  onBlur={(
-                    e: NativeSyntheticEvent<TextInputFocusEventData>,
-                  ) => {
-                    formik.handleBlur('bio')(e);
-                    setEditorState({ focusedField: undefined });
-                  }}
-                  onFocus={() => setEditorState({ focusedField: Fields.bio })}
+                <Divider text={'BIOGRAPHY'} />
+                <ListItem
+                  title={
+                    biography.length
+                      ? `${biography.substring(0, 200)}...`
+                      : 'Enter biography'
+                  }
+                  titleStyle={
+                    !biography.length ? { ...theme.styles.textPlaceholder } : {}
+                  }
+                  containerStyle={{ borderBottomWidth: 0 }}
+                  onPress={biographyModalRef.current?.present}
                 />
                 <ListItemInput
                   refInner={refPhotoUrl}
@@ -316,6 +324,13 @@ const PasteurEditorView = React.forwardRef<
           </Formik>
         </ScrollView>
       </AvoidSoftInputView>
+      <TextModal
+        ref={biographyModalRef}
+        headerTitle={'Biography'}
+        placeholder={'Enter biography'}
+        value={biography}
+        onDismiss={saveBiography}
+      />
       {/* This isn't working inside bottomsheet.
       {Platform.OS === 'ios' && (
         <KeyboardAccessory
