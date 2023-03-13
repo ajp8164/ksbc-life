@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* KSBCTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* KSBCTests.m */; };
+		068879F4C9666DEFE1D81417 /* Pods_KSBC_KSBCTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B3CEA0BF5FF651AB452F4CC /* Pods_KSBC_KSBCTests.framework */; };
 		0A87DAAC882B48DC86009DE8 /* SFUIText-RegularG1.otf in Resources */ = {isa = PBXBuildFile; fileRef = A48C97E12D094724943D7381 /* SFUIText-RegularG1.otf */; };
-		0C80B921A6F3F58F76C31292 /* libPods-KSBC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-KSBC.a */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
@@ -17,9 +17,9 @@
 		2434B7A3E9D54F66BEBFD293 /* SFUIText-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = F860E10586AA4BFD85999C60 /* SFUIText-Bold.otf */; };
 		28EA4225D5F1493D91DE6C5A /* SFUIText-ItalicG3.otf in Resources */ = {isa = PBXBuildFile; fileRef = 24DC126373CB454098BE184A /* SFUIText-ItalicG3.otf */; };
 		2C919DCE69CB4732B796E41F /* SFUIText-ItalicG2.otf in Resources */ = {isa = PBXBuildFile; fileRef = E5DEA2B1EABC4B4EAA9BFFE6 /* SFUIText-ItalicG2.otf */; };
+		4719989F9B0C63CCD7F7FF51 /* Pods_KSBC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4505D28130EECF248E7924D /* Pods_KSBC.framework */; };
 		6F555FA85EEE41A9A7234A0B /* SFUIText-BoldG2.otf in Resources */ = {isa = PBXBuildFile; fileRef = 7FEFF046B8D546DC93631BFA /* SFUIText-BoldG2.otf */; };
 		714A9B9E683646B791DDAE96 /* SFUIText-RegularG3.otf in Resources */ = {isa = PBXBuildFile; fileRef = 4EADF6543A1F4E39AC03FC34 /* SFUIText-RegularG3.otf */; };
-		7699B88040F8A987B510C191 /* libPods-KSBC-KSBCTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-KSBC-KSBCTests.a */; };
 		80DD5391B6C84580A677596C /* SFUIText-ItalicG1.otf in Resources */ = {isa = PBXBuildFile; fileRef = FBC65C468E224747836C0732 /* SFUIText-ItalicG1.otf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		97E5EF2D1DF840CABDF8B4A9 /* SFUIText-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 750008C8717A4D0F9DCA5AD8 /* SFUIText-Regular.otf */; };
@@ -61,10 +61,10 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = KSBC/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = KSBC/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = KSBC/main.m; sourceTree = "<group>"; };
-		19F6CBCC0A4E27FBF8BF4A61 /* libPods-KSBC-KSBCTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-KSBC-KSBCTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2141A5E6D005461F9C0D9909 /* SFUIText-BoldItalicG3.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SFUIText-BoldItalicG3.otf"; path = "../assets/fonts/SFUIText/SFUIText-BoldItalicG3.otf"; sourceTree = "<group>"; };
 		24DC126373CB454098BE184A /* SFUIText-ItalicG3.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SFUIText-ItalicG3.otf"; path = "../assets/fonts/SFUIText/SFUIText-ItalicG3.otf"; sourceTree = "<group>"; };
 		32DC5F93E4B249DB91C5875B /* SFUIText-SemiboldItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SFUIText-SemiboldItalic.otf"; path = "../assets/fonts/SFUIText/SFUIText-SemiboldItalic.otf"; sourceTree = "<group>"; };
+		3B3CEA0BF5FF651AB452F4CC /* Pods_KSBC_KSBCTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KSBC_KSBCTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B4392A12AC88292D35C810B /* Pods-KSBC.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KSBC.debug.xcconfig"; path = "Target Support Files/Pods-KSBC/Pods-KSBC.debug.xcconfig"; sourceTree = "<group>"; };
 		3F67846B6A844D9C8FE351E0 /* SFUIText-Light.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SFUIText-Light.otf"; path = "../assets/fonts/SFUIText/SFUIText-Light.otf"; sourceTree = "<group>"; };
 		48199A9D0E4A4F2088161619 /* SFUIText-RegularG2.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SFUIText-RegularG2.otf"; path = "../assets/fonts/SFUIText/SFUIText-RegularG2.otf"; sourceTree = "<group>"; };
@@ -74,7 +74,6 @@
 		5709B34CF0A7D63546082F79 /* Pods-KSBC.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KSBC.release.xcconfig"; path = "Target Support Files/Pods-KSBC/Pods-KSBC.release.xcconfig"; sourceTree = "<group>"; };
 		57F72E6899D040C2828F94D8 /* SFUIText-BoldItalicG2.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SFUIText-BoldItalicG2.otf"; path = "../assets/fonts/SFUIText/SFUIText-BoldItalicG2.otf"; sourceTree = "<group>"; };
 		5B7EB9410499542E8C5724F5 /* Pods-KSBC-KSBCTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KSBC-KSBCTests.debug.xcconfig"; path = "Target Support Files/Pods-KSBC-KSBCTests/Pods-KSBC-KSBCTests.debug.xcconfig"; sourceTree = "<group>"; };
-		5DCACB8F33CDC322A6C60F78 /* libPods-KSBC.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-KSBC.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6E3EEC081A0040E9A6915F96 /* SFUIText-BoldG1.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SFUIText-BoldG1.otf"; path = "../assets/fonts/SFUIText/SFUIText-BoldG1.otf"; sourceTree = "<group>"; };
 		750008C8717A4D0F9DCA5AD8 /* SFUIText-Regular.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SFUIText-Regular.otf"; path = "../assets/fonts/SFUIText/SFUIText-Regular.otf"; sourceTree = "<group>"; };
 		777336D6D2634B96863177A1 /* SFUIText-BoldItalicG1.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SFUIText-BoldItalicG1.otf"; path = "../assets/fonts/SFUIText/SFUIText-BoldItalicG1.otf"; sourceTree = "<group>"; };
@@ -104,6 +103,7 @@
 		A48C97E12D094724943D7381 /* SFUIText-RegularG1.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SFUIText-RegularG1.otf"; path = "../assets/fonts/SFUIText/SFUIText-RegularG1.otf"; sourceTree = "<group>"; };
 		C1A94B2FFA2C45AE93875C71 /* SFUIText-Medium.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SFUIText-Medium.otf"; path = "../assets/fonts/SFUIText/SFUIText-Medium.otf"; sourceTree = "<group>"; };
 		C95BA0D099564EB0AAEFE796 /* SFUIText-Semibold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SFUIText-Semibold.otf"; path = "../assets/fonts/SFUIText/SFUIText-Semibold.otf"; sourceTree = "<group>"; };
+		D4505D28130EECF248E7924D /* Pods_KSBC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KSBC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E5DEA2B1EABC4B4EAA9BFFE6 /* SFUIText-ItalicG2.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SFUIText-ItalicG2.otf"; path = "../assets/fonts/SFUIText/SFUIText-ItalicG2.otf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F70A8DACC635440F96CE11E7 /* SFUIText-Italic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SFUIText-Italic.otf"; path = "../assets/fonts/SFUIText/SFUIText-Italic.otf"; sourceTree = "<group>"; };
@@ -116,7 +116,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7699B88040F8A987B510C191 /* libPods-KSBC-KSBCTests.a in Frameworks */,
+				068879F4C9666DEFE1D81417 /* Pods_KSBC_KSBCTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -124,7 +124,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C80B921A6F3F58F76C31292 /* libPods-KSBC.a in Frameworks */,
+				4719989F9B0C63CCD7F7FF51 /* Pods_KSBC.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -167,8 +167,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				5DCACB8F33CDC322A6C60F78 /* libPods-KSBC.a */,
-				19F6CBCC0A4E27FBF8BF4A61 /* libPods-KSBC-KSBCTests.a */,
+				D4505D28130EECF248E7924D /* Pods_KSBC.framework */,
+				3B3CEA0BF5FF651AB452F4CC /* Pods_KSBC_KSBCTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

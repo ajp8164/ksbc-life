@@ -80,9 +80,11 @@
 	<key>NSCameraUsageDescription</key>
 	<string>To use the camera to take pictures in the app.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Used to secure your identity.</string>
+	<string>To secure your identity.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>To use the camera to take pictures in the app.</string>
+	<string>To use the microphone in the app.</string>
+  <key>NSPhotoLibraryUsageDescription</key>
+	<string>To select images from photo library.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
