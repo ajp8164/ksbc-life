@@ -1,12 +1,10 @@
 import { AppTheme, useTheme } from 'theme';
-import { Platform, StatusBar, View } from 'react-native';
 import React, { useImperativeHandle } from 'react';
 import { TextViewMethods, TextViewProps } from './types';
 
 import { Input } from '@rneui/base';
+import { View } from 'react-native';
 import { makeStyles } from '@rneui/themed';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { viewport } from '@react-native-ajp-elements/ui';
 
 type TextView = TextViewMethods;
 
@@ -15,19 +13,12 @@ const TextView = React.forwardRef<TextView, TextViewProps>((props, ref) => {
     containerStyle,
     onTextChanged,
     placeholder = 'Enter text here',
+    textHeight,
     value,
-    viewableHeightPercentage = 1,
   } = props;
 
   const theme = useTheme();
   const s = useStyles(theme);
-
-  const insets = useSafeAreaInsets();
-  const visibleHeight =
-    viewport.height * viewableHeightPercentage -
-    insets.top -
-    insets.bottom -
-    (Platform.OS === 'android' ? StatusBar.currentHeight || 0 : 0);
 
   const [text, setText] = React.useState(value);
 
@@ -42,9 +33,14 @@ const TextView = React.forwardRef<TextView, TextViewProps>((props, ref) => {
 
   return (
     <View
-      style={[theme.styles.viewAlt, { paddingHorizontal: 5 }, containerStyle]}>
+      style={[
+        theme.styles.viewAlt,
+        s.view,
+        { height: textHeight },
+        containerStyle,
+      ]}>
       <Input
-        style={[s.text, { height: visibleHeight }]}
+        style={[s.text]}
         inputContainerStyle={{ borderBottomWidth: 0 }}
         multiline={true}
         placeholder={placeholder}
@@ -59,6 +55,10 @@ const TextView = React.forwardRef<TextView, TextViewProps>((props, ref) => {
 });
 
 const useStyles = makeStyles((_theme, theme: AppTheme) => ({
+  view: {
+    paddingHorizontal: 5,
+    borderWidth: 1,
+  },
   text: {
     ...theme.styles.textNormal,
     textAlignVertical: 'top',

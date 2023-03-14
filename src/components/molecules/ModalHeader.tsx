@@ -1,10 +1,11 @@
 import { AppTheme, useTheme } from 'theme';
 import { Button, Icon } from '@rneui/base';
-import { Text, View } from 'react-native';
+import { LayoutChangeEvent, Text, View } from 'react-native';
 
 import { makeStyles } from '@rneui/themed';
 
 interface ModalHeaderInterface {
+  onLayout?: (event: LayoutChangeEvent) => void;
   onRightButtonPress?: () => void;
   rightButtonDisabled?: boolean;
   rightButtonText?: string;
@@ -16,6 +17,7 @@ interface ModalHeaderInterface {
 }
 
 const ModalHeader = ({
+  onLayout,
   onRightButtonPress,
   rightButtonDisabled,
   rightButtonText,
@@ -28,8 +30,12 @@ const ModalHeader = ({
   const theme = useTheme();
   const s = useStyles(theme);
 
+  const onHeaderLayout = (event: LayoutChangeEvent) => {
+    onLayout && onLayout(event);
+  };
+
   return (
-    <View style={s.view}>
+    <View style={s.view} onLayout={onHeaderLayout}>
       <Text style={s.title}>{title}</Text>
       <Button
         type={'clear'}

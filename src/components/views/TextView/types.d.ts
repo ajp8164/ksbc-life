@@ -14,7 +14,8 @@ export interface TextViewProps {
   onTextChanged: (text: string) => void;
   placeholder?: string;
   value?: string;
-  viewableHeightPercentage?: number;
+  // viewableHeightPercentage?: number;
+  textHeight: number;
 }
 
 export interface TextViewMethods {
