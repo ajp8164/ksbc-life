@@ -10,12 +10,13 @@ declare const TextView: React.MemoExoticComponent<
 >;
 
 export interface TextViewProps {
+  characterLimit?: number;
   containerStyle?: ViewStyle | ViewStyle[];
   onTextChanged: (text: string) => void;
   placeholder?: string;
   value?: string;
   // viewableHeightPercentage?: number;
-  textHeight: number;
+  textHeight: number | string;
 }
 
 export interface TextViewMethods {

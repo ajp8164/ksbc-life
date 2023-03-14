@@ -11,8 +11,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 type TextModal = TextModalMethods;
 
 const TextModal = React.forwardRef<TextModal, TextModalProps>((props, ref) => {
-  const { headerTitle, onDismiss, placeholder, textContainerStyle, value } =
-    props;
+  const {
+    characterLimit,
+    headerTitle,
+    onDismiss,
+    placeholder,
+    textContainerStyle,
+    value,
+  } = props;
 
   const innerRef = useRef<BottomSheetModalMethods>(null);
   const textViewRef = useRef<TextViewMethods>(null);
@@ -63,6 +69,7 @@ const TextModal = React.forwardRef<TextModal, TextModalProps>((props, ref) => {
       <TextView
         ref={textViewRef}
         placeholder={placeholder}
+        characterLimit={characterLimit}
         textHeight={textHeight}
         containerStyle={textContainerStyle}
         value={value}

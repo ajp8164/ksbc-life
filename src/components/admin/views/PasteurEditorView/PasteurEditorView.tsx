@@ -407,6 +407,7 @@ const PasteurEditorView = React.forwardRef<
       <TextModal
         ref={biographyModalRef}
         headerTitle={'Biography'}
+        characterLimit={1200}
         value={formikRef.current?.values.biography}
         onDismiss={saveBiography}
       />
