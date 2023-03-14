@@ -2,7 +2,6 @@ import {
   AdminNavigatorParamList,
   TabNavigatorParamList,
 } from 'types/navigation';
-import { AppTheme, useTheme } from 'theme';
 import { Button, Icon } from '@rneui/base';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import React, { useEffect, useRef, useState } from 'react';
@@ -15,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
 import { documentChangeListener } from 'firestore/events';
 import { getPasteurs } from 'firestore/church';
-import { makeStyles } from '@rneui/themed';
+import { useTheme } from 'theme';
 
 type Props = CompositeScreenProps<
   NativeStackScreenProps<AdminNavigatorParamList, 'AdminPasteursList'>,
@@ -24,7 +23,6 @@ type Props = CompositeScreenProps<
 
 const AdminPasteursListScreen = ({ navigation }: Props) => {
   const theme = useTheme();
-  const s = useStyles(theme);
 
   const editPasteurModalRef = useRef<EditPasteurModal>(null);
   const [pasteurs, setPasteurs] = useState<Pasteur[]>([]);
@@ -77,12 +75,10 @@ const AdminPasteursListScreen = ({ navigation }: Props) => {
                 index === 0 ? 'first' : undefined,
                 index === pasteurs.length - 1 ? 'last' : undefined,
               ]}
-              // leftImage={'cross-outline'}
-              // leftImageType={'material-community'}
+              leftImage={'account-outline'}
+              leftImageType={'material-community'}
               onPress={() =>
-                navigation.navigate('AdminPasteur', {
-                  pasteur,
-                })
+                editPasteurModalRef.current?.present('Edit Pasteur', pasteur)
               }
             />
           );
@@ -92,11 +88,5 @@ const AdminPasteursListScreen = ({ navigation }: Props) => {
     </SafeAreaView>
   );
 };
-
-const useStyles = makeStyles((_theme, theme: AppTheme) => ({
-  text: {
-    ...theme.styles.textNormal,
-  },
-}));
 
 export default AdminPasteursListScreen;

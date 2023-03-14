@@ -1,3 +1,4 @@
+import * as ImagePicker from 'react-native-image-picker';
 import * as Yup from 'yup';
 
 import {
@@ -14,6 +15,7 @@ import {
   Divider,
   ListItem,
   ListItemInput,
+  viewport,
 } from '@react-native-ajp-elements/ui';
 import {
   EditorState,
@@ -22,11 +24,14 @@ import {
 } from './types';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import React, { useEffect, useImperativeHandle, useRef } from 'react';
-import { ellipsis, useSetState } from '@react-native-ajp-elements/core';
+import { ellipsis, log, useSetState } from '@react-native-ajp-elements/core';
+import { saveImage, selectImage } from 'lib/imageSelect';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import FormikEffect from 'components/atoms/FormikEffect';
+import { Image } from '@rneui/base';
 import { TextModal } from 'components/modals/TextModal';
+import { appConfig } from 'config';
 import { makeStyles } from '@rneui/themed';
 import { putPasteur } from 'firestore/church';
 import { uuidv4 } from 'lib/uuid';
@@ -71,6 +76,7 @@ const PasteurEditorView = React.forwardRef<
   const refPhotoUrl = useRef<TextInput>(null);
 
   const biographyModalRef = useRef<TextModal>(null);
+  const pasteurImageAsset = useRef<ImagePicker.Asset>();
 
   // Same order as on form.
   const fieldRefs = [
@@ -107,36 +113,72 @@ const PasteurEditorView = React.forwardRef<
     return formikRef.current?.submitForm();
   };
 
-  const save = (
+  const save = async (
     values: FormValues,
     { resetForm }: FormikHelpers<FormValues>,
   ) => {
     Keyboard.dismiss();
     setEditorState({ isSubmitting: true });
-    return putPasteur({
-      id: pasteur?.id || uuidv4(),
-      firstName: values.firstName,
-      lastName: values.lastName,
-      title: values.title,
-      email: values.email,
-      phone: values.phone,
-      biography: values.biography,
-      photoUrl: values.photoUrl,
-    })
-      .then(() => {
-        resetForm({ values });
-        setEditorState({ isSubmitting: false });
+    await savePasteurImage();
+    // Saving the image updates the form but form values are already passed in.
+    // Overwrite the image value after saving the image to storage.
+    values.photoUrl = formikRef.current?.values.photoUrl || '';
+    return (
+      putPasteur({
+        id: pasteur?.id || uuidv4(),
+        firstName: values.firstName,
+        lastName: values.lastName,
+        title: values.title,
+        email: values.email,
+        phone: values.phone,
+        biography: values.biography,
+        photoUrl: values.photoUrl,
       })
-      .catch((e: Error) => {
+        .then(() => {
+          resetForm({ values });
+          setEditorState({ isSubmitting: false });
+        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .catch((e: any) => {
+          log.error(`Failed to save pasteur: ${e.message}`);
+          Alert.alert(
+            'Pasteur Not Saved',
+            'Please try again. If this problem persists please contact support.',
+            [{ text: 'OK' }],
+            { cancelable: false },
+          );
+          setEditorState({ isSubmitting: false });
+        })
+    );
+  };
+
+  const selectPasteurImage = () => {
+    selectImage({
+      onSuccess: imageAsset => {
+        pasteurImageAsset.current = imageAsset;
+        formikRef.current?.setFieldValue('photoUrl', imageAsset.uri);
+      },
+      onError: () => {
         Alert.alert(
-          'Pasteur Not Saved',
-          'Please try again. If this problem persists please contact support.',
+          'Image Not Selected',
+          'This image could not be selected. Please try again,',
           [{ text: 'OK' }],
           { cancelable: false },
         );
-        setEditorState({ isSubmitting: false });
-        throw e;
+      },
+    });
+  };
+
+  const savePasteurImage = async () => {
+    if (pasteurImageAsset.current) {
+      await saveImage({
+        imageAsset: pasteurImageAsset.current,
+        storagePath: appConfig.storageImagePasteurs,
+        oldImage: pasteur?.photoUrl,
+        onSuccess: url => formikRef.current?.setFieldValue('photoUrl', url),
+        onError: () => formikRef.current?.setFieldValue('photoUrl', ''),
       });
+    }
   };
 
   const validationSchema = Yup.object().shape({
@@ -145,7 +187,7 @@ const PasteurEditorView = React.forwardRef<
     title: Yup.string(),
     email: Yup.string().email('Must be a valid email address'),
     phone: Yup.string(),
-    biography: Yup.string(),
+    biography: Yup.string().max(2000),
     photoUrl: Yup.string(),
   });
 
@@ -296,26 +338,24 @@ const PasteurEditorView = React.forwardRef<
                   containerStyle={{ borderBottomWidth: 0 }}
                   onPress={biographyModalRef.current?.present}
                 />
-                <ListItemInput
-                  refInner={refPhotoUrl}
-                  placeholder={'Photo'}
-                  placeholderTextColor={theme.colors.textPlaceholder}
-                  value={formik.values.photoUrl}
-                  errorText={formik.errors.photoUrl}
-                  errorColor={theme.colors.error}
-                  autoCapitalize={'none'}
-                  autoCorrect={false}
-                  onBlur={(
-                    e: NativeSyntheticEvent<TextInputFocusEventData>,
-                  ) => {
-                    formik.handleBlur('photoUrl')(e);
-                    setEditorState({ focusedField: undefined });
-                  }}
-                  onChangeText={formik.handleChange('photoUrl')}
-                  onFocus={() =>
-                    setEditorState({ focusedField: Fields.photoUrl })
-                  }
-                />
+                {formik.values.photoUrl ? (
+                  <Image
+                    source={{ uri: formik.values.photoUrl }}
+                    containerStyle={{
+                      width: viewport.width - 30,
+                      height: ((viewport.width - 30) * 9) / 16,
+                      borderWidth: 1,
+                      borderColor: theme.colors.subtleGray,
+                    }}
+                    onPress={selectPasteurImage}
+                  />
+                ) : (
+                  <ListItem
+                    title={'Choose pasteur photo'}
+                    containerStyle={{ borderBottomWidth: 0 }}
+                    onPress={selectPasteurImage}
+                  />
+                )}
               </View>
             )}
           </Formik>

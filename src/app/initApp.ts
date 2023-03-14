@@ -7,6 +7,7 @@ import { BackHandler } from 'react-native';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { appConfig } from 'config';
 import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
 import { svgImages } from 'theme';
 
 export enum InitStatus {
@@ -21,6 +22,7 @@ export const initApp = async (): Promise<InitStatus> => {
     // Initialize firestore for dev as necessary.
     if (__DEV__) {
       firestore().useEmulator('localhost', 8080);
+      storage().useEmulator('localhost', 9199);
       console.log('Firestore emulator running at localhost:8080');
     }
 

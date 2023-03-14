@@ -7,19 +7,19 @@ import React, { useImperativeHandle, useRef, useState } from 'react';
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { Modal } from '@react-native-ajp-elements/ui';
 import ModalHeader from 'components/molecules/ModalHeader';
+import { Pasteur } from 'types/church';
 
 type EditPasteurModal = EditPasteurModalMethods;
 
 const EditPasteurModal = React.forwardRef<
   EditPasteurModal,
   EditPasteurModalProps
->((props, ref) => {
-  const { pasteur } = props;
-
+>((_props, ref) => {
   const innerRef = useRef<BottomSheetModalMethods>(null);
   const pasteurEditorViewRef = useRef<PasteurEditorView>(null);
 
   const [editorState, setEditorState] = useState({} as EditorState);
+  const [pasteur, setPasteur] = useState<Pasteur>();
   const [title, setTitle] = useState('');
 
   useImperativeHandle(ref, () => ({
@@ -32,8 +32,9 @@ const EditPasteurModal = React.forwardRef<
     innerRef.current?.dismiss();
   };
 
-  const present = (title: string) => {
+  const present = (title: string, pasteur?: Pasteur) => {
     setTitle(title);
+    setPasteur(pasteur);
     innerRef.current?.present();
   };
 
