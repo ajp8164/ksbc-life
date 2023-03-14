@@ -71,7 +71,7 @@ const AppSettings = () => {
         <Divider
           type={'note'}
           text={
-            'Biometrics enable face recognition or fingerprint. When enabled biometrics protects changes to your profile, access to your private key, ability to withdraw funds, disabling privacy mode and access to the app log.'
+            'Biometrics enable face recognition or fingerprint. When enabled biometrics protects changes to your information.'
           }
         />
         <Divider text={'APPEARANCE'} />
