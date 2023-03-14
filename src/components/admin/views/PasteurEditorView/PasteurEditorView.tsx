@@ -348,7 +348,7 @@ const PasteurEditorView = React.forwardRef<
                   title={
                     formik.values.biography.length
                       ? `${ellipsis(formik.values.biography, 200)}`
-                      : 'Enter biography'
+                      : 'Add a biography'
                   }
                   titleStyle={
                     !formik.values.biography.length
@@ -407,7 +407,6 @@ const PasteurEditorView = React.forwardRef<
       <TextModal
         ref={biographyModalRef}
         headerTitle={'Biography'}
-        placeholder={'Enter biography'}
         value={formikRef.current?.values.biography}
         onDismiss={saveBiography}
       />
