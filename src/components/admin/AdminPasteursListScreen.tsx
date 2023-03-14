@@ -66,23 +66,25 @@ const AdminPasteursListScreen = ({ navigation }: Props) => {
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior={'automatic'}>
         <Divider />
-        {pasteurs.map((pasteur, index) => {
-          return (
-            <ListItem
-              key={index}
-              title={`${pasteur.firstName} ${pasteur.lastName}`}
-              position={[
-                index === 0 ? 'first' : undefined,
-                index === pasteurs.length - 1 ? 'last' : undefined,
-              ]}
-              leftImage={'account-outline'}
-              leftImageType={'material-community'}
-              onPress={() =>
-                editPasteurModalRef.current?.present('Edit Pasteur', pasteur)
-              }
-            />
-          );
-        })}
+        {pasteurs
+          .sort((a, b) => (a.lastName > b.lastName ? 1 : -1))
+          .map((pasteur, index) => {
+            return (
+              <ListItem
+                key={index}
+                title={`${pasteur.firstName} ${pasteur.lastName}`}
+                position={[
+                  index === 0 ? 'first' : undefined,
+                  index === pasteurs.length - 1 ? 'last' : undefined,
+                ]}
+                leftImage={'account-outline'}
+                leftImageType={'material-community'}
+                onPress={() =>
+                  editPasteurModalRef.current?.present('Edit Pasteur', pasteur)
+                }
+              />
+            );
+          })}
       </ScrollView>
       <EditPasteurModal ref={editPasteurModalRef} />
     </SafeAreaView>
