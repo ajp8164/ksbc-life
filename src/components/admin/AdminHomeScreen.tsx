@@ -50,6 +50,14 @@ const AdminHomeScreen = ({ navigation }: Props) => {
         contentInsetAdjustmentBehavior={'automatic'}>
         <Divider />
         <ListItem
+          title={'Pasteurs'}
+          position={['first', 'last']}
+          leftImage={'account-outline'}
+          leftImageType={'material-community'}
+          onPress={() => navigation.navigate('AdminPasteursList')}
+        />
+        <Divider />
+        <ListItem
           title={'Sermons'}
           position={['first', 'last']}
           leftImage={'cross-outline'}
@@ -58,11 +66,11 @@ const AdminHomeScreen = ({ navigation }: Props) => {
         />
         <Divider />
         <ListItem
-          title={'Pasteurs'}
+          title={'Content'}
           position={['first', 'last']}
-          leftImage={'account-outline'}
+          leftImage={'file-document-edit-outline'}
           leftImageType={'material-community'}
-          onPress={() => navigation.navigate('AdminPasteursList')}
+          // onPress={() => navigation.navigate('AdminSermonsList')}
         />
       </ScrollView>
     </SafeAreaView>
