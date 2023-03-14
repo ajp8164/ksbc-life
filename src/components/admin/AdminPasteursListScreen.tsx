@@ -73,6 +73,7 @@ const AdminPasteursListScreen = ({ navigation }: Props) => {
               <ListItem
                 key={index}
                 title={`${pasteur.firstName} ${pasteur.lastName}`}
+                subtitle={pasteur.title}
                 position={[
                   index === 0 ? 'first' : undefined,
                   index === pasteurs.length - 1 ? 'last' : undefined,
