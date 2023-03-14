@@ -69,7 +69,7 @@ export const saveImage = async (args: {
           // Need a handler here to swallow possible second throw inside putFile().
         });
         const url = await storageRef.getDownloadURL();
-        oldImage && (await deleteOldImage(oldImage, storagePath));
+        oldImage && (await deleteImage({ filename: oldImage, storagePath }));
         onSuccess(url);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
@@ -83,17 +83,32 @@ export const saveImage = async (args: {
   }
 };
 
-const deleteOldImage = async (oldImage: string, storagePath: string) => {
-  const oldFilename = `${storagePath}${
-    oldImage.replace(/%2F/g, '/').split('/').pop()?.split('#')[0].split('?')[0]
+/**
+ * Delete an image from storage.
+ * @param args.filename - the file to delete
+ * @param args.storagePath - path in storage where the image is stored
+ * @param args.onSuccess - callback when complete
+ * @param args.onError - callback when an error occurs
+ */
+export const deleteImage = async (args: {
+  filename: string;
+  storagePath: string;
+  onSuccess?: () => void;
+  onError?: () => void;
+}) => {
+  const { filename, onError, onSuccess, storagePath } = args;
+  const filenameRef = `${storagePath}${
+    filename.replace(/%2F/g, '/').split('/').pop()?.split('#')[0].split('?')[0]
   }`;
   await storage()
-    .ref(oldFilename)
+    .ref(filenameRef)
     .delete()
+    .then(() => onSuccess && onSuccess())
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .catch((e: any) => {
       if (!e.message.includes('storage/object-not-found')) {
-        log.error(`Failed to delete old image: ${e.message}`);
+        log.error(`Failed to delete image: ${e.message}`);
       }
+      onError && onError();
     });
 };

@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { AppTheme, useTheme } from 'theme';
+import { Button, Icon, Image } from '@rneui/base';
 import {
   Divider,
   ListItem,
@@ -24,12 +25,11 @@ import {
 } from './types';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import React, { useEffect, useImperativeHandle, useRef } from 'react';
+import { deleteImage, saveImage, selectImage } from 'lib/imageSelect';
 import { ellipsis, log, useSetState } from '@react-native-ajp-elements/core';
-import { saveImage, selectImage } from 'lib/imageSelect';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import FormikEffect from 'components/atoms/FormikEffect';
-import { Image } from '@rneui/base';
 import { TextModal } from 'components/modals/TextModal';
 import { appConfig } from 'config';
 import { makeStyles } from '@rneui/themed';
@@ -181,6 +181,26 @@ const PasteurEditorView = React.forwardRef<
     }
   };
 
+  const deletePasteurImage = async () => {
+    if (pasteur?.photoUrl) {
+      await deleteImage({
+        filename: pasteur.photoUrl,
+        storagePath: appConfig.storageImagePasteurs,
+      })
+        .then(() => {
+          formikRef.current?.setFieldValue('photoUrl', '');
+        })
+        .catch(() => {
+          Alert.alert(
+            'Image Not Deleted',
+            'This image could not be deleted. Please try again,',
+            [{ text: 'OK' }],
+            { cancelable: false },
+          );
+        });
+    }
+  };
+
   const validationSchema = Yup.object().shape({
     firstName: Yup.string().required('First name is required'),
     lastName: Yup.string().required('Last name is required'),
@@ -323,7 +343,7 @@ const PasteurEditorView = React.forwardRef<
                   onChangeText={formik.handleChange('phone')}
                   onFocus={() => setEditorState({ focusedField: Fields.phone })}
                 />
-                <Divider text={'BIOGRAPHY'} />
+                <Divider text={'ABOUT'} />
                 <ListItem
                   title={
                     formik.values.biography.length
@@ -338,17 +358,40 @@ const PasteurEditorView = React.forwardRef<
                   containerStyle={{ borderBottomWidth: 0 }}
                   onPress={biographyModalRef.current?.present}
                 />
-                {formik.values.photoUrl ? (
-                  <Image
-                    source={{ uri: formik.values.photoUrl }}
-                    containerStyle={{
-                      width: viewport.width - 30,
-                      height: ((viewport.width - 30) * 9) / 16,
-                      borderWidth: 1,
-                      borderColor: theme.colors.subtleGray,
-                    }}
-                    onPress={selectPasteurImage}
-                  />
+                {formik.values.photoUrl.length ? (
+                  <>
+                    <Divider />
+                    <Image
+                      source={{ uri: formik.values.photoUrl }}
+                      containerStyle={s.imageContainer}>
+                      <View style={s.imageButtonsContainer}>
+                        <Button
+                          buttonStyle={s.imageButton}
+                          icon={
+                            <Icon
+                              name="image-edit-outline"
+                              type={'material-community'}
+                              color={theme.colors.darkGray}
+                              size={28}
+                            />
+                          }
+                          onPress={selectPasteurImage}
+                        />
+                        <Button
+                          buttonStyle={s.imageButton}
+                          icon={
+                            <Icon
+                              name="close-circle-outline"
+                              type={'material-community'}
+                              color={theme.colors.assertive}
+                              size={28}
+                            />
+                          }
+                          onPress={deletePasteurImage}
+                        />
+                      </View>
+                    </Image>
+                  </>
                 ) : (
                   <ListItem
                     title={'Choose pasteur photo'}
@@ -382,10 +425,23 @@ const PasteurEditorView = React.forwardRef<
 });
 
 const useStyles = makeStyles((_theme, theme: AppTheme) => ({
-  bioContainer: {
+  imageContainer: {
+    width: viewport.width - 30,
+    height: ((viewport.width - 30) * 9) / 16,
+    justifyContent: 'center',
     borderWidth: 1,
-    borderRadius: 3,
     borderColor: theme.colors.subtleGray,
+  },
+  imageButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    paddingHorizontal: '20%',
+  },
+  imageButton: {
+    backgroundColor: theme.colors.whiteTransparentMid,
+    height: 50,
+    borderRadius: 50,
   },
 }));
 
