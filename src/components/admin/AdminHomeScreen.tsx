@@ -72,6 +72,22 @@ const AdminHomeScreen = ({ navigation }: Props) => {
           leftImageType={'material-community'}
           // onPress={() => navigation.navigate('AdminSermonsList')}
         />
+        <Divider />
+        <ListItem
+          title={'Push Notifications'}
+          position={['first', 'last']}
+          leftImage={'bell-outline'}
+          leftImageType={'material-community'}
+          // onPress={() => navigation.navigate('AdminSermonsList')}
+        />
+        <Divider />
+        <ListItem
+          title={'Users'}
+          position={['first', 'last']}
+          leftImage={'account-multiple-outline'}
+          leftImageType={'material-community'}
+          // onPress={() => navigation.navigate('AdminSermonsList')}
+        />
       </ScrollView>
     </SafeAreaView>
   );
