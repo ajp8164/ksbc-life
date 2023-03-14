@@ -49,50 +49,62 @@ export const putPasteur = (pasteur: Pasteur): Promise<void> => {
 };
 
 const readChurch = (): Promise<Church> => {
-  return firestore()
-    .collection('Church')
-    .doc('Church')
-    .get()
-    .then(documentSnapshot => {
-      return (documentSnapshot.data() as Church) || initialChurch;
-    })
-    .catch((e: Error) => {
-      log.error(`Failed to read Church document: ${e.message}`);
-      throw e;
-    });
+  return (
+    firestore()
+      .collection('Church')
+      .doc('Church')
+      .get()
+      .then(documentSnapshot => {
+        return (documentSnapshot.data() as Church) || initialChurch;
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch((e: any) => {
+        log.error(`Failed to read Church document: ${e.message}`);
+        throw e;
+      })
+  );
 };
 
 const updateChurch = (church: Church): Promise<void> => {
   console.log('updateChurch', church);
   let retry = false;
-  return firestore()
-    .collection('Church')
-    .doc('Church')
-    .update(church)
-    .catch((e: Error) => {
-      if (e.message.includes('firestore/not-found') && !retry) {
-        // Document not found. Create it and retry.
-        retry = true;
-        return initChurch()
-          .then(() => updateChurch(church))
-          .catch((e: Error) => {
-            throw e;
-          });
-      } else {
-        log.error(`Failed to save Church document: ${e.message}`);
-        throw e;
-      }
-    });
+  return (
+    firestore()
+      .collection('Church')
+      .doc('Church')
+      .update(church)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch((e: any) => {
+        if (e.message.includes('firestore/not-found') && !retry) {
+          // Document not found. Create it and retry.
+          retry = true;
+          return (
+            initChurch()
+              .then(() => updateChurch(church))
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              .catch((e: any) => {
+                throw e;
+              })
+          );
+        } else {
+          log.error(`Failed to save Church document: ${e.message}`);
+          throw e;
+        }
+      })
+  );
 };
 
 const initChurch = (): Promise<void> => {
   console.log('initChurch');
-  return firestore()
-    .collection('Church')
-    .doc('Church')
-    .set(initialChurch)
-    .catch((e: Error) => {
-      log.error(`Failed to  initialize Church document: ${e.message}`);
-      throw e;
-    });
+  return (
+    firestore()
+      .collection('Church')
+      .doc('Church')
+      .set(initialChurch)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch((e: any) => {
+        log.error(`Failed to  initialize Church document: ${e.message}`);
+        throw e;
+      })
+  );
 };

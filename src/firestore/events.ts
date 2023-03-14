@@ -5,11 +5,14 @@ export const collectionnChangeListener = (
   col: string,
   handler: () => void,
 ): (() => void) => {
-  return firestore()
-    .collection(col)
-    .onSnapshot(handler, (e: Error) => {
-      log.error(`Failed onSnapshot for ${col} collection: ${e.message}`);
-    });
+  return (
+    firestore()
+      .collection(col)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .onSnapshot(handler, (e: any) => {
+        log.error(`Failed onSnapshot for ${col} collection: ${e.message}`);
+      })
+  );
 };
 
 export const documentChangeListener = (
@@ -17,10 +20,13 @@ export const documentChangeListener = (
   doc: string,
   handler: () => void,
 ): (() => void) => {
-  return firestore()
-    .collection(col)
-    .doc(doc)
-    .onSnapshot(handler, (e: Error) => {
-      log.error(`Failed onSnapshot for ${col}.${doc} document: ${e.message}`);
-    });
+  return (
+    firestore()
+      .collection(col)
+      .doc(doc)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .onSnapshot(handler, (e: any) => {
+        log.error(`Failed onSnapshot for ${col}.${doc} document: ${e.message}`);
+      })
+  );
 };
