@@ -2,6 +2,7 @@ import {
   AdminNavigatorParamList,
   TabNavigatorParamList,
 } from 'types/navigation';
+import { Alert, ScrollView } from 'react-native';
 import { Button, Icon } from '@rneui/base';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import React, { useEffect, useRef, useState } from 'react';
@@ -12,7 +13,6 @@ import { EditPasteurModal } from 'components/admin/modals/EditPasteurModal';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Pasteur } from 'types/church';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ScrollView } from 'react-native';
 import { documentChangeListener } from 'firestore/events';
 import { useTheme } from 'theme';
 
@@ -60,6 +60,22 @@ const AdminPasteursListScreen = ({ navigation }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const confirmDeletePasteur = async (id: string) => {
+    Alert.alert(
+      'Confirm Delete Note',
+      'Are you sure you want to delete this pasteur?',
+      [
+        {
+          text: 'Yes, delete',
+          onPress: () => deletePasteur(id),
+          style: 'destructive',
+        },
+        { text: 'No', style: 'cancel' },
+      ],
+      { cancelable: false },
+    );
+  };
+
   return (
     <SafeAreaView edges={['left', 'right']} style={theme.styles.view}>
       <ScrollView
@@ -92,7 +108,7 @@ const AdminPasteursListScreen = ({ navigation }: Props) => {
                         size={28}
                       />
                     ),
-                    onPress: () => deletePasteur(pasteur.id),
+                    onPress: () => confirmDeletePasteur(pasteur.id),
                   },
                 ]}
                 onPress={() =>
