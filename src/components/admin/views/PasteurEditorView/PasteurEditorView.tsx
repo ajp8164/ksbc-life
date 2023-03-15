@@ -33,7 +33,7 @@ import FormikEffect from 'components/atoms/FormikEffect';
 import { TextModal } from 'components/modals/TextModal';
 import { appConfig } from 'config';
 import { makeStyles } from '@rneui/themed';
-import { putPasteur } from 'firestore/church';
+import { updatePasteur } from 'firestore/church';
 import { uuidv4 } from 'lib/uuid';
 
 enum Fields {
@@ -124,7 +124,7 @@ const PasteurEditorView = React.forwardRef<
     // Overwrite the image value after saving the image to storage.
     values.photoUrl = formikRef.current?.values.photoUrl || '';
     return (
-      putPasteur({
+      updatePasteur({
         id: pasteur?.id || uuidv4(),
         firstName: values.firstName,
         lastName: values.lastName,

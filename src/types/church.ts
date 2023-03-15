@@ -3,7 +3,6 @@ import { ISODateString } from './common';
 
 export type Church = {
   pasteurs: Pasteur[];
-  sermons: Sermon[];
 };
 
 export type Sermon = {
