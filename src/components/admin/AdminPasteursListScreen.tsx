@@ -5,6 +5,7 @@ import {
 import { Button, Icon } from '@rneui/base';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import React, { useEffect, useRef, useState } from 'react';
+import { deletePasteur, getPasteurs } from 'firestore/church';
 
 import { CompositeScreenProps } from '@react-navigation/core';
 import { EditPasteurModal } from 'components/admin/modals/EditPasteurModal';
@@ -13,7 +14,6 @@ import { Pasteur } from 'types/church';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
 import { documentChangeListener } from 'firestore/events';
-import { getPasteurs } from 'firestore/church';
 import { useTheme } from 'theme';
 
 type Props = CompositeScreenProps<
@@ -80,6 +80,21 @@ const AdminPasteursListScreen = ({ navigation }: Props) => {
                 ]}
                 leftImage={'account-outline'}
                 leftImageType={'material-community'}
+                drawerRightItems={[
+                  {
+                    width: 50,
+                    background: theme.colors.assertive,
+                    customElement: (
+                      <Icon
+                        name="delete"
+                        type={'material-community'}
+                        color={theme.colors.stickyWhite}
+                        size={28}
+                      />
+                    ),
+                    onPress: () => deletePasteur(pasteur.id),
+                  },
+                ]}
                 onPress={() =>
                   editPasteurModalRef.current?.present('Edit Pasteur', pasteur)
                 }

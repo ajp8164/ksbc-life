@@ -29,6 +29,13 @@ export const getPasteur = (id: string): Promise<Pasteur | undefined> => {
   });
 };
 
+export const deletePasteur = (id: string): Promise<void> => {
+  return getChurch().then(church => {
+    lodash.remove(church.pasteurs, { id });
+    return updateChurch(church);
+  });
+};
+
 export const updateChurch = (church: Church): Promise<void> => {
   console.log('updateChurch', church);
   return (
