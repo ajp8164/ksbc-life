@@ -255,8 +255,6 @@ const PasteurEditorView = React.forwardRef<
                   value={formik.values.firstName}
                   errorText={formik.errors.firstName}
                   errorColor={theme.colors.error}
-                  autoCapitalize={'none'}
-                  autoCorrect={false}
                   onBlur={(
                     e: NativeSyntheticEvent<TextInputFocusEventData>,
                   ) => {
@@ -275,8 +273,6 @@ const PasteurEditorView = React.forwardRef<
                   value={formik.values.lastName}
                   errorText={formik.errors.lastName}
                   errorColor={theme.colors.error}
-                  autoCapitalize={'none'}
-                  autoCorrect={false}
                   onBlur={(
                     e: NativeSyntheticEvent<TextInputFocusEventData>,
                   ) => {
@@ -295,8 +291,6 @@ const PasteurEditorView = React.forwardRef<
                   value={formik.values.title}
                   errorText={formik.errors.title}
                   errorColor={theme.colors.error}
-                  autoCapitalize={'none'}
-                  autoCorrect={false}
                   onBlur={(
                     e: NativeSyntheticEvent<TextInputFocusEventData>,
                   ) => {
@@ -314,6 +308,7 @@ const PasteurEditorView = React.forwardRef<
                   value={formik.values.email}
                   errorText={formik.errors.email}
                   errorColor={theme.colors.error}
+                  keyboardType={'email-address'}
                   autoCapitalize={'none'}
                   autoCorrect={false}
                   onBlur={(
@@ -332,6 +327,7 @@ const PasteurEditorView = React.forwardRef<
                   value={formik.values.phone}
                   errorText={formik.errors.phone}
                   errorColor={theme.colors.error}
+                  keyboardType={'phone-pad'}
                   autoCapitalize={'none'}
                   autoCorrect={false}
                   onBlur={(
@@ -364,37 +360,36 @@ const PasteurEditorView = React.forwardRef<
                     <Image
                       source={{ uri: formik.values.photoUrl }}
                       containerStyle={s.imageContainer}>
-                      <View style={s.imageButtonsContainer}>
-                        <Button
-                          buttonStyle={s.imageButton}
-                          icon={
-                            <Icon
-                              name="image-edit-outline"
-                              type={'material-community'}
-                              color={theme.colors.darkGray}
-                              size={28}
-                            />
-                          }
-                          onPress={selectPasteurImage}
-                        />
-                        <Button
-                          buttonStyle={s.imageButton}
-                          icon={
-                            <Icon
-                              name="close-circle-outline"
-                              type={'material-community'}
-                              color={theme.colors.assertive}
-                              size={28}
-                            />
-                          }
-                          onPress={deletePasteurImage}
-                        />
-                      </View>
+                      <Button
+                        buttonStyle={s.imageButton}
+                        icon={
+                          <Icon
+                            name="image-edit-outline"
+                            type={'material-community'}
+                            color={theme.colors.darkGray}
+                            size={28}
+                          />
+                        }
+                        onPress={selectPasteurImage}
+                      />
+                      <Button
+                        buttonStyle={s.imageButton}
+                        icon={
+                          <Icon
+                            name="close-circle-outline"
+                            type={'material-community'}
+                            color={theme.colors.assertive}
+                            size={28}
+                          />
+                        }
+                        onPress={deletePasteurImage}
+                      />
                     </Image>
                   </>
                 ) : (
                   <ListItem
-                    title={'Choose pasteur photo'}
+                    title={'Add a photo'}
+                    titleStyle={theme.styles.textPlaceholder}
                     containerStyle={{ borderBottomWidth: 0 }}
                     onPress={selectPasteurImage}
                   />
@@ -428,20 +423,17 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   imageContainer: {
     width: viewport.width - 30,
     height: ((viewport.width - 30) * 9) / 16,
-    justifyContent: 'center',
     borderWidth: 1,
     borderColor: theme.colors.subtleGray,
-  },
-  imageButtonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    paddingHorizontal: '20%',
   },
   imageButton: {
     backgroundColor: theme.colors.whiteTransparentMid,
     height: 50,
-    borderRadius: 50,
+    width: 50,
+    alignSelf: 'flex-end',
+    borderRadius: 5,
+    marginTop: 10,
+    marginRight: 10,
   },
 }));
 
