@@ -13,6 +13,7 @@ interface ModalHeaderInterface {
   rightButtonIconColor?: string;
   rightButtonIconSize?: number;
   rightButtonIconType?: string;
+  size?: 'small' | 'large';
   title: string;
 }
 
@@ -25,6 +26,7 @@ const ModalHeader = ({
   rightButtonIconColor,
   rightButtonIconSize = 28,
   rightButtonIconType = 'material-community',
+  size = 'large',
   title,
 }: ModalHeaderInterface) => {
   const theme = useTheme();
@@ -35,8 +37,12 @@ const ModalHeader = ({
   };
 
   return (
-    <View style={s.view} onLayout={onHeaderLayout}>
-      <Text style={s.title}>{title}</Text>
+    <View
+      style={size === 'large' ? s.viewLarge : s.viewSmall}
+      onLayout={onHeaderLayout}>
+      <Text style={size === 'large' ? s.titleLarge : s.titleSmall}>
+        {title}
+      </Text>
       <Button
         type={'clear'}
         containerStyle={{ position: 'absolute', right: 15 }}
@@ -59,15 +65,22 @@ const ModalHeader = ({
 };
 
 const useStyles = makeStyles((_theme, theme: AppTheme) => ({
-  view: {
+  viewLarge: {
     paddingHorizontal: 15,
     flexDirection: 'row',
   },
-  title: {
+  viewSmall: {
+    paddingHorizontal: 10,
+  },
+  titleLarge: {
     ...theme.styles.textHeading1,
     fontSize: 34.5,
     letterSpacing: -1.7,
     marginTop: 30,
+  },
+  titleSmall: {
+    ...theme.styles.textHeading4,
+    marginVertical: 10,
   },
 }));
 
