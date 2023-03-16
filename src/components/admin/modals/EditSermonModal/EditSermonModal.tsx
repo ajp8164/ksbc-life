@@ -7,6 +7,7 @@ import SermonEditorView, {
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { Modal } from '@react-native-ajp-elements/ui';
 import ModalHeader from 'components/molecules/ModalHeader';
+import { Sermon } from 'types/church';
 
 type EditSermonModal = EditSermonModalMethods;
 
@@ -16,6 +17,7 @@ const EditSermonModal = React.forwardRef<EditSermonModal, EditSermonModalProps>(
     const sermonEditorViewRef = useRef<SermonEditorView>(null);
 
     const [editorState, setEditorState] = useState({} as EditorState);
+    const [sermon, setSermon] = useState<Sermon>();
     const [title, setTitle] = useState('');
 
     useImperativeHandle(ref, () => ({
@@ -28,8 +30,9 @@ const EditSermonModal = React.forwardRef<EditSermonModal, EditSermonModalProps>(
       innerRef.current?.dismiss();
     };
 
-    const present = (title: string) => {
+    const present = (title: string, sermon: Sermon) => {
       setTitle(title);
+      setSermon(sermon);
       innerRef.current?.present();
     };
 
@@ -38,12 +41,20 @@ const EditSermonModal = React.forwardRef<EditSermonModal, EditSermonModalProps>(
         <ModalHeader
           title={title}
           rightButtonText={'Save'}
-          rightButtonDisabled={!editorState.isValid}
+          rightButtonDisabled={!editorState.changed}
           onRightButtonPress={() => {
-            sermonEditorViewRef.current?.saveSermon().then(() => dismiss());
+            sermonEditorViewRef.current
+              ?.saveSermon()
+              .then(dismiss)
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
+              .catch(() => {});
           }}
         />
-        <SermonEditorView ref={sermonEditorViewRef} onChange={setEditorState} />
+        <SermonEditorView
+          ref={sermonEditorViewRef}
+          sermon={sermon}
+          onChange={setEditorState}
+        />
       </Modal>
     );
   },

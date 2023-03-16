@@ -1,4 +1,5 @@
 import React from 'react';
+import { Sermon } from 'types/church';
 
 export declare type SermonEditorView = SermonEditorViewMethods;
 
@@ -10,6 +11,7 @@ declare const TextView: React.MemoExoticComponent<
 
 export interface SermonEditorViewProps {
   onChange?: (editorState: EditorState) => void;
+  sermon?: Sermon;
 }
 
 export interface SermonEditorViewMethods {
@@ -20,5 +22,5 @@ export interface EditorState {
   fieldCount: number;
   focusedField?: number;
   isSubmitting: boolean;
-  isValid: boolean;
+  changed: boolean;
 }

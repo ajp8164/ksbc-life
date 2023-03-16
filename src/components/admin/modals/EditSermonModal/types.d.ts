@@ -13,5 +13,5 @@ export interface EditSermonModalProps {}
 
 export interface EditSermonModalMethods {
   dismiss: () => void;
-  present: (title: string) => void;
+  present: (title: string, sermon?: Pasteur) => void;
 }

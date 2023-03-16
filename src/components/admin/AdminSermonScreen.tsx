@@ -15,8 +15,6 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import VideoCard from 'components/molecules/VideoCard';
 import { makeStyles } from '@rneui/themed';
-import { selectSermon } from 'store/selectors/adminSelectors';
-import { useSelector } from 'react-redux';
 
 type Props = CompositeScreenProps<
   NativeStackScreenProps<AdminNavigatorParamList, 'AdminSermon'>,
@@ -27,8 +25,8 @@ const AdminSermonScreen = ({ navigation, route }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
+  const sermon = route.params.sermon;
   const editSermonModalRef = useRef<EditSermonModal>(null);
-  const sermon = useSelector(selectSermon(route.params?.sermonId));
   const [showVideo, setShowVideo] = useState(false);
   const [paused, setPaused] = useState(false);
 
