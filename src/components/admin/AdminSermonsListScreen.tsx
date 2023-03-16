@@ -3,7 +3,6 @@ import {
   TabNavigatorParamList,
 } from 'types/navigation';
 import { Alert, ScrollView } from 'react-native';
-import { AppTheme, useTheme } from 'theme';
 import { Button, Icon } from '@rneui/base';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import React, { useEffect, useRef, useState } from 'react';
@@ -18,7 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Sermon } from 'types/church';
 import { collectionnChangeListener } from 'firestore/events';
 import { getPasteurs } from 'firestore/church';
-import { makeStyles } from '@rneui/themed';
+import { useTheme } from 'theme';
 
 type Props = CompositeScreenProps<
   NativeStackScreenProps<AdminNavigatorParamList, 'AdminSermonsList'>,
@@ -27,7 +26,6 @@ type Props = CompositeScreenProps<
 
 const AdminSermonsListScreen = ({ navigation }: Props) => {
   const theme = useTheme();
-  const s = useStyles(theme);
 
   const editSermonModalRef = useRef<EditSermonModal>(null);
   const [lastDocument, setLastDocument] =
@@ -149,11 +147,5 @@ const AdminSermonsListScreen = ({ navigation }: Props) => {
     </SafeAreaView>
   );
 };
-
-const useStyles = makeStyles((_theme, theme: AppTheme) => ({
-  text: {
-    ...theme.styles.textNormal,
-  },
-}));
 
 export default AdminSermonsListScreen;
