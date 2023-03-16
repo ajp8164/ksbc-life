@@ -94,7 +94,7 @@ export const updateSermon = (sermon: Sermon): Promise<Sermon> => {
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((e: any) => {
-        log.error(`Failed to save sermon document: ${e.message}`);
+        log.error(`Failed to update sermon document: ${e.message}`);
         throw e;
       })
   );
