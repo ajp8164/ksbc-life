@@ -1,28 +1,16 @@
-import {
-  AdminNavigatorParamList,
-  TabNavigatorParamList,
-} from 'types/navigation';
-import { Alert, ScrollView } from 'react-native';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import React, { useEffect, useRef, useState } from 'react';
-import { getUsers, updateUser } from 'firestore/users';
 
-import { CompositeScreenProps } from '@react-navigation/core';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
-import { Icon } from '@rneui/base';
 // import { EditUserModal } from 'components/admin/modals/EditUserModal';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScrollView } from 'react-native';
 import { UserProfile } from 'types/user';
 import { collectionChangeListener } from 'firestore/events';
+import { getUsers } from 'firestore/users';
 import { useTheme } from 'theme';
 
-type Props = CompositeScreenProps<
-  NativeStackScreenProps<AdminNavigatorParamList, 'AdminPasteursList'>,
-  NativeStackScreenProps<TabNavigatorParamList>
->;
-
-const AdminUsersListScreen = ({ navigation }: Props) => {
+const AdminUsersListScreen = () => {
   const theme = useTheme();
 
   // const editUserModalRef = useRef<EditUserModal>(null);
@@ -46,22 +34,6 @@ const AdminUsersListScreen = ({ navigation }: Props) => {
       setUsers(u.users);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-empty
     } catch (e: any) {}
-  };
-
-  const confirmUpdateUser = async (user: UserProfile) => {
-    Alert.alert(
-      'Confirm Update User',
-      'Are you sure you want to update this user?',
-      [
-        {
-          text: 'Yes, update',
-          onPress: () => updateUser(user),
-          style: 'destructive',
-        },
-        { text: 'No', style: 'cancel' },
-      ],
-      { cancelable: false },
-    );
   };
 
   return (
