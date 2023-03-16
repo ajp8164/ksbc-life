@@ -2,7 +2,6 @@ import {
   AdminNavigatorParamList,
   TabNavigatorParamList,
 } from 'types/navigation';
-import { AppTheme, useTheme } from 'theme';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import React, { useEffect } from 'react';
 
@@ -12,8 +11,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
 import { dispatch } from 'store';
-import { makeStyles } from '@rneui/themed';
 import { saveAdminMode } from 'store/slices/appSettings';
+import { useTheme } from 'theme';
 
 type Props = CompositeScreenProps<
   NativeStackScreenProps<AdminNavigatorParamList, 'AdminHome'>,
@@ -22,7 +21,6 @@ type Props = CompositeScreenProps<
 
 const AdminHomeScreen = ({ navigation }: Props) => {
   const theme = useTheme();
-  const s = useStyles(theme);
 
   useEffect(() => {
     navigation.setOptions({
@@ -51,26 +49,23 @@ const AdminHomeScreen = ({ navigation }: Props) => {
         <Divider />
         <ListItem
           title={'Pasteurs'}
-          position={['first', 'last']}
+          position={['first']}
           leftImage={'account-outline'}
           leftImageType={'material-community'}
           onPress={() => navigation.navigate('AdminPasteursList')}
         />
-        <Divider />
         <ListItem
           title={'Sermons'}
-          position={['first', 'last']}
           leftImage={'cross-outline'}
           leftImageType={'material-community'}
           onPress={() => navigation.navigate('AdminSermonsList')}
         />
-        <Divider />
         <ListItem
           title={'Content'}
-          position={['first', 'last']}
+          position={['last']}
           leftImage={'file-document-edit-outline'}
           leftImageType={'material-community'}
-          // onPress={() => navigation.navigate('AdminSermonsList')}
+          // onPress={() => navigation.navigate('')}
         />
         <Divider />
         <ListItem
@@ -78,7 +73,7 @@ const AdminHomeScreen = ({ navigation }: Props) => {
           position={['first', 'last']}
           leftImage={'bell-outline'}
           leftImageType={'material-community'}
-          // onPress={() => navigation.navigate('AdminSermonsList')}
+          // onPress={() => navigation.navigate('')}
         />
         <Divider />
         <ListItem
@@ -86,17 +81,11 @@ const AdminHomeScreen = ({ navigation }: Props) => {
           position={['first', 'last']}
           leftImage={'account-multiple-outline'}
           leftImageType={'material-community'}
-          // onPress={() => navigation.navigate('AdminSermonsList')}
+          // onPress={() => navigation.navigate('')}
         />
       </ScrollView>
     </SafeAreaView>
   );
 };
-
-const useStyles = makeStyles((_theme, theme: AppTheme) => ({
-  text: {
-    ...theme.styles.textNormal,
-  },
-}));
 
 export default AdminHomeScreen;
