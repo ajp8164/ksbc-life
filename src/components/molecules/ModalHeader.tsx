@@ -45,7 +45,7 @@ const ModalHeader = ({
       </Text>
       <Button
         type={'clear'}
-        containerStyle={{ position: 'absolute', right: 15 }}
+        containerStyle={size === 'large' ? s.containerLarge : s.containerSmall}
         title={rightButtonText}
         icon={
           rightButtonIcon ? (
@@ -71,6 +71,14 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   },
   viewSmall: {
     paddingHorizontal: 10,
+  },
+  containerLarge: {
+    position: 'absolute',
+    right: 15,
+  },
+  containerSmall: {
+    position: 'absolute',
+    right: 0,
   },
   titleLarge: {
     ...theme.styles.textHeading1,
