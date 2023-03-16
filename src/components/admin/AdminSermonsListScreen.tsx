@@ -15,7 +15,7 @@ import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Sermon } from 'types/church';
-import { collectionnChangeListener } from 'firestore/events';
+import { collectionChangeListener } from 'firestore/events';
 import { getPasteurs } from 'firestore/church';
 import { useTheme } from 'theme';
 
@@ -33,7 +33,7 @@ const AdminSermonsListScreen = ({ navigation }: Props) => {
   const [sermons, setSermons] = useState<Sermon[]>([]);
 
   useEffect(() => {
-    const subscription = collectionnChangeListener('Sermons', () => {
+    const subscription = collectionChangeListener('Sermons', () => {
       getMoreSermons();
     });
 

@@ -81,7 +81,7 @@ const AdminHomeScreen = ({ navigation }: Props) => {
           position={['first', 'last']}
           leftImage={'account-multiple-outline'}
           leftImageType={'material-community'}
-          // onPress={() => navigation.navigate('')}
+          onPress={() => navigation.navigate('AdminUsersList')}
         />
       </ScrollView>
     </SafeAreaView>

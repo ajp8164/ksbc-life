@@ -1,7 +1,7 @@
 import firestore from '@react-native-firebase/firestore';
 import { log } from '@react-native-ajp-elements/core';
 
-export const collectionnChangeListener = (
+export const collectionChangeListener = (
   col: string,
   handler: () => void,
 ): (() => void) => {

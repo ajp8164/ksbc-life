@@ -6,6 +6,7 @@ export enum UserRole {
 }
 
 export type UserProfile = {
+  id?: string;
   name: string;
   email: string;
   photoUrl: string;
