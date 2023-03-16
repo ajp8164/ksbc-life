@@ -29,9 +29,18 @@ const AdminPasteursListScreen = ({ navigation }: Props) => {
 
   useEffect(() => {
     const subscription = documentChangeListener('Church', 'Church', () => {
-      getPasteurs().then(pasteurs => {
-        setPasteurs(pasteurs);
-      });
+      getPasteurs()
+        .then(pasteurs => {
+          setPasteurs(pasteurs);
+        })
+        .catch(() => {
+          Alert.alert(
+            'Could Not Load Pasteurs',
+            'Please try again.',
+            [{ text: 'OK' }],
+            { cancelable: false },
+          );
+        });
     });
 
     return subscription;
