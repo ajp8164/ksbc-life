@@ -30,7 +30,7 @@ const EditSermonModal = React.forwardRef<EditSermonModal, EditSermonModalProps>(
       innerRef.current?.dismiss();
     };
 
-    const present = (title: string, sermon: Sermon) => {
+    const present = (title: string, sermon?: Sermon) => {
       setTitle(title);
       setSermon(sermon);
       innerRef.current?.present();
@@ -46,8 +46,9 @@ const EditSermonModal = React.forwardRef<EditSermonModal, EditSermonModalProps>(
             sermonEditorViewRef.current
               ?.saveSermon()
               .then(dismiss)
-              // eslint-disable-next-line @typescript-eslint/no-empty-function
-              .catch(() => {});
+              .catch(() => {
+                // Nothing to do. Prevent unhandled promise.
+              });
           }}
         />
         <SermonEditorView
