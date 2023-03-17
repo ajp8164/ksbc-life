@@ -31,7 +31,10 @@ const handleUpdateUserProfile: CaseReducer<
 > = (state, { payload }) => {
   return {
     ...state,
-    profile: payload.userProfile,
+    profile: {
+      ...state.profile,
+      ...payload.userProfile,
+    },
   };
 };
 
