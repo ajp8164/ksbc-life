@@ -7,10 +7,11 @@ import {
   UserEditorViewProps,
 } from './types';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { UserProfile, UserRole } from 'types/user';
+import { UserProfile, UserRole, UserStatus } from 'types/user';
 
 import { Image } from '@rneui/base';
 import { UserRolePickerModal } from 'components/admin/modals/UserRolePickerModal';
+import { UserStatusPickerModal } from 'components/admin/modals/UserStatusPickerModal';
 import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { updateUser } from 'firestore/users';
@@ -27,9 +28,14 @@ const UserEditorView = React.forwardRef<UserEditorView, UserEditorViewProps>(
     const s = useStyles(theme);
 
     const userRolePickerModalRef = useRef<UserRolePickerModal>(null);
+    const userStatusPickerModalRef = useRef<UserStatusPickerModal>(null);
+
     const userProfile = useSelector(selectUserProfile);
     const [userRole, setUserRole] = useState<UserRole>(
       user?.role || UserRole.User,
+    );
+    const [userStatus, setUserStatus] = useState<UserStatus>(
+      user?.status || UserStatus.Active,
     );
 
     const [editorState, setEditorState] = useSetState<EditorState>({
@@ -53,6 +59,7 @@ const UserEditorView = React.forwardRef<UserEditorView, UserEditorViewProps>(
       const updatedUserProfile: UserProfile = {
         ...(user as UserProfile),
         role: userRole,
+        status: userStatus,
       };
 
       try {
@@ -71,6 +78,11 @@ const UserEditorView = React.forwardRef<UserEditorView, UserEditorViewProps>(
     const onUserRoleChange = (userRole: UserRole): void => {
       setUserRole(userRole);
       setEditorState({ changed: user?.role !== userRole });
+    };
+
+    const onUserStatusChange = (userStatus: UserStatus): void => {
+      setUserStatus(userStatus);
+      setEditorState({ changed: user?.status !== userStatus });
     };
 
     return (
@@ -95,8 +107,19 @@ const UserEditorView = React.forwardRef<UserEditorView, UserEditorViewProps>(
             leftImage={'shield-account-outline'}
             leftImageType={'material-community'}
             value={userRole}
-            position={['first', 'last']}
+            position={['first']}
             onPress={() => userRolePickerModalRef.current?.present()}
+          />
+          <ListItem
+            title={'Status'}
+            containerStyle={{
+              backgroundColor: theme.colors.listItemBackgroundAlt,
+            }}
+            leftImage={'pulse'}
+            leftImageType={'material-community'}
+            value={userStatus}
+            position={['last']}
+            onPress={() => userStatusPickerModalRef.current?.present()}
           />
         </ScrollView>
         <UserRolePickerModal
@@ -104,6 +127,12 @@ const UserEditorView = React.forwardRef<UserEditorView, UserEditorViewProps>(
           value={user?.role as UserRole}
           disabled={user?.id === userProfile?.id}
           onDismiss={onUserRoleChange}
+        />
+        <UserStatusPickerModal
+          ref={userStatusPickerModalRef}
+          value={user?.status as UserStatus}
+          disabled={user?.id === userProfile?.id}
+          onDismiss={onUserStatusChange}
         />
       </>
     );
