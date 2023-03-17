@@ -1,8 +1,9 @@
 import { FirebaseAuthTypes } from '@react-native-firebase/auth';
 
 export enum UserRole {
-  Admin = 'admin',
-  User = 'user',
+  Owner = 'Owner',
+  Admin = 'Administrator',
+  User = 'User',
 }
 
 export type UserProfile = {
@@ -10,7 +11,7 @@ export type UserProfile = {
   name: string;
   email: string;
   photoUrl: string;
-  roles: UserRole[];
+  role: UserRole;
 };
 
 export type User = {

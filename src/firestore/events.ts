@@ -1,4 +1,7 @@
-import firestore from '@react-native-firebase/firestore';
+import firestore, {
+  FirebaseFirestoreTypes,
+} from '@react-native-firebase/firestore';
+
 import { log } from '@react-native-ajp-elements/core';
 
 export const collectionChangeListener = (
@@ -18,7 +21,9 @@ export const collectionChangeListener = (
 export const documentChangeListener = (
   col: string,
   doc: string,
-  handler: () => void,
+  handler: (
+    documentSnapshot: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>,
+  ) => void,
 ): (() => void) => {
   return (
     firestore()

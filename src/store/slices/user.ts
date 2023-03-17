@@ -25,14 +25,26 @@ const handleSaveUser: CaseReducer<UserState, PayloadAction<{ user: User }>> = (
   };
 };
 
+const handleUpdateUserProfile: CaseReducer<
+  UserState,
+  PayloadAction<{ userProfile: UserProfile }>
+> = (state, { payload }) => {
+  return {
+    ...state,
+    profile: payload.userProfile,
+  };
+};
+
 const userSlice = createSlice({
   name: 'user',
   initialState: initialUserState,
   extraReducers: builder => builder.addCase(revertAll, () => initialUserState),
   reducers: {
     saveUser: handleSaveUser,
+    updateUserProfile: handleUpdateUserProfile,
   },
 });
 
 export const userReducer = userSlice.reducer;
 export const saveUser = userSlice.actions.saveUser;
+export const updateUserProfile = userSlice.actions.updateUserProfile;

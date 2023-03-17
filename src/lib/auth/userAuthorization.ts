@@ -26,7 +26,7 @@ export const useAuthorizeUser = () => {
         .doc(credentials.uid)
         .get()
         .then(documentSnapshot => {
-          if (!documentSnapshot.data()) {
+          if (!documentSnapshot.exists) {
             // Add user to firestore and set user.
             const profile = createProfile(credentials);
 
@@ -36,8 +36,11 @@ export const useAuthorizeUser = () => {
               .set(profile)
               .then(() => {
                 log.debug(`User profile created: ${JSON.stringify(profile)}`);
-                setUser(credentials, profile);
+                const user = setUser(credentials, profile);
                 result?.onAuthorized && result.onAuthorized();
+                log.debug(
+                  `User sign in complete: ${JSON.stringify(user.profile)}`,
+                );
               })
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               .catch((e: any) => {
@@ -62,8 +65,11 @@ export const useAuthorizeUser = () => {
                   log.debug(
                     `User profile updated: ${JSON.stringify(updatedProfile)}`,
                   );
-                  setUser(credentials, updatedProfile);
+                  const user = setUser(credentials, updatedProfile);
                   result?.onAuthorized && result.onAuthorized();
+                  log.debug(
+                    `User sign in complete: ${JSON.stringify(user.profile)}`,
+                  );
                 })
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 .catch((e: any) => {
@@ -71,8 +77,11 @@ export const useAuthorizeUser = () => {
                   result?.onError && result.onError();
                 });
             } else {
-              setUser(credentials, profile);
+              const user = setUser(credentials, profile);
               result?.onAuthorized && result.onAuthorized();
+              log.debug(
+                `User sign in complete: ${JSON.stringify(user.profile)}`,
+              );
             }
           }
         })
@@ -95,22 +104,23 @@ const createProfile = (credentials: FirebaseAuthTypes.User): UserProfile => {
     name: credentials.displayName,
     email: credentials.email,
     photoUrl: credentials.photoURL,
-    roles: [UserRole.User], // All users created with default role.
+    role: UserRole.User, // All users created with default role.
   } as UserProfile;
 };
 
 const useSetUser = () => {
   const dispatch = useDispatch();
   return (credentials: FirebaseAuthTypes.User, profile: UserProfile) => {
-    dispatch(
-      saveUser({
-        user: {
-          credentials: JSON.parse(JSON.stringify(credentials)), // Remove non-serializable properties (functions).
-          profile,
-        },
-      }),
-    );
-    log.debug(`User sign in complete: ${JSON.stringify(profile)}`);
+    const user = {
+      credentials: JSON.parse(JSON.stringify(credentials)), // Remove non-serializable properties (functions).
+      profile: {
+        ...profile,
+        id: credentials.uid, // Store the user id locally.
+      },
+    };
+
+    dispatch(saveUser({ user }));
+    return user;
   };
 };
 

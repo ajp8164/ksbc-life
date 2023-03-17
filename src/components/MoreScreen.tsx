@@ -6,18 +6,19 @@ import {
 } from 'types/navigation';
 import React, { useContext, useEffect } from 'react';
 import { ScrollView, View } from 'react-native';
+import { UserProfile, UserRole } from 'types/user';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { AuthContext } from 'lib/auth';
-import { Button } from '@rneui/base';
 import { CompositeScreenProps } from '@react-navigation/core';
 import { Image } from '@rneui/base';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { UserRole } from 'types/user';
 import { appConfig } from 'config';
+import { documentChangeListener } from 'firestore/events';
 import { makeStyles } from '@rneui/themed';
 import { saveAdminMode } from 'store/slices/appSettings';
 import { selectUserProfile } from 'store/selectors/userSelectors';
+import { updateUserProfile } from 'store/slices/user';
 
 export type Props = CompositeScreenProps<
   NativeStackScreenProps<MoreNavigatorParamList, 'More'>,
@@ -33,6 +34,26 @@ const MoreScreen = ({ navigation, route }: Props) => {
   const userProfile = useSelector(selectUserProfile);
 
   useEffect(() => {
+    //  Updates my profile if my information changed (e.g., admin action).
+    const subscription = documentChangeListener(
+      'Users',
+      userProfile?.id || '',
+      documentSnapshot => {
+        // userProfile && dispatch(updateUserProfile({ userProfile }));
+        userProfile &&
+          dispatch(
+            updateUserProfile({
+              userProfile: documentSnapshot.data() as UserProfile,
+            }),
+          );
+      },
+    );
+
+    return subscription;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     if (route.params?.subNav) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       navigation.navigate(route.params.subNav as any); // Could not discern type.
@@ -40,28 +61,6 @@ const MoreScreen = ({ navigation, route }: Props) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route.params?.subNav]);
-
-  useEffect(() => {
-    navigation.setOptions({
-      // eslint-disable-next-line react/no-unstable-nested-components
-      headerRight: () => (
-        <>
-          {!userProfile?.roles.includes(UserRole.Admin) && ( // TODO: remove ! - TESTING
-            <Button
-              type={'clear'}
-              title={'Enter Admin'}
-              titleStyle={{ color: theme.colors.assertive }}
-              onPress={() => {
-                dispatch(saveAdminMode({ value: true }));
-                navigation.navigate('AdminTab');
-              }}
-            />
-          )}
-        </>
-      ),
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <View>
@@ -111,6 +110,20 @@ const MoreScreen = ({ navigation, route }: Props) => {
           leftImageType={'material-community'}
           onPress={() => navigation.navigate('About')}
         />
+        <Divider />
+        {(userProfile?.role === UserRole.Owner ||
+          userProfile?.role === UserRole.Admin) && (
+          <ListItem
+            title={'Administration'}
+            position={['first', 'last']}
+            leftImage={'database-outline'}
+            leftImageType={'material-community'}
+            onPress={() => {
+              dispatch(saveAdminMode({ value: true }));
+              navigation.navigate('AdminTab');
+            }}
+          />
+        )}
       </ScrollView>
     </View>
   );

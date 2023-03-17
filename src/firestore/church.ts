@@ -37,7 +37,6 @@ export const deletePasteur = (id: string): Promise<void> => {
 };
 
 export const updateChurch = (church: Church): Promise<void> => {
-  console.log('updateChurch', church);
   return (
     firestore()
       .collection('Church')

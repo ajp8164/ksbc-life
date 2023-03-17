@@ -9,6 +9,31 @@ export type UsersQueryResult = {
   users: UserProfile[];
 };
 
+export const getUser = (id: string): Promise<UserProfile | undefined> => {
+  return (
+    firestore()
+      .collection('Users')
+      .doc(id)
+      .get()
+      .then(documentSnapshot => {
+        if (documentSnapshot.exists) {
+          const user = {
+            ...documentSnapshot.data(),
+            id,
+          };
+          return user as UserProfile;
+        } else {
+          return;
+        }
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch((e: any) => {
+        log.error(`Failed to get user document: ${e.message}`);
+        throw e;
+      })
+  );
+};
+
 export const getUsers = (
   limit: number,
   lastDocument?: FirebaseFirestoreTypes.DocumentData,

@@ -1,8 +1,8 @@
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import React, { useEffect, useRef, useState } from 'react';
 
+import { EditUserModal } from 'components/admin/modals/EditUserModal';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
-// import { EditUserModal } from 'components/admin/modals/EditUserModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
 import { UserProfile } from 'types/user';
@@ -13,7 +13,7 @@ import { useTheme } from 'theme';
 const AdminUsersListScreen = () => {
   const theme = useTheme();
 
-  // const editUserModalRef = useRef<EditUserModal>(null);
+  const editUserModalRef = useRef<EditUserModal>(null);
   const [lastDocument, setLastDocument] =
     useState<FirebaseFirestoreTypes.DocumentData>();
   const [users, setUsers] = useState<UserProfile[]>([]);
@@ -54,14 +54,14 @@ const AdminUsersListScreen = () => {
               ]}
               leftImage={'account-outline'}
               leftImageType={'material-community'}
-              // onPress={() =>
-              //   editUserModalRef.current?.present('Edit User', user)
-              // }
+              onPress={() =>
+                editUserModalRef.current?.present('Edit User', user)
+              }
             />
           );
         })}
       </ScrollView>
-      {/* <EditUserModal ref={editUserModalRef} /> */}
+      <EditUserModal ref={editUserModalRef} />
     </SafeAreaView>
   );
 };

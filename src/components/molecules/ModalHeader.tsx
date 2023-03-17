@@ -46,6 +46,7 @@ const ModalHeader = ({
       <Button
         type={'clear'}
         containerStyle={size === 'large' ? s.containerLarge : s.containerSmall}
+        buttonStyle={size === 'large' ? s.buttonLarge : s.buttonSmall}
         title={rightButtonText}
         icon={
           rightButtonIcon ? (
@@ -70,7 +71,8 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
     flexDirection: 'row',
   },
   viewSmall: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
+    justifyContent: 'center',
   },
   containerLarge: {
     position: 'absolute',
@@ -78,7 +80,12 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   },
   containerSmall: {
     position: 'absolute',
-    right: 0,
+    right: 15,
+  },
+  buttonLarge: {},
+  buttonSmall: {
+    paddingHorizontal: 0,
+    paddingVertical: 0,
   },
   titleLarge: {
     ...theme.styles.textHeading1,
