@@ -33,12 +33,11 @@ const MoreScreen = ({ navigation, route }: Props) => {
   const userProfile = useSelector(selectUserProfile);
 
   useEffect(() => {
-    //  Updates my profile if my information changed (e.g., admin action).
+    // Updates my profile if my information changed (e.g., admin action).
     const subscription = documentChangeListener(
       'Users',
       userProfile?.id || '',
       documentSnapshot => {
-        // userProfile && dispatch(updateUserProfile({ userProfile }));
         userProfile &&
           dispatch(
             updateUserProfile({
