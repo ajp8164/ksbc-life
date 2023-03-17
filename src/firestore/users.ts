@@ -38,14 +38,11 @@ export const getUsers = (
   limit: number,
   lastDocument?: FirebaseFirestoreTypes.DocumentData,
 ): Promise<UsersQueryResult> => {
-  let query = firestore().collection('Users').orderBy('name', 'asc');
-
-  if (lastDocument !== undefined) {
-    query = query.startAfter(lastDocument);
-  }
-
   return (
-    query
+    firestore()
+      .collection('Users')
+      .orderBy('name', 'asc')
+      .startAfter(lastDocument || 0)
       .limit(limit || 1) // Must be positive value
       .get()
       .then(querySnapshot => {
