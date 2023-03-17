@@ -7,10 +7,6 @@ export const selectAppSettings = createSelector(selectAppState, appState => {
   return appState.appSettings;
 });
 
-export const selectAdminMode = createSelector(selectAppState, appState => {
-  return appState.appSettings.adminMode;
-});
-
 export const selectBiometrics = createSelector(selectAppState, appState => {
   return appState.appSettings.biometrics;
 });

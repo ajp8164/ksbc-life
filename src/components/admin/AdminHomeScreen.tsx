@@ -1,45 +1,16 @@
-import {
-  AdminNavigatorParamList,
-  TabNavigatorParamList,
-} from 'types/navigation';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
-import React, { useEffect } from 'react';
 
-import { Button } from '@rneui/base';
-import { CompositeScreenProps } from '@react-navigation/core';
+import { MoreNavigatorParamList } from 'types/navigation';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
-import { dispatch } from 'store';
-import { saveAdminMode } from 'store/slices/appSettings';
 import { useTheme } from 'theme';
 
-type Props = CompositeScreenProps<
-  NativeStackScreenProps<AdminNavigatorParamList, 'AdminHome'>,
-  NativeStackScreenProps<TabNavigatorParamList>
->;
+type Props = NativeStackScreenProps<MoreNavigatorParamList, 'AdminHome'>;
 
 const AdminHomeScreen = ({ navigation }: Props) => {
   const theme = useTheme();
-
-  useEffect(() => {
-    navigation.setOptions({
-      // eslint-disable-next-line react/no-unstable-nested-components
-      headerRight: () => (
-        <>
-          <Button
-            type={'clear'}
-            title={'Exit Admin'}
-            onPress={() => {
-              dispatch(saveAdminMode({ value: false }));
-              navigation.navigate('MoreTab');
-            }}
-          />
-        </>
-      ),
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <SafeAreaView edges={['left', 'right']} style={theme.styles.view}>

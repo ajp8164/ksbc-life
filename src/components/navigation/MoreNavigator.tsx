@@ -1,13 +1,17 @@
 import AboutScreen from 'components/AboutScreen';
-import { MoreNavigatorParamList } from 'types/navigation';
-import MoreScreen from 'components/MoreScreen';
+import AdminHomeScreen from 'components/admin/AdminHomeScreen';
+import AdminPasteursListScreen from 'components/admin/AdminPasteursListScreen';
+import AdminSermonsListScreen from 'components/admin/AdminSermonsListScreen';
+import AdminUsersListScreen from 'components/admin/AdminUsersListScreen';
 import AppSettingsScreen from 'components/AppSettingsScreen';
 import ContentScreen from 'components/ContentScreen';
+import { MoreNavigatorParamList } from 'types/navigation';
+import MoreScreen from 'components/MoreScreen';
 import React from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useTheme } from 'theme';
 import UserProfileScreen from 'components/UserProfileScreen';
 import { appConfig } from 'config';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useTheme } from 'theme';
 
 const MoreStack = createNativeStackNavigator<MoreNavigatorParamList>();
 
@@ -67,6 +71,43 @@ const MoreNavigator = () => {
         component={AboutScreen}
         options={{
           title: `About ${appConfig.appName}`,
+          headerLargeTitle: true,
+        }}
+      />
+      {/* Admin screens */}
+      <MoreStack.Screen
+        name="AdminHome"
+        component={AdminHomeScreen}
+        options={{
+          title: 'Administration',
+          headerLeft: () => null,
+          headerLargeTitle: true,
+        }}
+      />
+      <MoreStack.Screen
+        name="AdminPasteursList"
+        component={AdminPasteursListScreen}
+        options={{
+          title: 'Pasteurs',
+          headerLeft: () => null,
+          headerLargeTitle: true,
+        }}
+      />
+      <MoreStack.Screen
+        name="AdminSermonsList"
+        component={AdminSermonsListScreen}
+        options={{
+          title: 'Sermons',
+          headerLeft: () => null,
+          headerLargeTitle: true,
+        }}
+      />
+      <MoreStack.Screen
+        name="AdminUsersList"
+        component={AdminUsersListScreen}
+        options={{
+          title: 'Users',
+          headerLeft: () => null,
           headerLargeTitle: true,
         }}
       />

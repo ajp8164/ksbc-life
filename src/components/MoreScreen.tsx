@@ -16,7 +16,6 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { appConfig } from 'config';
 import { documentChangeListener } from 'firestore/events';
 import { makeStyles } from '@rneui/themed';
-import { saveAdminMode } from 'store/slices/appSettings';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { updateUserProfile } from 'store/slices/user';
 
@@ -119,8 +118,7 @@ const MoreScreen = ({ navigation, route }: Props) => {
             leftImage={'database-outline'}
             leftImageType={'material-community'}
             onPress={() => {
-              dispatch(saveAdminMode({ value: true }));
-              navigation.navigate('AdminTab');
+              navigation.navigate('AdminHome');
             }}
           />
         )}

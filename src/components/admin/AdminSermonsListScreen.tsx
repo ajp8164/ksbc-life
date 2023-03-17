@@ -1,17 +1,13 @@
-import {
-  AdminNavigatorParamList,
-  TabNavigatorParamList,
-} from 'types/navigation';
 import { Alert, ScrollView } from 'react-native';
 import { Button, Icon } from '@rneui/base';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { deleteSermon, getSermons } from 'firestore/sermons';
 
-import { CompositeScreenProps } from '@react-navigation/core';
 import { DateTime } from 'luxon';
 import { EditSermonModal } from 'components/admin/modals/EditSermonModal';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+import { MoreNavigatorParamList } from 'types/navigation';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Sermon } from 'types/church';
@@ -19,10 +15,7 @@ import { collectionChangeListener } from 'firestore/events';
 import { getPasteurs } from 'firestore/church';
 import { useTheme } from 'theme';
 
-type Props = CompositeScreenProps<
-  NativeStackScreenProps<AdminNavigatorParamList, 'AdminSermonsList'>,
-  NativeStackScreenProps<TabNavigatorParamList>
->;
+type Props = NativeStackScreenProps<MoreNavigatorParamList, 'AdminSermonsList'>;
 
 const AdminSermonsListScreen = ({ navigation }: Props) => {
   const theme = useTheme();

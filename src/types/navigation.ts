@@ -7,13 +7,6 @@ export enum StartupScreen {
   Welcome = 'Welcome',
 }
 
-export type AdminNavigatorParamList = {
-  AdminHome: undefined;
-  AdminPasteursList: undefined;
-  AdminSermonsList: undefined;
-  AdminUsersList: undefined;
-};
-
 export type GivingNavigatorParamList = {
   Giving: undefined;
   GivingBrowser: undefined;
@@ -21,6 +14,10 @@ export type GivingNavigatorParamList = {
 
 export type MoreNavigatorParamList = {
   About: undefined;
+  AdminHome: undefined;
+  AdminPasteursList: undefined;
+  AdminSermonsList: undefined;
+  AdminUsersList: undefined;
   AppSettings: undefined;
   Content: {
     content: ContentView;
@@ -56,6 +53,4 @@ export type TabNavigatorParamList = {
   HomeTab: undefined;
   MoreTab: undefined;
   SermonsTab: undefined;
-  // Admin Tabs
-  AdminTab: undefined;
 };

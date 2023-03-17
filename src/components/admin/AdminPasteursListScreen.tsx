@@ -1,24 +1,20 @@
-import {
-  AdminNavigatorParamList,
-  TabNavigatorParamList,
-} from 'types/navigation';
 import { Alert, ScrollView } from 'react-native';
 import { Button, Icon } from '@rneui/base';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { deletePasteur, getPasteurs } from 'firestore/church';
 
-import { CompositeScreenProps } from '@react-navigation/core';
 import { EditPasteurModal } from 'components/admin/modals/EditPasteurModal';
+import { MoreNavigatorParamList } from 'types/navigation';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Pasteur } from 'types/church';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { documentChangeListener } from 'firestore/events';
 import { useTheme } from 'theme';
 
-type Props = CompositeScreenProps<
-  NativeStackScreenProps<AdminNavigatorParamList, 'AdminPasteursList'>,
-  NativeStackScreenProps<TabNavigatorParamList>
+type Props = NativeStackScreenProps<
+  MoreNavigatorParamList,
+  'AdminPasteursList'
 >;
 
 const AdminPasteursListScreen = ({ navigation }: Props) => {
