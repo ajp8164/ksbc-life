@@ -19,11 +19,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 type BibleReferenceContext = {
-  dismiss: (bibleVerse?: BibleReference) => void;
+  setResult: (bibleVerse?: BibleReference) => void;
 };
 
 export const BibleReferenceContext = createContext<BibleReferenceContext>({
-  dismiss: () => {
+  setResult: () => {
     return;
   },
 });
@@ -57,16 +57,21 @@ const BibleReferencePickerModal = React.forwardRef<
     innerRef.current?.present();
   };
 
+  const setResult = (bibleReference?: BibleReference) => {
+    dismiss(bibleReference);
+  };
+
   return (
     <Modal ref={innerRef} onDismiss={() => onDismiss(bibleReference)}>
-      <BibleReferenceContext.Provider value={{ dismiss }}>
+      <BibleReferenceContext.Provider value={{ setResult }}>
         <NavigationContainer independent={true}>
           <Stack.Navigator screenOptions={{}}>
             <Stack.Screen
               name="BibleBookChaptersScreen"
               component={BibleBookChaptersScreen}
               options={{
-                headerTitle: 'Books',
+                headerLargeTitle: true,
+                headerTitle: 'Select Book',
                 headerShadowVisible: false,
               }}
             />
@@ -74,8 +79,8 @@ const BibleReferencePickerModal = React.forwardRef<
               name="BibleVersesScreen"
               component={BibleVersesScreen}
               options={{
+                headerLargeTitle: true,
                 headerTitle: 'Select Verse',
-                headerBackTitle: 'Books',
                 headerShadowVisible: false,
               }}
             />

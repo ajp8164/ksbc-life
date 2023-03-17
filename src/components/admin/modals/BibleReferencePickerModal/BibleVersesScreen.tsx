@@ -1,6 +1,6 @@
 import { AppTheme, useTheme } from 'theme';
 import React, { useContext, useEffect, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text } from 'react-native';
 
 import { BibleReference } from 'types/bible';
 import { BibleReferenceContext } from './BibleReferencePickerModal';
@@ -23,7 +23,7 @@ const BibleVersesScreen = ({ navigation, route }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
-  const bibleReferenceModal = useContext(BibleReferenceContext);
+  const bibleReferenceContext = useContext(BibleReferenceContext);
 
   const [startVerse, setStartVerse] = useState('');
   const [endVerse, setEndVerse] = useState('');
@@ -51,7 +51,7 @@ const BibleVersesScreen = ({ navigation, route }: Props) => {
           type={'clear'}
           title={'Single Verse'}
           disabled={result.verse.start === ''}
-          onPress={() => bibleReferenceModal.dismiss(result)}
+          onPress={() => bibleReferenceContext.setResult(result)}
         />
       ),
     });
@@ -85,44 +85,43 @@ const BibleVersesScreen = ({ navigation, route }: Props) => {
           setEndVerse(verse.toString());
           result.verse.end = verse.toString();
           setTimeout(() => {
-            bibleReferenceModal.dismiss(result);
-          }, 750); // A bit of time to get visual feedback on selection before dismissal.
+            bibleReferenceContext.setResult(result);
+          }, 900); // A bit of time to get visual feedback on selection before dismissal.
         }
       }
     }
   };
 
   return (
-    <View>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      style={{ backgroundColor: theme.colors.white }}
+      contentContainerStyle={s.view}
+      contentInsetAdjustmentBehavior={'automatic'}>
       <Text
-        style={[
-          theme.styles.textNormal,
-          { textAlign: 'center', paddingVertical: 10 },
-        ]}>{`${route.params?.book} ${route.params?.chapter}${verseSpan}`}</Text>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={s.view}>
-        {verses.map((_verse, verseIndex) => {
-          return (
-            <Button
-              key={verseIndex}
-              title={(verseIndex + 1).toString()}
-              titleStyle={{ color: theme.colors.text }}
-              buttonStyle={[
-                s.button,
-                verseIndex + 1 === Number(startVerse) ||
-                (verseIndex + 1 >= Number(startVerse) &&
-                  verseIndex + 1 <= Number(endVerse))
-                  ? { backgroundColor: theme.colors.brandSecondary }
-                  : {},
-              ]}
-              containerStyle={{ padding: buttonPadding }}
-              onPress={() => determineSpan(verseIndex + 1)}
-            />
-          );
-        })}
-      </ScrollView>
-    </View>
+        style={
+          s.selectionText
+        }>{`${route.params?.book} ${route.params?.chapter}${verseSpan}`}</Text>
+      {verses.map((_verse, verseIndex) => {
+        return (
+          <Button
+            key={verseIndex}
+            title={(verseIndex + 1).toString()}
+            titleStyle={{ color: theme.colors.text }}
+            buttonStyle={[
+              s.button,
+              verseIndex + 1 === Number(startVerse) ||
+              (verseIndex + 1 >= Number(startVerse) &&
+                verseIndex + 1 <= Number(endVerse))
+                ? { backgroundColor: theme.colors.brandSecondary }
+                : {},
+            ]}
+            containerStyle={{ padding: buttonPadding }}
+            onPress={() => determineSpan(verseIndex + 1)}
+          />
+        );
+      })}
+    </ScrollView>
   );
 };
 
@@ -131,8 +130,15 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
     flexDirection: 'row',
     flexWrap: 'wrap',
     paddingLeft: viewPad,
-    backgroundColor: theme.colors.hintGray,
+    backgroundColor: theme.colors.white,
     paddingBottom: 50,
+  },
+  selectionText: {
+    ...theme.styles.textNormal,
+    textAlign: 'center',
+    paddingVertical: 10,
+    backgroundColor: theme.colors.white,
+    width: '100%',
   },
   button: {
     width: buttonSize,

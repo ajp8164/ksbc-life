@@ -25,18 +25,16 @@ const BibleBookChaptersScreen = ({ navigation }: Props) => {
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom: 50 }}>
+      style={{ backgroundColor: theme.colors.white }}
+      contentContainerStyle={{ paddingBottom: 50 }}
+      contentInsetAdjustmentBehavior={'automatic'}>
       {bible.map(book => {
         return (
           <ListItemAccordian
             key={book.name}
             title={book.name}
             titleStyle={theme.styles.textNormal}
-            containerStyle={{
-              borderColor: 'transparent',
-              height: 45,
-              paddingVertical: 0,
-            }}>
+            containerStyle={s.bookListItemContainer}>
             <View style={s.buttonsContainer}>
               {book.chapters.map((_chapter, chapterIndex) => {
                 return (
@@ -65,11 +63,16 @@ const BibleBookChaptersScreen = ({ navigation }: Props) => {
 };
 
 const useStyles = makeStyles((_theme, theme: AppTheme) => ({
+  bookListItemContainer: {
+    borderColor: 'transparent',
+    height: 45,
+    paddingVertical: 0,
+  },
   buttonsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     paddingLeft: viewPad,
-    backgroundColor: theme.colors.hintGray,
+    backgroundColor: theme.colors.white,
   },
   button: {
     width: buttonSize,
