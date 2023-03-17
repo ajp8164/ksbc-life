@@ -36,6 +36,7 @@ import FormikEffect from 'components/atoms/FormikEffect';
 import { ItemPickerModal } from 'components/modals/ItemPickerModal';
 import { saveSermon as commitSermon } from 'firestore/sermons';
 import { getPasteurs } from 'firestore/church';
+import lodash from 'lodash';
 import { makeStyles } from '@rneui/themed';
 import { useSetState } from '@react-native-ajp-elements/core';
 
@@ -72,12 +73,9 @@ const SermonEditorView = React.forwardRef<
   const pasteurPickerModalRef = useRef<ItemPickerModal>(null);
   const sermonDatePickerModalRef = useRef<DatePickerModal>(null);
 
-  const [bibleReference, setBibleReference] = useState<BibleReference>({
-    book: '',
-    chapter: '',
-    verse: { start: '', end: '' },
-  });
-  const [bibleReferenceStr, setBibleReferenceStr] = useState<string>();
+  const [bibleReference, setBibleReference] = useState<BibleReference>(
+    {} as BibleReference,
+  );
   const [pasteurItems, setPasteurItems] = useState<PickerItem[]>([]);
 
   const formikRef = useRef<FormikProps<FormValues>>(null);
@@ -138,7 +136,9 @@ const SermonEditorView = React.forwardRef<
       pasteur: values.pasteur,
       title: values.title,
       seriesTitle: values.seriesTitle,
-      bibleReference,
+      bibleReference: !lodash.isEmpty(bibleReference)
+        ? bibleReference
+        : { book: '', chapter: '', verse: { start: '', end: '' } },
       videoId: values.videoId,
       lifeApplication: values.lifeApplication,
     };
@@ -170,12 +170,18 @@ const SermonEditorView = React.forwardRef<
   };
 
   const onBibleReferenceChange = (bibleReference: BibleReference): void => {
-    setBibleReference(bibleReference);
-    setBibleReferenceStr(
-      bibleReference.verse.end.length > 0
+    if (!lodash.isEmpty(bibleReference)) {
+      setBibleReference(bibleReference);
+    }
+  };
+
+  const bibleReferenceToString = (bibleReference: BibleReference): string => {
+    if (!lodash.isEmpty(bibleReference)) {
+      return bibleReference.verse.end.length > 0
         ? `${bibleReference.book} ${bibleReference.chapter}:${bibleReference.verse.start}-${bibleReference.verse.end}`
-        : `${bibleReference.book} ${bibleReference.chapter}:${bibleReference.verse.start}`,
-    );
+        : `${bibleReference.book} ${bibleReference.chapter}:${bibleReference.verse.start}`;
+    }
+    return '';
   };
 
   const validationSchema = Yup.object().shape({
@@ -287,7 +293,8 @@ const SermonEditorView = React.forwardRef<
                 />
                 <ListItem
                   title={'Bible Reference'}
-                  value={bibleReferenceStr}
+                  placeholder={''}
+                  value={bibleReferenceToString(bibleReference)}
                   onPress={() =>
                     bibleReferencePickerModalRef.current?.present()
                   }
