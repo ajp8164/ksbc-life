@@ -1,10 +1,11 @@
-import { UserProfile, UserRole } from 'types/user';
+import { UserProfile, UserRole, UserStatus } from 'types/user';
 
 import { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import lodash from 'lodash';
 import { log } from '@react-native-ajp-elements/core';
 import { saveUser } from 'store/slices/user';
+import { signOut } from 'lib/auth';
 import { useDispatch } from 'react-redux';
 
 export const useAuthorizeUser = () => {
@@ -15,7 +16,7 @@ export const useAuthorizeUser = () => {
     credentials: FirebaseAuthTypes.User | null,
     result?: {
       onAuthorized?: () => void;
-      onUnauthorized?: () => void;
+      onUnauthorized?: (alertUser?: boolean) => void;
       onError?: () => void;
     },
   ) => {
@@ -50,38 +51,47 @@ export const useAuthorizeUser = () => {
           } else {
             // User exists. Update user in firestore (if needed) and set user.
             const profile = documentSnapshot.data() as UserProfile;
-            const updatedProfile = Object.assign({}, profile, {
-              photoUrl: credentials?.photoURL,
-            }) as UserProfile;
 
-            if (!lodash.isEqual(updatedProfile, profile)) {
-              firestore()
-                .collection('Users')
-                .doc(credentials.uid)
-                .update({
-                  photoUrl: credentials?.photoURL,
-                })
-                .then(() => {
-                  log.debug(
-                    `User profile updated: ${JSON.stringify(updatedProfile)}`,
-                  );
-                  const user = setUser(credentials, updatedProfile);
-                  result?.onAuthorized && result.onAuthorized();
-                  log.debug(
-                    `User sign in complete: ${JSON.stringify(user.profile)}`,
-                  );
-                })
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                .catch((e: any) => {
-                  log.error(`Failed to add user to firestore: ${e.message}`);
-                  result?.onError && result.onError();
-                });
+            if (profile.status === UserStatus.Active) {
+              const updatedProfile = Object.assign({}, profile, {
+                photoUrl: credentials?.photoURL,
+              }) as UserProfile;
+
+              if (!lodash.isEqual(updatedProfile, profile)) {
+                firestore()
+                  .collection('Users')
+                  .doc(credentials.uid)
+                  .update({
+                    photoUrl: credentials?.photoURL,
+                  })
+                  .then(() => {
+                    log.debug(
+                      `User profile updated: ${JSON.stringify(updatedProfile)}`,
+                    );
+                    const user = setUser(credentials, updatedProfile);
+                    result?.onAuthorized && result.onAuthorized();
+                    log.debug(
+                      `User sign in complete: ${JSON.stringify(user.profile)}`,
+                    );
+                  })
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  .catch((e: any) => {
+                    log.error(`Failed to add user to firestore: ${e.message}`);
+                    result?.onError && result.onError();
+                  });
+              } else {
+                const user = setUser(credentials, profile);
+                result?.onAuthorized && result.onAuthorized();
+                log.debug(
+                  `User sign in complete: ${JSON.stringify(user.profile)}`,
+                );
+              }
             } else {
-              const user = setUser(credentials, profile);
-              result?.onAuthorized && result.onAuthorized();
-              log.debug(
-                `User sign in complete: ${JSON.stringify(user.profile)}`,
-              );
+              // User is not allowed to sign in.
+              signOut().then(() => {
+                unauthorizeUser();
+                result?.onUnauthorized && result.onUnauthorized(true);
+              });
             }
           }
         })
@@ -93,8 +103,10 @@ export const useAuthorizeUser = () => {
           result?.onError && result.onError();
         });
     } else {
-      unauthorizeUser();
-      result?.onUnauthorized && result.onUnauthorized();
+      signOut().then(() => {
+        unauthorizeUser();
+        result?.onUnauthorized && result.onUnauthorized();
+      });
     }
   };
 };
@@ -105,6 +117,7 @@ const createProfile = (credentials: FirebaseAuthTypes.User): UserProfile => {
     email: credentials.email,
     photoUrl: credentials.photoURL,
     role: UserRole.User, // All users created with default role.
+    status: UserStatus.Active,
   } as UserProfile;
 };
 

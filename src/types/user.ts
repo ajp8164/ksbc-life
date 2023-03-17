@@ -6,12 +6,18 @@ export enum UserRole {
   User = 'User',
 }
 
+export enum UserStatus {
+  Active = 'Active',
+  Disabled = 'Disabled',
+}
+
 export type UserProfile = {
   id?: string;
   name: string;
   email: string;
   photoUrl: string;
   role: UserRole;
+  status: UserStatus;
 };
 
 export type User = {

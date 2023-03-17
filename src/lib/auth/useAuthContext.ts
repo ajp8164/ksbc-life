@@ -50,9 +50,8 @@ export const useAuthContext = (
 
       authorizeUserDebounced.current(credentials, {
         onError: onAuthError,
-        onAuthorized: () => {
-          dismiss();
-        },
+        onAuthorized: dismiss,
+        onUnauthorized: onNotAuthorized,
       });
     });
     return unsubscribe;
@@ -74,6 +73,18 @@ export const useAuthContext = (
       [{ text: 'OK' }],
       { cancelable: false },
     );
+  };
+
+  const onNotAuthorized = (alertUser?: boolean) => {
+    dismiss();
+    if (alertUser) {
+      Alert.alert(
+        'Account Disabled',
+        'Contact your administrator for more information.',
+        [{ text: 'OK' }],
+        { cancelable: false },
+      );
+    }
   };
 
   return {

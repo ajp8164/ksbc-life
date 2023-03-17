@@ -31,7 +31,11 @@ export const documentChangeListener = (
       .doc(doc)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .onSnapshot(handler, (e: any) => {
-        log.error(`Failed onSnapshot for ${col}.${doc} document: ${e.message}`);
+        if (!e.message.includes('firestore/permission-denied')) {
+          log.error(
+            `Failed onSnapshot for ${col}.${doc} document: ${e.message}`,
+          );
+        }
       })
   );
 };
