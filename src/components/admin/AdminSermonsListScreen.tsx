@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { deleteSermon, getSermons } from 'firestore/sermons';
 
 import { DateTime } from 'luxon';
+import { EditPasteurModal } from 'components/admin/modals/EditPasteurModal';
 import { EditSermonModal } from 'components/admin/modals/EditSermonModal';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { MoreNavigatorParamList } from 'types/navigation';
@@ -12,7 +13,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Sermon } from 'types/church';
 import { collectionChangeListener } from 'firestore/events';
-import { getPasteurs } from 'firestore/church';
+// import { getDocumentCount } from 'firestore/utils';
 import { useTheme } from 'theme';
 
 type Props = NativeStackScreenProps<MoreNavigatorParamList, 'AdminSermonsList'>;
@@ -20,10 +21,13 @@ type Props = NativeStackScreenProps<MoreNavigatorParamList, 'AdminSermonsList'>;
 const AdminSermonsListScreen = ({ navigation }: Props) => {
   const theme = useTheme();
 
+  const editPasteurModalRef = useRef<EditPasteurModal>(null);
   const editSermonModalRef = useRef<EditSermonModal>(null);
+
   const [lastDocument, setLastDocument] =
     useState<FirebaseFirestoreTypes.DocumentData>();
   const [sermons, setSermons] = useState<Sermon[]>([]);
+  const [pasteurCount, setPasteurCount] = useState(0);
 
   useEffect(() => {
     const subscription = collectionChangeListener('Sermons', () => {
@@ -35,8 +39,17 @@ const AdminSermonsListScreen = ({ navigation }: Props) => {
   }, []);
 
   useEffect(() => {
+    const subscription = collectionChangeListener('Pasteurs', async snapshot =>
+      setPasteurCount(snapshot.size),
+    );
+
+    return subscription;
+  }, []);
+
+  useEffect(() => {
     (async () => {
-      const pasteurs = await getPasteurs();
+      // const count = await getDocumentCount('Pasteurs');
+      // setPasteurCount(count);
       navigation.setOptions({
         // eslint-disable-next-line react/no-unstable-nested-components
         headerRight: () => (
@@ -51,25 +64,16 @@ const AdminSermonsListScreen = ({ navigation }: Props) => {
                   size={28}
                 />
               }
-              onPress={() => {
-                if (pasteurs.length > 0) {
-                  editSermonModalRef.current?.present('Add Sermon');
-                } else {
-                  Alert.alert(
-                    'No Pasteurs Found',
-                    'You must setup at least one pasteur to create a sermon.',
-                    [{ text: 'OK' }],
-                    { cancelable: false },
-                  );
-                }
-              }}
+              disabled={pasteurCount === 0}
+              disabledStyle={theme.styles.buttonClearDisabled}
+              onPress={() => editSermonModalRef.current?.present('New Sermon')}
             />
           </>
         ),
       });
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pasteurCount]);
 
   const getMoreSermons = async (limit = 10) => {
     try {
@@ -101,41 +105,79 @@ const AdminSermonsListScreen = ({ navigation }: Props) => {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior={'automatic'}>
-        <Divider />
-        {sermons.map((sermon, index) => {
-          return (
+        {pasteurCount > 0 ? (
+          sermons.length ? (
+            <>
+              <Divider />
+              {sermons.map((sermon, index) => {
+                return (
+                  <ListItem
+                    key={index}
+                    title={sermon.title}
+                    subtitle={DateTime.fromISO(sermon.date).toFormat(
+                      'MMM d, yyyy',
+                    )}
+                    position={[
+                      index === 0 ? 'first' : undefined,
+                      index === sermons.length - 1 ? 'last' : undefined,
+                    ]}
+                    leftImage={'cross-outline'}
+                    leftImageType={'material-community'}
+                    drawerRightItems={[
+                      {
+                        width: 50,
+                        background: theme.colors.assertive,
+                        customElement: (
+                          <Icon
+                            name="delete"
+                            type={'material-community'}
+                            color={theme.colors.stickyWhite}
+                            size={28}
+                          />
+                        ),
+                        onPress: () => confirmDeleteSermon(sermon.id || ''),
+                      },
+                    ]}
+                    onPress={() =>
+                      editSermonModalRef.current?.present('Edit Sermon', sermon)
+                    }
+                  />
+                );
+              })}
+            </>
+          ) : (
+            <>
+              <Divider />
+              <ListItem
+                title={'Add a sermon'}
+                position={['first', 'last']}
+                leftImage={'cross-outline'}
+                leftImageType={'material-community'}
+                onPress={() =>
+                  editSermonModalRef.current?.present('New Sermon')
+                }
+              />
+            </>
+          )
+        ) : (
+          <>
+            <Divider
+              type={'note'}
+              text={'There msut be at least one pasteur to create a sermon.'}
+            />
             <ListItem
-              key={index}
-              title={sermon.title}
-              subtitle={DateTime.fromISO(sermon.date).toFormat('MMM d, yyyy')}
-              position={[
-                index === 0 ? 'first' : undefined,
-                index === sermons.length - 1 ? 'last' : undefined,
-              ]}
-              leftImage={'cross-outline'}
+              title={'Add a pasteur'}
+              position={['first', 'last']}
+              leftImage={'account-outline'}
               leftImageType={'material-community'}
-              drawerRightItems={[
-                {
-                  width: 50,
-                  background: theme.colors.assertive,
-                  customElement: (
-                    <Icon
-                      name="delete"
-                      type={'material-community'}
-                      color={theme.colors.stickyWhite}
-                      size={28}
-                    />
-                  ),
-                  onPress: () => confirmDeleteSermon(sermon.id || ''),
-                },
-              ]}
               onPress={() =>
-                editSermonModalRef.current?.present('Edit Sermon', sermon)
+                editPasteurModalRef.current?.present('New Pasteur')
               }
             />
-          );
-        })}
+          </>
+        )}
       </ScrollView>
+      <EditPasteurModal ref={editPasteurModalRef} />
       <EditSermonModal ref={editSermonModalRef} />
     </SafeAreaView>
   );

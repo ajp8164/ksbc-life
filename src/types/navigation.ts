@@ -14,6 +14,7 @@ export type GivingNavigatorParamList = {
 
 export type MoreNavigatorParamList = {
   About: undefined;
+  AdminChurch: undefined;
   AdminHome: undefined;
   AdminPasteursList: undefined;
   AdminSermonsList: undefined;

@@ -3,10 +3,8 @@ import { UserProfile } from 'types/user';
 
 export declare type UserEditorView = UserEditorViewMethods;
 
-declare const TextView: React.MemoExoticComponent<
-  React.ForwardRefExoticComponent<
-    UserEditorViewProps & React.RefAttributes<UserEditorViewMethods>
-  >
+declare const UserEditorView: React.MemoExoticComponent<
+  React.ForwardRefExoticComponent<UserEditorViewProps & React.RefAttributes<UserEditorViewMethods>>
 >;
 
 export interface UserEditorViewProps {

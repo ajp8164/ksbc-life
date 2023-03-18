@@ -1,19 +1,18 @@
-import { Alert, FlatList, ListRenderItem, Text, View } from 'react-native';
 import { AppTheme, useTheme } from 'theme';
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { FlatList, ListRenderItem, Text, View } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
 
 import { AuthContext } from 'lib/auth';
 import { DateTime } from 'luxon';
+import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SermonsNavigatorParamList } from 'types/navigation';
 import VideoCard from 'components/molecules/VideoCard';
-// import YoutubePlayer from 'react-native-youtube-iframe';
+import { YouTubeVideo } from 'types/youTube';
+import { collectionChangeListener } from 'firestore/events';
+import { getVideos } from 'firestore/youTube';
 import { makeStyles } from '@rneui/themed';
-import { saveSermonVideos } from 'store/slices/videos';
-import { selectSermonVideos } from 'store/selectors/videos';
-import { youTubeBroadcastVideos } from 'lib/youTube';
 
 export type Props = NativeStackScreenProps<
   SermonsNavigatorParamList,
@@ -23,64 +22,35 @@ export type Props = NativeStackScreenProps<
 const SermonsScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
-  const dispatch = useDispatch();
 
   const auth = useContext(AuthContext);
-  const storedVideos = useSelector(selectSermonVideos);
 
-  const allLoaded = useRef(false);
-  const nextPageToken = useRef('');
-  const [videos, setVideos] =
-    useState<GoogleApiYouTubeSearchResource[]>(storedVideos);
+  const [lastDocument, setLastDocument] =
+    useState<FirebaseFirestoreTypes.DocumentData>();
+  const [videos, setVideos] = useState<YouTubeVideo[]>([]);
+
   const [showVideo, setShowVideo] = useState<string | undefined>(undefined);
   const [paused, setPaused] = useState(false);
 
   useEffect(() => {
-    fetchVideos();
+    const subscription = collectionChangeListener('YouTubeVideos', () => {
+      getMoreSermons();
+    });
+
+    return subscription;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    dispatch(saveSermonVideos({ videos }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [videos]);
-
-  const removeDuplicateVideos = (videos: GoogleApiYouTubeSearchResource[]) => {
-    return Array.from(new Set(videos.map(v => v.id.videoId))).map(videoId => {
-      return videos.find(
-        v => v.id.videoId === videoId,
-      ) as GoogleApiYouTubeSearchResource;
-    });
+  const getMoreSermons = async (limit = 3) => {
+    try {
+      const v = await getVideos(limit, lastDocument);
+      setLastDocument(v.lastDocument);
+      setVideos(([] as YouTubeVideo[]).concat(v.videos, videos));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-empty
+    } catch (e: any) {}
   };
 
-  const fetchVideos = () => {
-    if (!allLoaded.current) {
-      youTubeBroadcastVideos(nextPageToken.current)
-        .then(data => {
-          if (
-            data.pageInfo.totalResults !== videos.length &&
-            data.nextPageToken
-          ) {
-            nextPageToken.current = data.nextPageToken;
-            setVideos(removeDuplicateVideos(videos.concat(data.items)));
-          } else {
-            allLoaded.current = true;
-          }
-        })
-        .catch(() => {
-          Alert.alert(
-            'Video Loading Error',
-            'There was a problem loading videos. Please try again later.',
-            [{ text: 'OK' }],
-            {
-              cancelable: false,
-            },
-          );
-        });
-    }
-  };
-
-  const renderVideo: ListRenderItem<GoogleApiYouTubeSearchResource> = ({
+  const renderSermon: ListRenderItem<GoogleApiYouTubeSearchResource> = ({
     item,
   }) => {
     const date = DateTime.fromISO(item.snippet.publishedAt)
@@ -91,7 +61,7 @@ const SermonsScreen = ({ navigation }: Props) => {
       <View style={s.playerContainer}>
         <VideoCard
           header={'John 2:13-25 | Jamie Auton'}
-          title={'Spring Cleaning'}
+          title={item.snippet.title}
           footer={`${date} | Series: Book of John`}
           imageSource={{ uri: item.snippet.thumbnails.high.url }}
           videoId={item.id.videoId}
@@ -145,7 +115,7 @@ const SermonsScreen = ({ navigation }: Props) => {
   const renderListEmptyComponent = () => {
     return (
       <View style={s.emptyListContainer}>
-        <Text style={theme.styles.textNormal}>{'No videos yet'}</Text>
+        <Text style={theme.styles.textNormal}>{'No sermons yet'}</Text>
       </View>
     );
   };
@@ -157,11 +127,11 @@ const SermonsScreen = ({ navigation }: Props) => {
         style={[theme.styles.view, { paddingHorizontal: 0 }]}>
         <FlatList
           data={videos}
-          renderItem={renderVideo}
+          renderItem={renderSermon}
           ListEmptyComponent={renderListEmptyComponent}
           keyExtractor={item => item.etag}
           onEndReachedThreshold={0.2}
-          onEndReached={fetchVideos}
+          onEndReached={() => getMoreSermons()}
           contentContainerStyle={{
             paddingVertical: 15,
             ...theme.styles.viewWidth,

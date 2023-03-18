@@ -2,7 +2,10 @@ import { BibleReference } from 'types/bible';
 import { ISODateString } from './common';
 
 export type Church = {
-  pasteurs: Pasteur[];
+  name: string;
+  shortName: string;
+  values: string;
+  beliefs: string;
 };
 
 export type LifeApplication = {
@@ -22,14 +25,3 @@ export type Sermon = {
 };
 
 export type SermonVideo = GoogleApiYouTubeSearchResource;
-
-export type Pasteur = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  title: string;
-  email: string;
-  phone: string;
-  biography: string;
-  photoUrl: string;
-};

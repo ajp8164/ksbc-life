@@ -15,7 +15,7 @@ export const getSermons = (
 ): Promise<SermonsQueryResult> => {
   let query = firestore().collection('Sermons').orderBy('date', 'desc');
 
-  if (lastDocument !== undefined) {
+  if (lastDocument) {
     query = query.startAfter(lastDocument);
   }
 

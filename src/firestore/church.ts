@@ -1,7 +1,5 @@
-import { Church, Pasteur } from 'types/church';
-
+import { Church } from 'types/church';
 import firestore from '@react-native-firebase/firestore';
-import lodash from 'lodash';
 import { log } from '@react-native-ajp-elements/core';
 
 export const getChurch = (): Promise<Church> => {
@@ -10,30 +8,37 @@ export const getChurch = (): Promise<Church> => {
     .doc('Church')
     .get()
     .then(documentSnapshot => {
-      return documentSnapshot.data() as Church;
+      if (!documentSnapshot.exists) {
+        return addChurch();
+      } else {
+        return documentSnapshot.data() as Church;
+      }
     });
 };
 
-export const getPasteurs = (): Promise<Pasteur[]> => {
-  return getChurch().then(church => {
-    return (church.pasteurs || []) as Pasteur[];
-  });
-};
+export const addChurch = (): Promise<Church> => {
+  // Initialize the church doc.
+  const church: Church = {
+    name: 'My Church',
+    shortName: '',
+    values: '',
+    beliefs: '',
+  };
 
-export const getPasteur = (id: string): Promise<Pasteur | undefined> => {
-  return getChurch().then(church => {
-    const pasteurs = church.pasteurs as Pasteur[];
-    return pasteurs.find(pasteur => {
-      return pasteur.id === id;
-    });
-  });
-};
-
-export const deletePasteur = (id: string): Promise<void> => {
-  return getChurch().then(church => {
-    lodash.remove(church.pasteurs, { id });
-    return updateChurch(church);
-  });
+  return (
+    firestore()
+      .collection('Church')
+      .doc('Church')
+      .set(church)
+      .then(() => {
+        return church;
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch((e: any) => {
+        log.error(`Failed to add church document: ${e.message}`);
+        throw e;
+      })
+  );
 };
 
 export const updateChurch = (church: Church): Promise<void> => {
@@ -44,18 +49,8 @@ export const updateChurch = (church: Church): Promise<void> => {
       .update(church)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((e: any) => {
-        log.error(`Failed to save Church document: ${e.message}`);
+        log.error(`Failed to update Church document: ${e.message}`);
         throw e;
       })
   );
-};
-
-export const updatePasteur = (pasteur: Pasteur): Promise<void> => {
-  return getChurch().then(church => {
-    lodash.remove(church.pasteurs, p => {
-      return p.id === pasteur.id;
-    });
-    church.pasteurs.push(pasteur);
-    return updateChurch(church);
-  });
 };

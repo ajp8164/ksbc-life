@@ -19,21 +19,29 @@ const AdminHomeScreen = ({ navigation }: Props) => {
         contentInsetAdjustmentBehavior={'automatic'}>
         <Divider />
         <ListItem
-          title={'Pasteurs'}
+          title={'Church'}
           position={['first']}
+          leftImage={'church'}
+          leftImageType={'material-community'}
+          onPress={() => navigation.navigate('AdminChurch')}
+        />
+        <ListItem
+          title={'Pasteurs'}
           leftImage={'account-outline'}
           leftImageType={'material-community'}
           onPress={() => navigation.navigate('AdminPasteursList')}
         />
         <ListItem
           title={'Sermons'}
+          position={['last']}
           leftImage={'cross-outline'}
           leftImageType={'material-community'}
           onPress={() => navigation.navigate('AdminSermonsList')}
         />
+        <Divider />
         <ListItem
           title={'Content'}
-          position={['last']}
+          position={['first', 'last']}
           leftImage={'file-document-edit-outline'}
           leftImageType={'material-community'}
           // onPress={() => navigation.navigate('')}

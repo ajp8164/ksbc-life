@@ -1,25 +1,25 @@
-import { EditPasteurModalMethods, EditPasteurModalProps } from './types';
-import PasteurEditorView, {
+import { EditLocationModalMethods, EditLocationModalProps } from './types';
+import LocationEditorView, {
   EditorState,
-} from 'components/admin/views/PasteurEditorView';
+} from 'components/admin/views/LocationEditorView';
 import React, { useImperativeHandle, useRef, useState } from 'react';
 
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
+import { Location } from 'types/location';
 import { Modal } from '@react-native-ajp-elements/ui';
 import ModalHeader from 'components/molecules/ModalHeader';
-import { Pasteur } from 'types/pasteur';
 
-type EditPasteurModal = EditPasteurModalMethods;
+type EditLocationModal = EditLocationModalMethods;
 
-const EditPasteurModal = React.forwardRef<
-  EditPasteurModal,
-  EditPasteurModalProps
+const EditLocationModal = React.forwardRef<
+  EditLocationModal,
+  EditLocationModalProps
 >((_props, ref) => {
   const innerRef = useRef<BottomSheetModalMethods>(null);
-  const pasteurEditorViewRef = useRef<PasteurEditorView>(null);
+  const LocationEditorViewRef = useRef<LocationEditorView>(null);
 
   const [editorState, setEditorState] = useState({} as EditorState);
-  const [pasteur, setPasteur] = useState<Pasteur>();
+  const [location, setLocation] = useState<Location>();
   const [title, setTitle] = useState('');
 
   useImperativeHandle(ref, () => ({
@@ -32,9 +32,9 @@ const EditPasteurModal = React.forwardRef<
     innerRef.current?.dismiss();
   };
 
-  const present = (title: string, pasteur?: Pasteur) => {
+  const present = (title: string, location?: Location) => {
     setTitle(title);
-    setPasteur(pasteur);
+    setLocation(location);
     innerRef.current?.present();
   };
 
@@ -45,21 +45,21 @@ const EditPasteurModal = React.forwardRef<
         rightButtonText={'Save'}
         rightButtonDisabled={!editorState.changed}
         onRightButtonPress={() =>
-          pasteurEditorViewRef.current
-            ?.savePasteur()
+          LocationEditorViewRef.current
+            ?.saveLocation()
             .then(dismiss)
             .catch(() => {
               // Nothing to do. Prevent unhandled promise.
             })
         }
       />
-      <PasteurEditorView
-        ref={pasteurEditorViewRef}
-        pasteur={pasteur}
+      <LocationEditorView
+        ref={LocationEditorViewRef}
+        location={location}
         onChange={setEditorState}
       />
     </Modal>
   );
 });
 
-export { EditPasteurModal };
+export { EditLocationModal };

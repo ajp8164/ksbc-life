@@ -20,68 +20,73 @@ import {
 } from '@react-native-ajp-elements/ui';
 import {
   EditorState,
-  PasteurEditorViewMethods,
-  PasteurEditorViewProps,
+  LocationEditorViewMethods,
+  LocationEditorViewProps,
 } from './types';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import React, { useEffect, useImperativeHandle, useRef } from 'react';
 import { deleteImage, saveImage, selectImage } from 'lib/imageSelect';
-import { ellipsis, log, useSetState } from '@react-native-ajp-elements/core';
+import { log, useSetState } from '@react-native-ajp-elements/core';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import FormikEffect from 'components/atoms/FormikEffect';
-import { TextModal } from 'components/modals/TextModal';
+import { StreetAddress } from 'types/common';
 import { appConfig } from 'config';
 import { makeStyles } from '@rneui/themed';
-import { updatePasteur } from 'firestore/pasteurs';
+import { updateLocation } from 'firestore/locations';
 
 enum Fields {
-  firstName,
-  lastName,
-  title,
+  name,
+  street1,
+  street2,
+  city,
+  state,
+  postalCode,
   email,
   phone,
-  biography,
   photoUrl,
 }
 
 type FormValues = {
-  firstName: string;
-  lastName: string;
-  title: string;
+  name: string;
+  address: StreetAddress;
   email: string;
   phone: string;
-  biography: string;
   photoUrl: string;
 };
 
-type PasteurEditorView = PasteurEditorViewMethods;
+type LocationEditorView = LocationEditorViewMethods;
 
-const PasteurEditorView = React.forwardRef<
-  PasteurEditorView,
-  PasteurEditorViewProps
+const LocationEditorView = React.forwardRef<
+  LocationEditorView,
+  LocationEditorViewProps
 >((props, ref) => {
-  const { onChange, pasteur } = props;
+  const { location, onChange } = props;
 
   const theme = useTheme();
   const s = useStyles(theme);
 
   const formikRef = useRef<FormikProps<FormValues>>(null);
-  const refFirstName = useRef<TextInput>(null);
-  const refLastName = useRef<TextInput>(null);
-  const refTitle = useRef<TextInput>(null);
+  const refName = useRef<TextInput>(null);
+  const refStreet1 = useRef<TextInput>(null);
+  const refStreet2 = useRef<TextInput>(null);
+  const refCity = useRef<TextInput>(null);
+  const refState = useRef<TextInput>(null);
+  const refPostalCode = useRef<TextInput>(null);
   const refEmail = useRef<TextInput>(null);
   const refPhone = useRef<TextInput>(null);
   const refPhotoUrl = useRef<TextInput>(null);
 
-  const biographyModalRef = useRef<TextModal>(null);
-  const pasteurImageAsset = useRef<ImagePicker.Asset>();
+  const locationImageAsset = useRef<ImagePicker.Asset>();
 
   // Same order as on form.
   const fieldRefs = [
-    refFirstName.current,
-    refLastName.current,
-    refTitle.current,
+    refName.current,
+    refStreet1.current,
+    refStreet2.current,
+    refCity.current,
+    refState.current,
+    refPostalCode.current,
     refEmail.current,
     refPhone.current,
     refPhotoUrl.current,
@@ -96,7 +101,7 @@ const PasteurEditorView = React.forwardRef<
 
   useImperativeHandle(ref, () => ({
     //  These functions exposed to the parent component through the ref.
-    savePasteur,
+    saveLocation,
   }));
 
   useEffect(() => {
@@ -104,11 +109,7 @@ const PasteurEditorView = React.forwardRef<
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorState]);
 
-  const saveBiography = (text: string) => {
-    formikRef.current?.setFieldValue('biography', text);
-  };
-
-  const savePasteur = async () => {
+  const saveLocation = async () => {
     return formikRef.current?.submitForm();
   };
 
@@ -118,19 +119,17 @@ const PasteurEditorView = React.forwardRef<
   ) => {
     Keyboard.dismiss();
     setEditorState({ isSubmitting: true });
-    await savePasteurImage();
+    await saveLocationImage();
     // Saving the image updates the form but form values are already passed in.
     // Overwrite the image value after saving the image to storage.
     values.photoUrl = formikRef.current?.values.photoUrl || '';
     return (
-      updatePasteur({
-        id: pasteur?.id,
-        firstName: values.firstName,
-        lastName: values.lastName,
-        title: values.title,
+      updateLocation({
+        id: location?.id,
+        name: values.name,
+        address: values.address,
         email: values.email,
         phone: values.phone,
-        biography: values.biography,
         photoUrl: values.photoUrl,
       })
         .then(() => {
@@ -139,9 +138,9 @@ const PasteurEditorView = React.forwardRef<
         })
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .catch((e: any) => {
-          log.error(`Failed to save pasteur: ${e.message}`);
+          log.error(`Failed to save location: ${e.message}`);
           Alert.alert(
-            'Pasteur Not Saved',
+            'Location Not Saved',
             'Please try again. If this problem persists please contact support.',
             [{ text: 'OK' }],
             { cancelable: false },
@@ -151,10 +150,10 @@ const PasteurEditorView = React.forwardRef<
     );
   };
 
-  const selectPasteurImage = () => {
+  const selectLocationImage = () => {
     selectImage({
       onSuccess: imageAsset => {
-        pasteurImageAsset.current = imageAsset;
+        locationImageAsset.current = imageAsset;
         formikRef.current?.setFieldValue('photoUrl', imageAsset.uri);
       },
       onError: () => {
@@ -168,23 +167,23 @@ const PasteurEditorView = React.forwardRef<
     });
   };
 
-  const savePasteurImage = async () => {
-    if (pasteurImageAsset.current) {
+  const saveLocationImage = async () => {
+    if (locationImageAsset.current) {
       await saveImage({
-        imageAsset: pasteurImageAsset.current,
-        storagePath: appConfig.storageImagePasteurs,
-        oldImage: pasteur?.photoUrl,
+        imageAsset: locationImageAsset.current,
+        storagePath: appConfig.storageImageLocations,
+        oldImage: location?.photoUrl,
         onSuccess: url => formikRef.current?.setFieldValue('photoUrl', url),
         onError: () => formikRef.current?.setFieldValue('photoUrl', ''),
       });
     }
   };
 
-  const deletePasteurImage = async () => {
-    if (pasteur?.photoUrl) {
+  const deleteLocationImage = async () => {
+    if (location?.photoUrl) {
       await deleteImage({
-        filename: pasteur.photoUrl,
-        storagePath: appConfig.storageImagePasteurs,
+        filename: location.photoUrl,
+        storagePath: appConfig.storageImageLocations,
       })
         .then(() => {
           formikRef.current?.setFieldValue('photoUrl', '');
@@ -201,12 +200,14 @@ const PasteurEditorView = React.forwardRef<
   };
 
   const validationSchema = Yup.object().shape({
-    firstName: Yup.string().required('First name is required'),
-    lastName: Yup.string().required('Last name is required'),
-    title: Yup.string(),
+    name: Yup.string().required('Location name is required'),
+    street1: Yup.string(),
+    street2: Yup.string(),
+    city: Yup.string(),
+    state: Yup.string(),
+    postalCode: Yup.string(),
     email: Yup.string().email('Must be a valid email address'),
     phone: Yup.string(),
-    biography: Yup.string().max(1200),
     photoUrl: Yup.string(),
   });
 
@@ -219,13 +220,11 @@ const PasteurEditorView = React.forwardRef<
           <Formik
             innerRef={formikRef}
             initialValues={{
-              firstName: pasteur?.firstName || '',
-              lastName: pasteur?.lastName || '',
-              title: pasteur?.title || '',
-              email: pasteur?.email || '',
-              phone: pasteur?.phone || '',
-              biography: pasteur?.biography || '',
-              photoUrl: pasteur?.photoUrl || '',
+              name: location?.name || '',
+              address: location?.address || ({} as StreetAddress),
+              email: location?.email || '',
+              phone: location?.phone || '',
+              photoUrl: location?.photoUrl || '',
             }}
             validateOnChange={true}
             validateOnMount={true}
@@ -248,56 +247,107 @@ const PasteurEditorView = React.forwardRef<
                   }}
                 />
                 <ListItemInput
-                  refInner={refFirstName}
-                  placeholder={'First name'}
+                  refInner={refName}
+                  placeholder={'Location name'}
                   placeholderTextColor={theme.colors.textPlaceholder}
-                  value={formik.values.firstName}
-                  errorText={formik.errors.firstName}
+                  value={formik.values.name}
+                  errorText={formik.errors.name}
                   errorColor={theme.colors.error}
                   onBlur={(
                     e: NativeSyntheticEvent<TextInputFocusEventData>,
                   ) => {
-                    formik.handleBlur('firstName')(e);
+                    formik.handleBlur('name')(e);
                     setEditorState({ focusedField: undefined });
                   }}
-                  onChangeText={formik.handleChange('firstName')}
+                  onChangeText={formik.handleChange('name')}
+                  onFocus={() => setEditorState({ focusedField: Fields.name })}
+                />
+                <Divider text={'ADDRESS'} />
+                <ListItemInput
+                  refInner={refStreet1}
+                  placeholder={'Street 1'}
+                  placeholderTextColor={theme.colors.textPlaceholder}
+                  value={formik.values.address.street1}
+                  errorText={formik.errors.address?.street1}
+                  errorColor={theme.colors.error}
+                  onBlur={(
+                    e: NativeSyntheticEvent<TextInputFocusEventData>,
+                  ) => {
+                    formik.handleBlur('address.street1')(e);
+                    setEditorState({ focusedField: undefined });
+                  }}
+                  onChangeText={formik.handleChange('address.street1')}
                   onFocus={() =>
-                    setEditorState({ focusedField: Fields.firstName })
+                    setEditorState({ focusedField: Fields.street1 })
                   }
                 />
                 <ListItemInput
-                  refInner={refLastName}
-                  placeholder={'Last name'}
+                  refInner={refStreet2}
+                  placeholder={'Street 2'}
                   placeholderTextColor={theme.colors.textPlaceholder}
-                  value={formik.values.lastName}
-                  errorText={formik.errors.lastName}
+                  value={formik.values.address.street2}
+                  errorText={formik.errors.address?.street2}
                   errorColor={theme.colors.error}
                   onBlur={(
                     e: NativeSyntheticEvent<TextInputFocusEventData>,
                   ) => {
-                    formik.handleBlur('lastName')(e);
+                    formik.handleBlur('address.street2')(e);
                     setEditorState({ focusedField: undefined });
                   }}
-                  onChangeText={formik.handleChange('lastName')}
+                  onChangeText={formik.handleChange('address.street2')}
                   onFocus={() =>
-                    setEditorState({ focusedField: Fields.lastName })
+                    setEditorState({ focusedField: Fields.street2 })
                   }
                 />
                 <ListItemInput
-                  refInner={refTitle}
-                  placeholder={'Title'}
+                  refInner={refCity}
+                  placeholder={'City'}
                   placeholderTextColor={theme.colors.textPlaceholder}
-                  value={formik.values.title}
-                  errorText={formik.errors.title}
+                  value={formik.values.address.city}
+                  errorText={formik.errors.address?.city}
                   errorColor={theme.colors.error}
                   onBlur={(
                     e: NativeSyntheticEvent<TextInputFocusEventData>,
                   ) => {
-                    formik.handleBlur('title')(e);
+                    formik.handleBlur('address.city')(e);
                     setEditorState({ focusedField: undefined });
                   }}
-                  onChangeText={formik.handleChange('title')}
-                  onFocus={() => setEditorState({ focusedField: Fields.title })}
+                  onChangeText={formik.handleChange('address.city')}
+                  onFocus={() => setEditorState({ focusedField: Fields.city })}
+                />
+                <ListItemInput
+                  refInner={refState}
+                  placeholder={'State'}
+                  placeholderTextColor={theme.colors.textPlaceholder}
+                  value={formik.values.address.state}
+                  errorText={formik.errors.address?.state}
+                  errorColor={theme.colors.error}
+                  onBlur={(
+                    e: NativeSyntheticEvent<TextInputFocusEventData>,
+                  ) => {
+                    formik.handleBlur('address.state')(e);
+                    setEditorState({ focusedField: undefined });
+                  }}
+                  onChangeText={formik.handleChange('address.state')}
+                  onFocus={() => setEditorState({ focusedField: Fields.state })}
+                />
+                <ListItemInput
+                  refInner={refPostalCode}
+                  placeholder={'Postal code'}
+                  placeholderTextColor={theme.colors.textPlaceholder}
+                  value={formik.values.address.postalCode}
+                  errorText={formik.errors.address?.postalCode}
+                  errorColor={theme.colors.error}
+                  onBlur={(
+                    e: NativeSyntheticEvent<TextInputFocusEventData>,
+                  ) => {
+                    formik.handleBlur('address.postalCode')(e);
+                    setEditorState({ focusedField: undefined });
+                  }}
+                  onChangeText={formik.handleChange('address.postalCode')}
+                  onFocus={() =>
+                    setEditorState({ focusedField: Fields.postalCode })
+                  }
                 />
                 <Divider text={'CONTACT'} />
                 <ListItemInput
@@ -338,21 +388,6 @@ const PasteurEditorView = React.forwardRef<
                   onChangeText={formik.handleChange('phone')}
                   onFocus={() => setEditorState({ focusedField: Fields.phone })}
                 />
-                <Divider text={'ABOUT'} />
-                <ListItem
-                  title={
-                    formik.values.biography.length
-                      ? `${ellipsis(formik.values.biography, 200)}`
-                      : 'Add a biography'
-                  }
-                  titleStyle={
-                    !formik.values.biography.length
-                      ? { ...theme.styles.textPlaceholder }
-                      : {}
-                  }
-                  containerStyle={{ borderBottomWidth: 0 }}
-                  onPress={biographyModalRef.current?.present}
-                />
                 {formik.values.photoUrl.length ? (
                   <>
                     <Divider />
@@ -369,7 +404,7 @@ const PasteurEditorView = React.forwardRef<
                             size={28}
                           />
                         }
-                        onPress={selectPasteurImage}
+                        onPress={selectLocationImage}
                       />
                       <Button
                         buttonStyle={s.imageButton}
@@ -381,7 +416,7 @@ const PasteurEditorView = React.forwardRef<
                             size={28}
                           />
                         }
-                        onPress={deletePasteurImage}
+                        onPress={deleteLocationImage}
                       />
                     </Image>
                   </>
@@ -390,7 +425,7 @@ const PasteurEditorView = React.forwardRef<
                     title={'Add a photo'}
                     titleStyle={theme.styles.textPlaceholder}
                     containerStyle={{ borderBottomWidth: 0 }}
-                    onPress={selectPasteurImage}
+                    onPress={selectLocationImage}
                   />
                 )}
               </View>
@@ -398,13 +433,6 @@ const PasteurEditorView = React.forwardRef<
           </Formik>
         </ScrollView>
       </AvoidSoftInputView>
-      <TextModal
-        ref={biographyModalRef}
-        headerTitle={'Biography'}
-        characterLimit={1200}
-        value={formikRef.current?.values.biography}
-        onDismiss={saveBiography}
-      />
       {/* This isn't working inside bottomsheet.
       {Platform.OS === 'ios' && (
         <KeyboardAccessory
@@ -436,4 +464,4 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   },
 }));
 
-export default PasteurEditorView;
+export default LocationEditorView;

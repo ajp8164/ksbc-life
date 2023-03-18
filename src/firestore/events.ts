@@ -6,7 +6,9 @@ import { log } from '@react-native-ajp-elements/core';
 
 export const collectionChangeListener = (
   col: string,
-  handler: () => void,
+  handler: (
+    snapshot: FirebaseFirestoreTypes.QuerySnapshot<FirebaseFirestoreTypes.DocumentData>,
+  ) => void,
 ): (() => void) => {
   return (
     firestore()

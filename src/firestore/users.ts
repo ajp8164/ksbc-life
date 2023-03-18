@@ -38,11 +38,14 @@ export const getUsers = (
   limit: number,
   lastDocument?: FirebaseFirestoreTypes.DocumentData,
 ): Promise<UsersQueryResult> => {
+  let query = firestore().collection('Users').orderBy('name', 'asc');
+
+  if (lastDocument) {
+    query = query.startAfter(lastDocument);
+  }
+
   return (
-    firestore()
-      .collection('Users')
-      .orderBy('name', 'asc')
-      .startAfter(lastDocument || 0)
+    query
       .limit(limit || 1) // Must be positive value
       .get()
       .then(querySnapshot => {
@@ -59,7 +62,7 @@ export const getUsers = (
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((e: any) => {
-        log.error(`Failed to get user document: ${e.message}`);
+        log.error(`Failed to get user documents: ${e.message}`);
         throw e;
       })
   );

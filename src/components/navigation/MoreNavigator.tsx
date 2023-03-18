@@ -1,4 +1,5 @@
 import AboutScreen from 'components/AboutScreen';
+import AdminChurchScreen from 'components/admin/AdminChurchScreen';
 import AdminHomeScreen from 'components/admin/AdminHomeScreen';
 import AdminPasteursListScreen from 'components/admin/AdminPasteursListScreen';
 import AdminSermonsListScreen from 'components/admin/AdminSermonsListScreen';
@@ -80,6 +81,15 @@ const MoreNavigator = () => {
         component={AdminHomeScreen}
         options={{
           title: 'Administration',
+          headerLeft: () => null,
+          headerLargeTitle: true,
+        }}
+      />
+      <MoreStack.Screen
+        name="AdminChurch"
+        component={AdminChurchScreen}
+        options={{
+          title: 'Church',
           headerLeft: () => null,
           headerLargeTitle: true,
         }}

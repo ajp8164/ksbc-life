@@ -35,7 +35,7 @@ import { DateTime } from 'luxon';
 import FormikEffect from 'components/atoms/FormikEffect';
 import { ItemPickerModal } from 'components/modals/ItemPickerModal';
 import { saveSermon as commitSermon } from 'firestore/sermons';
-import { getPasteurs } from 'firestore/church';
+import { getPasteurs } from 'firestore/pasteurs';
 import lodash from 'lodash';
 import { makeStyles } from '@rneui/themed';
 import { useSetState } from '@react-native-ajp-elements/core';
@@ -107,7 +107,8 @@ const SermonEditorView = React.forwardRef<
   useEffect(() => {
     (async () => {
       const items: PickerItem[] = [{ label: 'Select  Pastuer', value: '' }];
-      (await getPasteurs()).forEach(p => {
+      const p = await getPasteurs(100);
+      p.pasteurs.forEach(p => {
         const name = `${p.firstName} ${p.lastName}`;
         items.push({ label: name, value: name });
       });

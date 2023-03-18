@@ -3,7 +3,7 @@ import React from 'react';
 
 export declare type EditPasteurModal = EditPasteurModalMethods;
 
-declare const LegalModal: React.MemoExoticComponent<
+declare const PasteurModal: React.MemoExoticComponent<
   React.ForwardRefExoticComponent<
     EditPasteurModalProps & React.RefAttributes<EditPasteurModalMethods>
   >

@@ -3,7 +3,7 @@ import { Sermon } from 'types/church';
 
 export declare type SermonEditorView = SermonEditorViewMethods;
 
-declare const TextView: React.MemoExoticComponent<
+declare const SermonEditorView: React.MemoExoticComponent<
   React.ForwardRefExoticComponent<
     SermonEditorViewProps & React.RefAttributes<SermonEditorViewMethods>
   >
