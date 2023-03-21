@@ -45,8 +45,8 @@ const UserRolePickerView = ({
                 title={UserRole[r]}
                 textStyle={theme.styles.textNormal}
                 containerStyle={{
-                  borderWidth: 1,
                   padding: 0,
+                  backgroundColor: theme.colors.transparent,
                 }}
                 // Owner role is always disabled. Changing requires direct database access by support.
                 disabled={disabled || UserRole[r] === UserRole.Owner}

@@ -42,8 +42,8 @@ const UserStatusPickerView = ({
                 title={UserStatus[st]}
                 textStyle={theme.styles.textNormal}
                 containerStyle={{
-                  borderWidth: 1,
                   padding: 0,
+                  backgroundColor: theme.colors.transparent,
                 }}
                 disabled={disabled}
                 checkedColor={theme.colors.brandSecondary}
