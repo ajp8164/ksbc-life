@@ -22,7 +22,7 @@ import { EditLocationModal } from 'components/admin/modals/EditLocationModal';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { Location } from 'types/location';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { documentChangeListener } from 'firestore/events';
+import { churchCollectionChangeListener } from 'firestore/church';
 import { makeStyles } from '@rneui/themed';
 import { useHeaderHeight } from '@react-navigation/elements';
 
@@ -45,14 +45,22 @@ const AdminChurchScreen = () => {
   const [locations, setLocations] = useState<Location[]>([]);
 
   useEffect(() => {
-    const subscription = documentChangeListener(
-      'Church',
-      'Church',
-      documentSnapshot => {
-        setChurch(documentSnapshot.data() as Church);
+    const subscription = churchCollectionChangeListener(
+      snapshot => {
+        console.log('hello');
+        const updated: Church[] = [];
+        snapshot.docs.forEach(d => {
+          updated.push({ ...d.data(), id: d.id } as Church);
+        });
+        console.log(updated[0]);
+        setChurch(updated[0]); // Single church at the moment
+        setLastDocument(snapshot.docs[snapshot.docs.length - 1]);
+        setAllLoaded(false);
       },
+      { lastDocument },
     );
     return subscription;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -162,7 +170,7 @@ const AdminChurchScreen = () => {
       <View style={{ marginTop: contentTop }}>
         <Divider />
         <ListItem
-          title={church?.name}
+          title={church?.name || 'Setup my church'}
           position={['first', 'last']}
           leftImage={'church'}
           leftImageType={'material-community'}
