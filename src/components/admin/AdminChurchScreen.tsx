@@ -47,12 +47,10 @@ const AdminChurchScreen = () => {
   useEffect(() => {
     const subscription = churchCollectionChangeListener(
       snapshot => {
-        console.log('hello');
         const updated: Church[] = [];
         snapshot.docs.forEach(d => {
           updated.push({ ...d.data(), id: d.id } as Church);
         });
-        console.log(updated[0]);
         setChurch(updated[0]); // Single church at the moment
         setLastDocument(snapshot.docs[snapshot.docs.length - 1]);
         setAllLoaded(false);
