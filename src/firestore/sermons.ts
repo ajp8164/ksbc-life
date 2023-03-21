@@ -80,6 +80,9 @@ export const updateSermon = (sermon: Sermon): Promise<Sermon> => {
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((e: any) => {
+        if (e.message.includes('firestore/not-found')) {
+          return addSermon(sermon);
+        }
         log.error(`Failed to update sermon document: ${e.message}`);
         throw e;
       })
