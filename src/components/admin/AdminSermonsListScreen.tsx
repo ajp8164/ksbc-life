@@ -3,6 +3,7 @@ import {
   Alert,
   FlatList,
   ListRenderItem,
+  ScrollView,
   View,
 } from 'react-native';
 import { AppTheme, useTheme } from 'theme';
@@ -209,7 +210,9 @@ const AdminSermonsListScreen = ({ navigation }: Props) => {
           onEndReachedThreshold={0.2}
         />
       ) : (
-        <>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentInsetAdjustmentBehavior={'automatic'}>
           <Divider
             type={'note'}
             text={'There must be at least one pasteur to create a sermon.'}
@@ -221,7 +224,7 @@ const AdminSermonsListScreen = ({ navigation }: Props) => {
             leftImageType={'material-community'}
             onPress={() => editPasteurModalRef.current?.present('New Pasteur')}
           />
-        </>
+        </ScrollView>
       )}
       <EditPasteurModal ref={editPasteurModalRef} />
       <EditSermonModal ref={editSermonModalRef} />
