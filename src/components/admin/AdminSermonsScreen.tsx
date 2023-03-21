@@ -28,7 +28,7 @@ import { cacheYouTubeBroadcastVideosToFirestore } from 'lib/youTube';
 import { getDocumentCount } from 'firestore/utils';
 import { makeStyles } from '@rneui/themed';
 
-type Props = NativeStackScreenProps<MoreNavigatorParamList, 'AdminSermonsList'>;
+type Props = NativeStackScreenProps<MoreNavigatorParamList, 'AdminSermons'>;
 
 const AdminSermonsScreen = ({ navigation }: Props) => {
   const theme = useTheme();

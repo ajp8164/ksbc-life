@@ -20,10 +20,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { makeStyles } from '@rneui/themed';
 import { pasteursCollectionChangeListener } from 'firestore/pasteurs';
 
-type Props = NativeStackScreenProps<
-  MoreNavigatorParamList,
-  'AdminPasteursList'
->;
+type Props = NativeStackScreenProps<MoreNavigatorParamList, 'AdminPasteurs'>;
 
 const AdminPasteursScreen = ({ navigation }: Props) => {
   const theme = useTheme();

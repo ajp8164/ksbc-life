@@ -29,14 +29,14 @@ const AdminHomeScreen = ({ navigation }: Props) => {
           title={'Pasteurs'}
           leftImage={'account-outline'}
           leftImageType={'material-community'}
-          onPress={() => navigation.navigate('AdminPasteursList')}
+          onPress={() => navigation.navigate('AdminPasteurs')}
         />
         <ListItem
           title={'Sermons'}
           position={['last']}
           leftImage={'cross-outline'}
           leftImageType={'material-community'}
-          onPress={() => navigation.navigate('AdminSermonsList')}
+          onPress={() => navigation.navigate('AdminSermons')}
         />
         <Divider />
         <ListItem
@@ -44,7 +44,7 @@ const AdminHomeScreen = ({ navigation }: Props) => {
           position={['first', 'last']}
           leftImage={'file-document-edit-outline'}
           leftImageType={'material-community'}
-          // onPress={() => navigation.navigate('')}
+          onPress={() => navigation.navigate('AdminContent')}
         />
         <Divider />
         <ListItem
@@ -52,7 +52,7 @@ const AdminHomeScreen = ({ navigation }: Props) => {
           position={['first', 'last']}
           leftImage={'bell-outline'}
           leftImageType={'material-community'}
-          // onPress={() => navigation.navigate('')}
+          onPress={() => navigation.navigate('AdminNotifications')}
         />
         <Divider />
         <ListItem
@@ -60,7 +60,7 @@ const AdminHomeScreen = ({ navigation }: Props) => {
           position={['first', 'last']}
           leftImage={'account-multiple-outline'}
           leftImageType={'material-community'}
-          onPress={() => navigation.navigate('AdminUsersList')}
+          onPress={() => navigation.navigate('AdminUsers')}
         />
       </ScrollView>
     </SafeAreaView>

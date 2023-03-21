@@ -16,11 +16,13 @@ export type GivingNavigatorParamList = {
 export type MoreNavigatorParamList = {
   About: undefined;
   AdminChurch: undefined;
+  AdminContent: undefined;
   AdminHome: undefined;
-  AdminPasteursList: undefined;
-  AdminSermonsList: undefined;
-  AdminSermonVideosList: undefined;
-  AdminUsersList: undefined;
+  AdminNotifications: undefined;
+  AdminPasteurs: undefined;
+  AdminSermons: undefined;
+  AdminSermonVideos: undefined;
+  AdminUsers: undefined;
   AppSettings: undefined;
   Content: {
     content: ContentView;

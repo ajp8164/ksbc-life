@@ -4,6 +4,8 @@ import AdminHomeScreen from 'components/admin/AdminHomeScreen';
 import AdminPasteursScreen from 'components/admin/AdminPasteursScreen';
 import AdminSermonsScreen from 'components/admin/AdminSermonsScreen';
 import AdminUsersScreen from 'components/admin/AdminUsersScreen';
+import AdminContentScreen from 'components/admin/AdminContentScreen';
+import AdminNotificationsScreen from 'components/admin/AdminNotificationsScreen';
 import AppSettingsScreen from 'components/AppSettingsScreen';
 import ContentScreen from 'components/ContentScreen';
 import { MoreNavigatorParamList } from 'types/navigation';
@@ -95,7 +97,7 @@ const MoreNavigator = () => {
         }}
       />
       <MoreStack.Screen
-        name="AdminPasteursList"
+        name="AdminPasteurs"
         component={AdminPasteursScreen}
         options={{
           title: 'Pasteurs',
@@ -104,7 +106,7 @@ const MoreNavigator = () => {
         }}
       />
       <MoreStack.Screen
-        name="AdminSermonsList"
+        name="AdminSermons"
         component={AdminSermonsScreen}
         options={{
           title: 'Sermons',
@@ -113,7 +115,25 @@ const MoreNavigator = () => {
         }}
       />
       <MoreStack.Screen
-        name="AdminUsersList"
+        name="AdminContent"
+        component={AdminContentScreen}
+        options={{
+          title: 'Content',
+          headerLeft: () => null,
+          headerLargeTitle: true,
+        }}
+      />
+      <MoreStack.Screen
+        name="AdminNotifications"
+        component={AdminNotificationsScreen}
+        options={{
+          title: 'Notifications',
+          headerLeft: () => null,
+          headerLargeTitle: true,
+        }}
+      />
+      <MoreStack.Screen
+        name="AdminUsers"
         component={AdminUsersScreen}
         options={{
           title: 'Users',
