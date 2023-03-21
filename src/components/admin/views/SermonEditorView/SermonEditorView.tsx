@@ -144,11 +144,13 @@ const SermonEditorView = React.forwardRef<
         ? bibleReference
         : { book: '', chapter: '', verse: { start: '', end: '' } },
       lifeApplication: values.lifeApplication,
-      video: sermonVideo,
     };
 
     if (sermon?.id) {
       s.id = sermon.id;
+    }
+    if (sermonVideo) {
+      s.video = sermonVideo;
     }
 
     try {
@@ -161,7 +163,6 @@ const SermonEditorView = React.forwardRef<
       Alert.alert('Sermon Not Saved', 'Please try again.', [{ text: 'OK' }], {
         cancelable: false,
       });
-      throw e;
     }
   };
 

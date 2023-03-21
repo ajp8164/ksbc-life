@@ -3,7 +3,6 @@ import { Button, Icon } from '@rneui/base';
 import {
   GestureResponderEvent,
   Platform,
-  Text,
   TextStyle,
   TouchableOpacity,
   View,
@@ -11,6 +10,7 @@ import {
 } from 'react-native';
 
 import { ImageSource } from 'react-native-vector-icons/Icon';
+import NoItems from 'components/atoms/NoItems';
 import { Card as RNULCard } from 'react-native-ui-lib';
 import React from 'react';
 import YoutubePlayer from 'react-native-youtube-iframe';
@@ -85,12 +85,8 @@ const VideoCard = ({
       containerStyle={{ shadowColor: theme.colors.shadowColor }}
       style={[s.card, cardStyle]}>
       {!videoId ? (
-        <View
-          style={[
-            s.videoPlaceholderImage,
-            { width: imageWidth, height: imageHeight },
-          ]}>
-          <Text>{'No video'}</Text>
+        <View style={[s.noVideo, { width: imageWidth, height: imageHeight }]}>
+          <NoItems title={'No sermon video yet'} />
         </View>
       ) : showVideo ? (
         <View style={s.player}>
@@ -244,6 +240,13 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
         backgroundColor: theme.colors.black,
       },
     }),
+  },
+  noVideo: {
+    alignSelf: 'center',
+    justifyContent: 'center',
+    marginVertical: 15,
+    borderRadius: 10,
+    backgroundColor: theme.colors.hintGray,
   },
 }));
 
