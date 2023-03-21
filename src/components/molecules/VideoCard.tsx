@@ -3,6 +3,7 @@ import { Button, Icon } from '@rneui/base';
 import {
   GestureResponderEvent,
   Platform,
+  Text,
   TextStyle,
   TouchableOpacity,
   View,
@@ -39,7 +40,7 @@ interface VideoCardInterface {
   showVideo?: boolean;
   title?: string;
   titleStyle?: TextStyle | TextStyle[];
-  videoId: string;
+  videoId?: string;
 }
 
 const VideoCard = ({
@@ -83,7 +84,15 @@ const VideoCard = ({
     <RNULCard
       containerStyle={{ shadowColor: theme.colors.shadowColor }}
       style={[s.card, cardStyle]}>
-      {showVideo ? (
+      {!videoId ? (
+        <View
+          style={[
+            s.videoPlaceholderImage,
+            { width: imageWidth, height: imageHeight },
+          ]}>
+          <Text>{'No video'}</Text>
+        </View>
+      ) : showVideo ? (
         <View style={s.player}>
           <YoutubePlayer
             height={imageHeight}

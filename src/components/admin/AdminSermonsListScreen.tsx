@@ -132,7 +132,7 @@ const AdminSermonsListScreen = ({ navigation }: Props) => {
         title={item.title}
         subtitle={DateTime.fromISO(item.date).toFormat('MMM d, yyyy')}
         value={
-          item.videoId ? (
+          item.video?.id.videoId ? (
             <Icon
               name="youtube"
               type={'material-community'}

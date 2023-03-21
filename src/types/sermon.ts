@@ -13,8 +13,8 @@ export type Sermon = {
   pasteur: string;
   seriesTitle?: string;
   bibleReference?: BibleReference;
-  videoId?: string;
   lifeApplication?: LifeApplication;
+  video?: SermonVideo;
 };
 
 export type SermonVideo = GoogleApiYouTubeSearchResource;

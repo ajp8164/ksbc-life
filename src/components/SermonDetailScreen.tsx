@@ -14,6 +14,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SermonsNavigatorParamList } from 'types/navigation';
 import { TextModal } from 'components/modals/TextModal';
+import { bibleReferenceToString } from 'lib/bible';
 import { biometricAuthentication } from 'lib/biometricAuthentication';
 import { makeStyles } from '@rneui/themed';
 import { openURL } from '@react-native-ajp-elements/core';
@@ -27,8 +28,10 @@ const SermonDetailScreen = ({ navigation, route }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
-  console.log(route.params.id);
   const textModalRef = useRef<TextModal>(null);
+
+  const sermon = route.params.sermon;
+  const date = DateTime.fromISO(sermon.date).toFormat('MMM d, yyyy');
 
   const notes = [
     {
@@ -45,7 +48,7 @@ const SermonDetailScreen = ({ navigation, route }: Props) => {
 
   useEffect(() => {
     navigation.setOptions({
-      title: 'Spring Cleaning',
+      title: sermon.title,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -77,12 +80,6 @@ const SermonDetailScreen = ({ navigation, route }: Props) => {
   const saveNotes = (text: string) => {
     console.log('save note', text);
   };
-
-  const date = DateTime.fromISO('2023-01-30T05:51:01Z')
-    .minus({ day: 1 }) // Videos posted 1 day after recording
-    .toFormat('MMM d, yyyy');
-
-  const lifeApplication = ['He is our Passover', 'Hearts are the priority'];
 
   const renderDescriptionItem = (args: {
     iconName: string;
@@ -124,23 +121,25 @@ const SermonDetailScreen = ({ navigation, route }: Props) => {
         contentContainerStyle={{ paddingBottom: 20 }}
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior={'automatic'}>
-        <Text style={s.sermonTitle}>{'Spring Cleaning'}</Text>
+        <Text style={s.sermonTitle}>{sermon.title}</Text>
         <View style={{ paddingTop: 20 }}>
           <View style={{ alignItems: 'center' }}>
             <View>
-              {renderDescriptionItem({
-                iconName: 'book-open-page-variant-outline',
-                text: 'John 2:13-25',
-                url: 'https://bible.com/bible/1713/jhn.2.13.CSB',
-              })}
-              {renderDescriptionItem({
-                iconName: 'sunny',
-                iconType: 'ionicon',
-                text: 'Series: Book of John',
-              })}
+              {sermon.bibleReference?.book &&
+                renderDescriptionItem({
+                  iconName: 'book-open-page-variant-outline',
+                  text: bibleReferenceToString(sermon.bibleReference),
+                  url: 'https://bible.com/bible/1713/jhn.2.13.CSB',
+                })}
+              {sermon.seriesTitle &&
+                renderDescriptionItem({
+                  iconName: 'sunny',
+                  iconType: 'ionicon',
+                  text: `Series: ${sermon.seriesTitle}`,
+                })}
               {renderDescriptionItem({
                 iconName: 'account-circle-outline',
-                text: 'Jamie Auton',
+                text: sermon.pasteur,
               })}
               {renderDescriptionItem({
                 iconName: 'calendar-today',
@@ -148,25 +147,29 @@ const SermonDetailScreen = ({ navigation, route }: Props) => {
               })}
             </View>
           </View>
-          <Card
-            header={'Life Application'}
-            headerStyle={s.laHeader}
-            title={'The cleansing of the temple by Jesus revealed...'}
-            titleStyle={s.laTitle}
-            BodyComponent={
-              <View style={{ alignItems: 'center' }}>
-                <BulletList
-                  containerStyle={{ marginTop: -10 }}
-                  bulletStyle={s.laBullet}
-                  type={'ordered'}
-                  items={lifeApplication.map(b => {
-                    return <Text style={s.laBulletText}>{b}</Text>;
-                  })}
-                />
-              </View>
-            }
-            cardStyle={s.laCardStyle}
-          />
+          {sermon.lifeApplication?.title && (
+            <Card
+              header={'Life Application'}
+              headerStyle={s.laHeader}
+              title={sermon.lifeApplication?.title}
+              titleStyle={s.laTitle}
+              BodyComponent={
+                sermon.lifeApplication && (
+                  <View style={{ alignItems: 'center' }}>
+                    <BulletList
+                      containerStyle={{ marginTop: -10 }}
+                      bulletStyle={s.laBullet}
+                      type={'ordered'}
+                      items={sermon.lifeApplication?.items.map(b => {
+                        return <Text style={s.laBulletText}>{b}</Text>;
+                      })}
+                    />
+                  </View>
+                )
+              }
+              cardStyle={s.laCardStyle}
+            />
+          )}
         </View>
         <View style={s.sectionHeaderContainer}>
           <Text style={s.sectionHeaderTitle}>{'SERMON NOTES'}</Text>

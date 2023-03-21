@@ -35,9 +35,9 @@ import { DateTime } from 'luxon';
 import FormikEffect from 'components/atoms/FormikEffect';
 import { ItemPickerModal } from 'components/modals/ItemPickerModal';
 import { SermonVideoPickerModal } from 'components/admin/modals/SermonVideoPickerModal';
+import { bibleReferenceToString } from 'lib/bible';
 import { saveSermon as commitSermon } from 'firestore/sermons';
 import { getPasteurs } from 'firestore/pasteurs';
-import { getSermonVideo } from 'firestore/sermonVideos';
 import lodash from 'lodash';
 import { makeStyles } from '@rneui/themed';
 import { useSetState } from '@react-native-ajp-elements/core';
@@ -120,16 +120,6 @@ const SermonEditorView = React.forwardRef<
   }, []);
 
   useEffect(() => {
-    (async () => {
-      if (sermon?.videoId) {
-        const video = await getSermonVideo(sermon.videoId);
-        setSermonVideo(video);
-      }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
     onChange && onChange(editorState);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorState]);
@@ -153,8 +143,8 @@ const SermonEditorView = React.forwardRef<
       bibleReference: !lodash.isEmpty(bibleReference)
         ? bibleReference
         : { book: '', chapter: '', verse: { start: '', end: '' } },
-      videoId: sermonVideo?.id.videoId || '',
       lifeApplication: values.lifeApplication,
+      video: sermonVideo,
     };
 
     if (sermon?.id) {
@@ -191,15 +181,6 @@ const SermonEditorView = React.forwardRef<
   const onSermonVideoChange = (video?: SermonVideo): void => {
     setSermonVideo(video);
     formikRef.current?.setFieldValue('videoId', video ? video.id.videoId : '');
-  };
-
-  const bibleReferenceToString = (bibleReference: BibleReference): string => {
-    if (!lodash.isEmpty(bibleReference)) {
-      return bibleReference.verse.end.length > 0
-        ? `${bibleReference.book} ${bibleReference.chapter}:${bibleReference.verse.start}-${bibleReference.verse.end}`
-        : `${bibleReference.book} ${bibleReference.chapter}:${bibleReference.verse.start}`;
-    }
-    return '';
   };
 
   const validationSchema = Yup.object().shape({
@@ -241,7 +222,7 @@ const SermonEditorView = React.forwardRef<
               lifeApplication:
                 sermon?.lifeApplication ||
                 ({ title: '', items: [] } as LifeApplication),
-              videoId: sermon?.videoId || '',
+              videoId: sermon?.video?.id.videoId || '',
             }}
             validateOnChange={true}
             validateOnMount={true}

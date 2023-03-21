@@ -1,17 +1,17 @@
 import { AppTheme, useTheme } from 'theme';
 import { FlatList, ListRenderItem, Text, View } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
+import { getSermons, sermonsCollectionChangeListener } from 'firestore/sermons';
 
 import { AuthContext } from 'lib/auth';
 import { DateTime } from 'luxon';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Sermon } from 'types/sermon';
 import { SermonsNavigatorParamList } from 'types/navigation';
 import VideoCard from 'components/molecules/VideoCard';
-import { YouTubeVideo } from 'types/youTube';
-import { collectionChangeListener } from 'firestore/events';
-import { getSermonVideos } from 'firestore/sermonVideos';
+import { bibleReferenceToString } from 'lib/bible';
 import { makeStyles } from '@rneui/themed';
 
 export type Props = NativeStackScreenProps<
@@ -25,50 +25,64 @@ const SermonsScreen = ({ navigation }: Props) => {
 
   const auth = useContext(AuthContext);
 
+  const [allLoaded, setAllLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [lastDocument, setLastDocument] =
     useState<FirebaseFirestoreTypes.DocumentData>();
-  const [isLoading, setIsLoading] = useState(false);
-  const [videos, setVideos] = useState<YouTubeVideo[]>([]);
-
+  const [sermons, setSermons] = useState<Sermon[]>([]);
   const [showVideo, setShowVideo] = useState<string | undefined>(undefined);
   const [paused, setPaused] = useState(false);
 
   useEffect(() => {
-    const subscription = collectionChangeListener('YouTubeVideos', () => {
-      getMoreSermons();
-    });
-
+    const subscription = sermonsCollectionChangeListener(
+      snapshot => {
+        const updated: Sermon[] = [];
+        snapshot.docs.forEach(d => {
+          updated.push({ ...d.data(), id: d.id } as Sermon);
+        });
+        setSermons(updated);
+        setLastDocument(snapshot.docs[snapshot.docs.length - 1]);
+        setAllLoaded(false);
+      },
+      { lastDocument },
+    );
     return subscription;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const getMoreSermons = async (limit = 3) => {
-    try {
+  const getMoreSermons = async () => {
+    if (!allLoaded) {
       setIsLoading(true);
-      const v = await getSermonVideos({ limit, lastDocument });
-      setLastDocument(v.lastDocument);
-      setVideos(([] as YouTubeVideo[]).concat(v.result, videos));
+      const s = await getSermons({ lastDocument });
+      setLastDocument(s.lastDocument);
+      setSermons(sermons.concat(s.result));
+      setAllLoaded(s.allLoaded);
       setIsLoading(false);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-empty
-    } catch (e: any) {}
+    }
   };
 
-  const renderSermon: ListRenderItem<GoogleApiYouTubeSearchResource> = ({
-    item,
-  }) => {
-    const date = DateTime.fromISO(item.snippet.publishedAt)
-      .minus({ day: 1 }) // Videos posted 1 day after recording
-      .toFormat('MMM d, yyyy');
-    const videoShown = showVideo === item.id.videoId;
+  const renderSermon: ListRenderItem<Sermon> = ({ item }) => {
+    const date = item.video
+      ? DateTime.fromISO(item.video.snippet.publishedAt).toFormat('MMM d, yyyy')
+      : '';
+    const header =
+      bibleReferenceToString(item.bibleReference) +
+      (item.bibleReference?.book.length ? ' | ' : '') +
+      item.pasteur;
+    const footer =
+      date + (item.seriesTitle?.length ? ' | ' : '') + item.seriesTitle;
+    const videoShown = item.video && showVideo === item.video.id.videoId;
     return (
       <View style={s.playerContainer}>
         <VideoCard
-          header={'John 2:13-25 | Jamie Auton'}
-          title={item.snippet.title}
-          footer={`${date} | Series: Book of John`}
-          imageSource={{ uri: item.snippet.thumbnails.high.url }}
-          videoId={item.id.videoId}
-          onPressVideo={() => setShowVideo(item.id.videoId)}
+          header={header}
+          title={item.title}
+          footer={footer}
+          imageSource={{
+            uri: item.video ? item.video.snippet.thumbnails.high.url : '',
+          }}
+          videoId={item.video ? item.video.id.videoId : undefined}
+          onPressVideo={() => item.video && setShowVideo(item.video.id.videoId)}
           showVideo={videoShown}
           playing={!paused}
           onPlayerStateChange={event => {
@@ -102,7 +116,7 @@ const SermonsScreen = ({ navigation }: Props) => {
                 // Require user authentication for this feature.
                 if (auth.userIsAuthenticated) {
                   navigation.navigate('SermonDetail', {
-                    id: item.id.videoId,
+                    sermon: item,
                   });
                 } else {
                   auth.presentSignInModal('Please sign in to take notes.');
@@ -130,10 +144,10 @@ const SermonsScreen = ({ navigation }: Props) => {
         edges={['left', 'right', 'top']}
         style={[theme.styles.view, { paddingHorizontal: 0 }]}>
         <FlatList
-          data={videos}
+          data={sermons}
           renderItem={renderSermon}
           ListEmptyComponent={renderListEmptyComponent}
-          keyExtractor={item => item.etag}
+          keyExtractor={item => `${item.date}${item.title}`}
           onEndReachedThreshold={0.2}
           onEndReached={() => getMoreSermons()}
           contentContainerStyle={{

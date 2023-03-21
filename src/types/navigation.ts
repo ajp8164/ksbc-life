@@ -1,5 +1,6 @@
 import { ContentView } from 'types/content';
 import { NavigatorScreenParams } from '@react-navigation/core';
+import { Sermon } from 'types/sermon';
 
 export enum StartupScreen {
   None = 'None',
@@ -42,7 +43,7 @@ export type HomeNavigatorParamList = {
 export type SermonsNavigatorParamList = {
   Sermons: undefined;
   SermonDetail: {
-    id: string;
+    sermon: Sermon;
   };
 };
 

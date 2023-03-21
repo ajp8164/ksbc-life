@@ -14,10 +14,10 @@ import { CompositeScreenProps } from '@react-navigation/core';
 import { Image } from '@rneui/base';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { appConfig } from 'config';
-import { documentChangeListener } from 'firestore/events';
 import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { updateUserProfile } from 'store/slices/user';
+import { usersDocumentChangeListener } from 'firestore/users';
 
 export type Props = CompositeScreenProps<
   NativeStackScreenProps<MoreNavigatorParamList, 'More'>,
@@ -34,8 +34,7 @@ const MoreScreen = ({ navigation, route }: Props) => {
 
   useEffect(() => {
     // Updates my profile if my information changed (e.g., admin action).
-    const subscription = documentChangeListener(
-      'Users',
+    const subscription = usersDocumentChangeListener(
       userProfile?.id || '',
       documentSnapshot => {
         userProfile &&
