@@ -71,7 +71,6 @@ const UserEditorView = React.forwardRef<UserEditorView, UserEditorViewProps>(
         Alert.alert('User Not Saved', 'Please try again.', [{ text: 'OK' }], {
           cancelable: false,
         });
-        throw e;
       }
     };
 

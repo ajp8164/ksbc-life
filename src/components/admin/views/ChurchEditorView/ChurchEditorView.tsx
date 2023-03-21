@@ -135,7 +135,6 @@ const ChurchEditorView = React.forwardRef<
       Alert.alert('Church Not Saved', 'Please try again.', [{ text: 'OK' }], {
         cancelable: false,
       });
-      throw e;
     }
   };
 

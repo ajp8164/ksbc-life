@@ -147,7 +147,6 @@ const LocationEditorView = React.forwardRef<
       Alert.alert('Location Not Saved', 'Please try again.', [{ text: 'OK' }], {
         cancelable: false,
       });
-      throw e;
     }
   };
 

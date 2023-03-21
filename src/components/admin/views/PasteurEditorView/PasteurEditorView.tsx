@@ -146,7 +146,6 @@ const PasteurEditorView = React.forwardRef<
       Alert.alert('Pasteur Not Saved', 'Please try again.', [{ text: 'OK' }], {
         cancelable: false,
       });
-      throw e;
     }
   };
 
