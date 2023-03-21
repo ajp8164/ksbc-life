@@ -30,14 +30,11 @@ export const getLocations = (opts?: {
 };
 
 export const addLocation = (location: Location): Promise<Location> => {
-  console.log('here', location);
-
   return (
     firestore()
       .collection('Locations')
       .add(location)
       .then(documentSnapshot => {
-        console.log('here');
         location.id = documentSnapshot.id;
         return location;
       })
