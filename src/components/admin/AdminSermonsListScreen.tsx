@@ -111,8 +111,8 @@ const AdminSermonsListScreen = ({ navigation }: Props) => {
 
   const confirmDeleteSermon = async (id: string) => {
     Alert.alert(
-      'Confirm Delete Note',
-      'Are you sure you want to delete this pasteur?',
+      'Confirm Delete Sermon',
+      'Are you sure you want to delete this sermon?',
       [
         {
           text: 'Yes, delete',
