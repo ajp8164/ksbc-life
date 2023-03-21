@@ -83,7 +83,8 @@ const SermonVideoPickerView = ({
         leftImageType={'material-community'}
         checkedIcon={'check'}
         checkIconType={'material-community'}
-        uncheckedIcon={''}
+        uncheckedIcon={'checkbox-blank-outline'}
+        uncheckedColor={theme.colors.transparent}
         checkedColor={theme.colors.brandSecondary}
         checked={item.id.videoId === selected?.id.videoId}
         position={[
