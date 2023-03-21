@@ -11,7 +11,7 @@ import { SermonsNavigatorParamList } from 'types/navigation';
 import VideoCard from 'components/molecules/VideoCard';
 import { YouTubeVideo } from 'types/youTube';
 import { collectionChangeListener } from 'firestore/events';
-import { getVideos } from 'firestore/youTube';
+import { getSermonVideos } from 'firestore/sermonVideos';
 import { makeStyles } from '@rneui/themed';
 
 export type Props = NativeStackScreenProps<
@@ -45,9 +45,9 @@ const SermonsScreen = ({ navigation }: Props) => {
   const getMoreSermons = async (limit = 3) => {
     try {
       setIsLoading(true);
-      const v = await getVideos(limit, lastDocument);
+      const v = await getSermonVideos({ limit, lastDocument });
       setLastDocument(v.lastDocument);
-      setVideos(([] as YouTubeVideo[]).concat(v.videos, videos));
+      setVideos(([] as YouTubeVideo[]).concat(v.result, videos));
       setIsLoading(false);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-empty
     } catch (e: any) {}
