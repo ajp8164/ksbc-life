@@ -1,5 +1,5 @@
 import { AppTheme, useTheme } from 'theme';
-import { FlatList, ListRenderItem, Text, View } from 'react-native';
+import { FlatList, ListRenderItem, View } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
 import { getSermons, sermonsCollectionChangeListener } from 'firestore/sermons';
 
@@ -7,6 +7,7 @@ import { AuthContext } from 'lib/auth';
 import { DateTime } from 'luxon';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import NoItems from 'components/atoms/NoItems';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Sermon } from 'types/sermon';
 import { SermonsNavigatorParamList } from 'types/navigation';
@@ -133,7 +134,7 @@ const SermonsScreen = ({ navigation }: Props) => {
     if (isLoading) return null;
     return (
       <View style={s.emptyListContainer}>
-        <Text style={theme.styles.textNormal}>{'No sermons yet'}</Text>
+        <NoItems title={'No sermons yet'} />
       </View>
     );
   };
@@ -162,9 +163,7 @@ const SermonsScreen = ({ navigation }: Props) => {
 };
 
 const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
-  emptyListContainer: {
-    alignItems: 'center',
-  },
+  emptyListContainer: {},
   playerContainer: {
     marginBottom: 10,
   },
