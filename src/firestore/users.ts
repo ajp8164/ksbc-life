@@ -2,6 +2,7 @@ import {
   QueryOrderBy,
   QueryResult,
   collectionChangeListener,
+  documentChangeListener,
   getDocument,
   getDocuments,
 } from 'firestore/utils';
@@ -62,10 +63,19 @@ export const usersCollectionChangeListener = (
     lastDocument,
     limit,
     orderBy = { fieldPath: 'name', directionStr: 'asc' },
-  } = opts;
+  } = opts || {};
   return collectionChangeListener('User', handler, {
     lastDocument,
     limit,
     orderBy,
   });
+};
+
+export const usersDocumentChangeListener = (
+  documentPath: string,
+  handler: (
+    snapshot: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>,
+  ) => void,
+): (() => void) => {
+  return documentChangeListener('Users', documentPath, handler);
 };

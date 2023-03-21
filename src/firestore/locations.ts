@@ -2,6 +2,7 @@ import {
   QueryOrderBy,
   QueryResult,
   collectionChangeListener,
+  documentChangeListener,
   getDocument,
   getDocuments,
 } from 'firestore/utils';
@@ -94,7 +95,7 @@ export const locationsCollectionChangeListener = (
   handler: (
     snapshot: FirebaseFirestoreTypes.QuerySnapshot<FirebaseFirestoreTypes.DocumentData>,
   ) => void,
-  opts: {
+  opts?: {
     lastDocument?: FirebaseFirestoreTypes.DocumentData;
     limit?: number;
     orderBy?: QueryOrderBy;
@@ -104,10 +105,19 @@ export const locationsCollectionChangeListener = (
     lastDocument,
     limit,
     orderBy = { fieldPath: 'name', directionStr: 'asc' },
-  } = opts;
+  } = opts || {};
   return collectionChangeListener('Locations', handler, {
     lastDocument,
     limit,
     orderBy,
   });
+};
+
+export const locationsDocumentChangeListener = (
+  documentPath: string,
+  handler: (
+    snapshot: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>,
+  ) => void,
+): (() => void) => {
+  return documentChangeListener('Locations', documentPath, handler);
 };

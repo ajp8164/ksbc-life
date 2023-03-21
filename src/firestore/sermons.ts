@@ -2,6 +2,7 @@ import {
   QueryOrderBy,
   QueryResult,
   collectionChangeListener,
+  documentChangeListener,
   getDocument,
   getDocuments,
 } from 'firestore/utils';
@@ -93,7 +94,7 @@ export const sermonsCollectionChangeListener = (
   handler: (
     snapshot: FirebaseFirestoreTypes.QuerySnapshot<FirebaseFirestoreTypes.DocumentData>,
   ) => void,
-  opts: {
+  opts?: {
     lastDocument?: FirebaseFirestoreTypes.DocumentData;
     limit?: number;
     orderBy?: QueryOrderBy;
@@ -103,10 +104,19 @@ export const sermonsCollectionChangeListener = (
     lastDocument,
     limit,
     orderBy = { fieldPath: 'date', directionStr: 'desc' },
-  } = opts;
+  } = opts || {};
   return collectionChangeListener('Sermons', handler, {
     lastDocument,
     limit,
     orderBy,
   });
+};
+
+export const sermonsDocumentChangeListener = (
+  documentPath: string,
+  handler: (
+    snapshot: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>,
+  ) => void,
+): (() => void) => {
+  return documentChangeListener('Sermons', documentPath, handler);
 };
