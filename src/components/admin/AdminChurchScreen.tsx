@@ -22,7 +22,7 @@ import { EditLocationModal } from 'components/admin/modals/EditLocationModal';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { Location } from 'types/location';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { churchCollectionChangeListener } from 'firestore/church';
+import { churchCollectionChangeListener } from 'firestore/churches';
 import { makeStyles } from '@rneui/themed';
 import { useHeaderHeight } from '@react-navigation/elements';
 

@@ -33,7 +33,7 @@ import { Church } from 'types/church';
 import FormikEffect from 'components/atoms/FormikEffect';
 import { TextModal } from 'components/modals/TextModal';
 import { appConfig } from 'config';
-import { saveChurch as commitChurch } from 'firestore/church';
+import { saveChurch as commitChurch } from 'firestore/churches';
 import { makeStyles } from '@rneui/themed';
 
 enum Fields {
