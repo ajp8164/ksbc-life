@@ -1,71 +1,32 @@
-import { UserProfile } from 'types/user';
+import {
+  QueryOrderBy,
+  QueryResult,
+  collectionChangeListener,
+  getDocument,
+  getDocuments,
+} from 'firestore/utils';
 import firestore, {
   FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';
+
+import { UserProfile } from 'types/user';
 import { log } from '@react-native-ajp-elements/core';
 
-export type UsersQueryResult = {
-  lastDocument: FirebaseFirestoreTypes.DocumentData;
-  users: UserProfile[];
-};
-
 export const getUser = (id: string): Promise<UserProfile | undefined> => {
-  return (
-    firestore()
-      .collection('Users')
-      .doc(id)
-      .get()
-      .then(documentSnapshot => {
-        if (documentSnapshot.exists) {
-          const user = {
-            ...documentSnapshot.data(),
-            id,
-          };
-          return user as UserProfile;
-        } else {
-          return;
-        }
-      })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch((e: any) => {
-        log.error(`Failed to get user document: ${e.message}`);
-        throw e;
-      })
-  );
+  return getDocument('Users', id);
 };
 
-export const getUsers = (
-  limit: number,
-  lastDocument?: FirebaseFirestoreTypes.DocumentData,
-): Promise<UsersQueryResult> => {
-  let query = firestore().collection('Users').orderBy('name', 'asc');
-
-  if (lastDocument) {
-    query = query.startAfter(lastDocument);
-  }
-
-  return (
-    query
-      .limit(limit || 1) // Must be positive value
-      .get()
-      .then(querySnapshot => {
-        const users: UserProfile[] = [];
-        querySnapshot.forEach(doc => {
-          const user = <UserProfile>doc.data();
-          user.id = doc.id;
-          users.push(user);
-        });
-        return {
-          lastDocument: querySnapshot.docs[querySnapshot.docs.length - 1],
-          users,
-        };
-      })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch((e: any) => {
-        log.error(`Failed to get user documents: ${e.message}`);
-        throw e;
-      })
-  );
+export const getUsers = (opts?: {
+  limit?: number;
+  lastDocument?: FirebaseFirestoreTypes.DocumentData;
+  orderBy?: QueryOrderBy;
+}): Promise<QueryResult<UserProfile>> => {
+  const {
+    lastDocument,
+    limit = 10,
+    orderBy = { fieldPath: 'name', directionStr: 'asc' },
+  } = opts || {};
+  return getDocuments('Users', { orderBy, limit, lastDocument });
 };
 
 export const updateUser = (user: UserProfile): Promise<UserProfile> => {
@@ -85,4 +46,26 @@ export const updateUser = (user: UserProfile): Promise<UserProfile> => {
         throw e;
       })
   );
+};
+
+export const usersCollectionChangeListener = (
+  handler: (
+    snapshot: FirebaseFirestoreTypes.QuerySnapshot<FirebaseFirestoreTypes.DocumentData>,
+  ) => void,
+  opts: {
+    lastDocument?: FirebaseFirestoreTypes.DocumentData;
+    limit?: number;
+    orderBy?: QueryOrderBy;
+  },
+): (() => void) => {
+  const {
+    lastDocument,
+    limit,
+    orderBy = { fieldPath: 'name', directionStr: 'asc' },
+  } = opts;
+  return collectionChangeListener('User', handler, {
+    lastDocument,
+    limit,
+    orderBy,
+  });
 };

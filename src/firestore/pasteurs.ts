@@ -1,7 +1,15 @@
-import { Pasteur } from 'types/pasteur';
+import {
+  QueryOrderBy,
+  QueryResult,
+  collectionChangeListener,
+  getDocument,
+  getDocuments,
+} from 'firestore/utils';
 import firestore, {
   FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';
+
+import { Pasteur } from 'types/pasteur';
 import { log } from '@react-native-ajp-elements/core';
 
 export type PasteursQueryResult = {
@@ -10,62 +18,20 @@ export type PasteursQueryResult = {
 };
 
 export const getPasteur = (id: string): Promise<Pasteur | undefined> => {
-  return (
-    firestore()
-      .collection('Pasteurs')
-      .doc(id)
-      .get()
-      .then(documentSnapshot => {
-        if (documentSnapshot.exists) {
-          const pasteur = {
-            ...documentSnapshot.data(),
-            id,
-          };
-          return pasteur as Pasteur;
-        } else {
-          return;
-        }
-      })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch((e: any) => {
-        log.error(`Failed to get pastuer document: ${e.message}`);
-        throw e;
-      })
-  );
+  return getDocument('Pasteurs', id);
 };
 
-export const getPasteurs = (
-  limit: number,
-  lastDocument?: FirebaseFirestoreTypes.DocumentData,
-): Promise<PasteursQueryResult> => {
-  let query = firestore().collection('Pasteurs').orderBy('firstName', 'asc');
-
-  if (lastDocument) {
-    query = query.startAfter(lastDocument);
-  }
-
-  return (
-    query
-      .limit(limit || 1) // Must be positive value
-      .get()
-      .then(querySnapshot => {
-        const pasteurs: Pasteur[] = [];
-        querySnapshot.forEach(doc => {
-          const pasteur = <Pasteur>doc.data();
-          pasteur.id = doc.id;
-          pasteurs.push(pasteur);
-        });
-        return {
-          lastDocument: querySnapshot.docs[querySnapshot.docs.length - 1],
-          pasteurs,
-        };
-      })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch((e: any) => {
-        log.error(`Failed to get pasteur documents: ${e.message}`);
-        throw e;
-      })
-  );
+export const getPasteurs = (opts?: {
+  lastDocument?: FirebaseFirestoreTypes.DocumentData;
+  limit?: number;
+  orderBy?: QueryOrderBy;
+}): Promise<QueryResult<Pasteur>> => {
+  const {
+    lastDocument,
+    limit = 10,
+    orderBy = { fieldPath: 'firstName', directionStr: 'asc' },
+  } = opts || {};
+  return getDocuments('Pasteurs', { orderBy, limit, lastDocument });
 };
 
 export const addPasteur = (pasteur: Pasteur): Promise<Pasteur> => {
@@ -106,6 +72,14 @@ export const updatePasteur = (pasteur: Pasteur): Promise<Pasteur> => {
   );
 };
 
+export const savePasteur = (pasteur: Pasteur): Promise<Pasteur> => {
+  if (pasteur.id) {
+    return updatePasteur(pasteur);
+  } else {
+    return addPasteur(pasteur);
+  }
+};
+
 export const deletePasteur = (id: string): Promise<void> => {
   return (
     firestore()
@@ -118,4 +92,26 @@ export const deletePasteur = (id: string): Promise<void> => {
         throw e;
       })
   );
+};
+
+export const pasteursCollectionChangeListener = (
+  handler: (
+    snapshot: FirebaseFirestoreTypes.QuerySnapshot<FirebaseFirestoreTypes.DocumentData>,
+  ) => void,
+  opts: {
+    lastDocument?: FirebaseFirestoreTypes.DocumentData;
+    limit?: number;
+    orderBy?: QueryOrderBy;
+  },
+): (() => void) => {
+  const {
+    lastDocument,
+    limit,
+    orderBy = { fieldPath: 'firstName', directionStr: 'asc' },
+  } = opts;
+  return collectionChangeListener('Pasteurs', handler, {
+    lastDocument,
+    limit,
+    orderBy,
+  });
 };

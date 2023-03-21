@@ -26,14 +26,15 @@ import {
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import React, { useEffect, useImperativeHandle, useRef } from 'react';
 import { deleteImage, saveImage, selectImage } from 'lib/imageSelect';
-import { ellipsis, log, useSetState } from '@react-native-ajp-elements/core';
+import { ellipsis, useSetState } from '@react-native-ajp-elements/core';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import FormikEffect from 'components/atoms/FormikEffect';
+import { Pasteur } from 'types/pasteur';
 import { TextModal } from 'components/modals/TextModal';
 import { appConfig } from 'config';
+import { savePasteur as commitPasteur } from 'firestore/pasteurs';
 import { makeStyles } from '@rneui/themed';
-import { updatePasteur } from 'firestore/pasteurs';
 
 enum Fields {
   firstName,
@@ -61,7 +62,7 @@ const PasteurEditorView = React.forwardRef<
   PasteurEditorView,
   PasteurEditorViewProps
 >((props, ref) => {
-  const { onChange, pasteur } = props;
+  const { onEditorStateChange, pasteur } = props;
 
   const theme = useTheme();
   const s = useStyles(theme);
@@ -72,7 +73,6 @@ const PasteurEditorView = React.forwardRef<
   const refTitle = useRef<TextInput>(null);
   const refEmail = useRef<TextInput>(null);
   const refPhone = useRef<TextInput>(null);
-  const refPhotoUrl = useRef<TextInput>(null);
 
   const biographyModalRef = useRef<TextModal>(null);
   const pasteurImageAsset = useRef<ImagePicker.Asset>();
@@ -84,7 +84,6 @@ const PasteurEditorView = React.forwardRef<
     refTitle.current,
     refEmail.current,
     refPhone.current,
-    refPhotoUrl.current,
   ];
 
   const [editorState, setEditorState] = useSetState<EditorState>({
@@ -100,7 +99,7 @@ const PasteurEditorView = React.forwardRef<
   }));
 
   useEffect(() => {
-    onChange && onChange(editorState);
+    onEditorStateChange && onEditorStateChange(editorState);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorState]);
 
@@ -122,33 +121,33 @@ const PasteurEditorView = React.forwardRef<
     // Saving the image updates the form but form values are already passed in.
     // Overwrite the image value after saving the image to storage.
     values.photoUrl = formikRef.current?.values.photoUrl || '';
-    return (
-      updatePasteur({
-        id: pasteur?.id,
-        firstName: values.firstName,
-        lastName: values.lastName,
-        title: values.title,
-        email: values.email,
-        phone: values.phone,
-        biography: values.biography,
-        photoUrl: values.photoUrl,
-      })
-        .then(() => {
-          resetForm({ values });
-          setEditorState({ isSubmitting: false });
-        })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .catch((e: any) => {
-          log.error(`Failed to save pasteur: ${e.message}`);
-          Alert.alert(
-            'Pasteur Not Saved',
-            'Please try again. If this problem persists please contact support.',
-            [{ text: 'OK' }],
-            { cancelable: false },
-          );
-          setEditorState({ isSubmitting: false });
-        })
-    );
+
+    const p: Pasteur = {
+      firstName: values.firstName,
+      lastName: values.lastName,
+      title: values.title,
+      email: values.email,
+      phone: values.phone,
+      biography: values.biography,
+      photoUrl: values.photoUrl,
+    };
+
+    if (pasteur?.id) {
+      p.id = pasteur.id;
+    }
+
+    try {
+      await commitPasteur(p);
+      resetForm({ values });
+      setEditorState({ isSubmitting: false });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+      setEditorState({ isSubmitting: false });
+      Alert.alert('Pasteur Not Saved', 'Please try again.', [{ text: 'OK' }], {
+        cancelable: false,
+      });
+      throw e;
+    }
   };
 
   const selectPasteurImage = () => {

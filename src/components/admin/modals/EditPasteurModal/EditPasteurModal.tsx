@@ -56,7 +56,7 @@ const EditPasteurModal = React.forwardRef<
       <PasteurEditorView
         ref={pasteurEditorViewRef}
         pasteur={pasteur}
-        onChange={setEditorState}
+        onEditorStateChange={setEditorState}
       />
     </Modal>
   );

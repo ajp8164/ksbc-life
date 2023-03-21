@@ -1,3 +1,4 @@
+import * as ImagePicker from 'react-native-image-picker';
 import * as Yup from 'yup';
 
 import {
@@ -10,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { AppTheme, useTheme } from 'theme';
+import { Button, Icon, Image } from '@rneui/base';
 import {
   ChurchEditorViewMethods,
   ChurchEditorViewProps,
@@ -23,13 +25,16 @@ import {
 } from '@react-native-ajp-elements/ui';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import React, { useEffect, useImperativeHandle, useRef } from 'react';
-import { ellipsis, log, useSetState } from '@react-native-ajp-elements/core';
+import { deleteImage, saveImage, selectImage } from 'lib/imageSelect';
+import { ellipsis, useSetState } from '@react-native-ajp-elements/core';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
+import { Church } from 'types/church';
 import FormikEffect from 'components/atoms/FormikEffect';
 import { TextModal } from 'components/modals/TextModal';
+import { appConfig } from 'config';
+import { saveChurch as commitChurch } from 'firestore/church';
 import { makeStyles } from '@rneui/themed';
-import { updateChurch } from 'firestore/church';
 
 enum Fields {
   name,
@@ -43,6 +48,7 @@ type FormValues = {
   shortName: string;
   values: string;
   beliefs: string;
+  photoUrl: string;
 };
 
 type ChurchEditorView = ChurchEditorViewMethods;
@@ -62,6 +68,7 @@ const ChurchEditorView = React.forwardRef<
 
   const beliefsModalRef = useRef<TextModal>(null);
   const valuesModalRef = useRef<TextModal>(null);
+  const churchImageAsset = useRef<ImagePicker.Asset>();
 
   // Same order as on form.
   const fieldRefs = [refName.current];
@@ -101,29 +108,84 @@ const ChurchEditorView = React.forwardRef<
   ) => {
     Keyboard.dismiss();
     setEditorState({ isSubmitting: true });
-    return (
-      updateChurch({
-        name: values.name,
-        shortName: values.shortName,
-        values: values.values,
-        beliefs: values.beliefs,
+    await saveChurchImage();
+    // Saving the image updates the form but form values are already passed in.
+    // Overwrite the image value after saving the image to storage.
+    values.photoUrl = formikRef.current?.values.photoUrl || '';
+
+    const c: Church = {
+      name: values.name,
+      shortName: values.shortName,
+      values: values.values,
+      beliefs: values.beliefs,
+      photoUrl: values.photoUrl,
+    };
+
+    if (church?.id) {
+      c.id = church.id;
+    }
+
+    try {
+      await commitChurch(c);
+      resetForm({ values });
+      setEditorState({ isSubmitting: false });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+      setEditorState({ isSubmitting: false });
+      Alert.alert('Church Not Saved', 'Please try again.', [{ text: 'OK' }], {
+        cancelable: false,
+      });
+      throw e;
+    }
+  };
+
+  const selectChurchImage = () => {
+    selectImage({
+      onSuccess: imageAsset => {
+        churchImageAsset.current = imageAsset;
+        formikRef.current?.setFieldValue('photoUrl', imageAsset.uri);
+      },
+      onError: () => {
+        Alert.alert(
+          'Image Not Selected',
+          'This image could not be selected. Please try again,',
+          [{ text: 'OK' }],
+          { cancelable: false },
+        );
+      },
+    });
+  };
+
+  const saveChurchImage = async () => {
+    if (churchImageAsset.current) {
+      await saveImage({
+        imageAsset: churchImageAsset.current,
+        storagePath: appConfig.storageImageChurch,
+        oldImage: church?.photoUrl,
+        onSuccess: url => formikRef.current?.setFieldValue('photoUrl', url),
+        onError: () => formikRef.current?.setFieldValue('photoUrl', ''),
+      });
+    }
+  };
+
+  const deleteChurchImage = async () => {
+    if (church?.photoUrl) {
+      await deleteImage({
+        filename: church.photoUrl,
+        storagePath: appConfig.storageImageChurch,
       })
         .then(() => {
-          resetForm({ values });
-          setEditorState({ isSubmitting: false });
+          formikRef.current?.setFieldValue('photoUrl', '');
         })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .catch((e: any) => {
-          log.error(`Failed to save church: ${e.message}`);
+        .catch(() => {
           Alert.alert(
-            'Church Not Saved',
-            'Please try again. If this problem persists please contact support.',
+            'Image Not Deleted',
+            'This image could not be deleted. Please try again,',
             [{ text: 'OK' }],
             { cancelable: false },
           );
-          setEditorState({ isSubmitting: false });
-        })
-    );
+        });
+    }
   };
 
   const validationSchema = Yup.object().shape({
@@ -131,6 +193,7 @@ const ChurchEditorView = React.forwardRef<
     shortName: Yup.string(),
     values: Yup.string().max(1200),
     beliefs: Yup.string().max(1200),
+    photoUrl: Yup.string(),
   });
 
   return (
@@ -146,6 +209,7 @@ const ChurchEditorView = React.forwardRef<
               shortName: church?.shortName || '',
               values: church?.values || '',
               beliefs: church?.beliefs || '',
+              photoUrl: church?.photoUrl || '',
             }}
             validateOnChange={true}
             validateOnMount={true}
@@ -231,6 +295,46 @@ const ChurchEditorView = React.forwardRef<
                   containerStyle={{ borderBottomWidth: 0 }}
                   onPress={beliefsModalRef.current?.present}
                 />
+                {formik.values.photoUrl.length ? (
+                  <>
+                    <Divider />
+                    <Image
+                      source={{ uri: formik.values.photoUrl }}
+                      containerStyle={s.imageContainer}>
+                      <Button
+                        buttonStyle={s.imageButton}
+                        icon={
+                          <Icon
+                            name="image-edit-outline"
+                            type={'material-community'}
+                            color={theme.colors.darkGray}
+                            size={28}
+                          />
+                        }
+                        onPress={selectChurchImage}
+                      />
+                      <Button
+                        buttonStyle={s.imageButton}
+                        icon={
+                          <Icon
+                            name="close-circle-outline"
+                            type={'material-community'}
+                            color={theme.colors.assertive}
+                            size={28}
+                          />
+                        }
+                        onPress={deleteChurchImage}
+                      />
+                    </Image>
+                  </>
+                ) : (
+                  <ListItem
+                    title={'Add a photo'}
+                    titleStyle={theme.styles.textPlaceholder}
+                    containerStyle={{ borderBottomWidth: 0 }}
+                    onPress={selectChurchImage}
+                  />
+                )}
               </View>
             )}
           </Formik>

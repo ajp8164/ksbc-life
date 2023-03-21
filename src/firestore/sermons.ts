@@ -1,46 +1,32 @@
-import { Sermon } from 'types/church';
+import {
+  QueryOrderBy,
+  QueryResult,
+  collectionChangeListener,
+  getDocument,
+  getDocuments,
+} from 'firestore/utils';
 import firestore, {
   FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';
+
+import { Sermon } from 'types/sermon';
 import { log } from '@react-native-ajp-elements/core';
 
-export type SermonsQueryResult = {
-  lastDocument: FirebaseFirestoreTypes.DocumentData;
-  sermons: Sermon[];
+export const getSermon = (id: string): Promise<Sermon | undefined> => {
+  return getDocument('Sermons', id);
 };
 
-export const getSermons = (
-  limit: number,
-  lastDocument?: FirebaseFirestoreTypes.DocumentData,
-): Promise<SermonsQueryResult> => {
-  let query = firestore().collection('Sermons').orderBy('date', 'desc');
-
-  if (lastDocument) {
-    query = query.startAfter(lastDocument);
-  }
-
-  return (
-    query
-      .limit(limit || 1) // Must be positive value
-      .get()
-      .then(querySnapshot => {
-        const sermons: Sermon[] = [];
-        querySnapshot.forEach(doc => {
-          const sermon = <Sermon>doc.data();
-          sermon.id = doc.id;
-          sermons.push(sermon);
-        });
-        return {
-          lastDocument: querySnapshot.docs[querySnapshot.docs.length - 1],
-          sermons,
-        };
-      })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch((e: any) => {
-        log.error(`Failed to get sermon document: ${e.message}`);
-        throw e;
-      })
-  );
+export const getSermons = (opts?: {
+  lastDocument?: FirebaseFirestoreTypes.DocumentData;
+  limit?: number;
+  orderBy?: QueryOrderBy;
+}): Promise<QueryResult<Sermon>> => {
+  const {
+    lastDocument,
+    limit = 10,
+    orderBy = { fieldPath: 'date', directionStr: 'desc' },
+  } = opts || {};
+  return getDocuments('Sermons', { orderBy, limit, lastDocument });
 };
 
 export const addSermon = (sermon: Sermon): Promise<Sermon> => {
@@ -98,4 +84,26 @@ export const updateSermon = (sermon: Sermon): Promise<Sermon> => {
         throw e;
       })
   );
+};
+
+export const sermonsCollectionChangeListener = (
+  handler: (
+    snapshot: FirebaseFirestoreTypes.QuerySnapshot<FirebaseFirestoreTypes.DocumentData>,
+  ) => void,
+  opts: {
+    lastDocument?: FirebaseFirestoreTypes.DocumentData;
+    limit?: number;
+    orderBy?: QueryOrderBy;
+  },
+): (() => void) => {
+  const {
+    lastDocument,
+    limit,
+    orderBy = { fieldPath: 'date', directionStr: 'desc' },
+  } = opts;
+  return collectionChangeListener('Sermons', handler, {
+    lastDocument,
+    limit,
+    orderBy,
+  });
 };

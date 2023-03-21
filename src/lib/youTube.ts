@@ -1,19 +1,44 @@
+import { ISODateString } from 'types/common';
+import { YouTubeVideo } from 'types/youTube';
+import { addSermonVideos } from 'firestore/sermonVideos';
 import { appConfig } from 'config';
 import { log } from '@react-native-ajp-elements/core';
 
-const pageSize = 50;
+const pageSize = 10;
 
-export const youTubeBroadcastVideos = async (
-  pageToken = '',
-): Promise<GoogleApiYouTubePaginationInfo<GoogleApiYouTubeSearchResource>> => {
+export const cacheYouTubeBroadcastVideosToFirestore = async () => {
+  const videosPaginationInfo = await getYouTubeBroadcastVideos();
+  const videos = ([] as YouTubeVideo[]).concat(videosPaginationInfo.items);
+  addSermonVideos(videos);
+};
+
+const getYouTubeBroadcastVideos = async (args?: {
+  pageToken?: string;
+  publishedAfter?: ISODateString;
+  publishedBefore?: ISODateString;
+}): Promise<GoogleApiYouTubePaginationInfo<GoogleApiYouTubeSearchResource>> => {
   //////////
-  return testData() as GoogleApiYouTubePaginationInfo<GoogleApiYouTubeSearchResource>;
+  return testData();
   //////////
 
   const url = 'GET /search';
   try {
     const response = await fetch(
-      `${appConfig.youTubeApiUrl}/search?part=snippet%2Cid&order=date&maxResults=${pageSize}&eventType=completed&type=video&pageToken=${pageToken}&channelId=${appConfig.youTubeChannelId}&key=${appConfig.youTubeApiKey}`,
+      `${appConfig.youTubeApiUrl}/search` +
+        '?part=snippet%2Cid' +
+        '&order=date' +
+        `&maxResults=${pageSize}` +
+        (args?.pageToken ? `&pageToken=${args?.pageToken}` : '') +
+        (args?.publishedAfter
+          ? `&publishedAfter=${args?.publishedAfter}`
+          : '') +
+        (args?.publishedBefore
+          ? `&publishedBefore=${args?.publishedBefore}`
+          : '') +
+        `&channelId=${appConfig.youTubeChannelId}` +
+        '&type=video' +
+        '&eventType=completed' +
+        `&key=${appConfig.youTubeApiKey}`,
       {
         method: 'GET',
         credentials: 'include',
@@ -37,7 +62,8 @@ const testData =
       kind: 'youtube#searchListResponse',
       etag: 'htM5sB6bKuPquI1ogW02oJQDp-U',
       nextPageToken: 'CBQQAA',
-      regionCode: 'US',
+      prevPageToken: '',
+      // regionCode: 'US',
       pageInfo: {
         totalResults: 162,
         resultsPerPage: 20,

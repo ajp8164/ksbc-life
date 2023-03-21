@@ -13,6 +13,7 @@ export const collectionChangeListener = (
   return (
     firestore()
       .collection(col)
+      .limit(10)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .onSnapshot(handler, (e: any) => {
         log.error(`Failed onSnapshot for ${col} collection: ${e.message}`);

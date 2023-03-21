@@ -3,7 +3,7 @@ import { UserStatus } from 'types/user';
 
 export declare type UserStatusPickerModal = UserStatusPickerModalMethods;
 
-declare const UserStatusModal: React.MemoExoticComponent<
+declare const UserStatusPickerModal: React.MemoExoticComponent<
   React.ForwardRefExoticComponent<
     UserStatusPickerModalProps &
       React.RefAttributes<UserStatusPickerModalMethods>

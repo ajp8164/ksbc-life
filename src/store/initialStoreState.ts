@@ -8,14 +8,12 @@ import {
   initialNetworkStatusState,
 } from 'store/slices/networkStatus';
 import { UserState, initialUserState } from 'store/slices/user';
-import { VideosState, initialVideosState } from 'store/slices/videos';
 
 export interface StoreState {
   app: AppState;
   appSettings: AppSettingsState;
   networkStatus: NetworkStatusState;
   user: UserState;
-  videos: VideosState;
 }
 
 export const initialStoreState = Object.freeze<StoreState>({
@@ -23,5 +21,4 @@ export const initialStoreState = Object.freeze<StoreState>({
   appSettings: initialAppSettingsState,
   networkStatus: initialNetworkStatusState,
   user: initialUserState,
-  videos: initialVideosState,
 });

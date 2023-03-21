@@ -1,79 +1,43 @@
-import { Location } from 'types/location';
+import {
+  QueryOrderBy,
+  QueryResult,
+  collectionChangeListener,
+  getDocument,
+  getDocuments,
+} from 'firestore/utils';
 import firestore, {
   FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';
+
+import { Location } from 'types/location';
 import { log } from '@react-native-ajp-elements/core';
 
-export type LocationsQueryResult = {
-  lastDocument: FirebaseFirestoreTypes.DocumentData;
-  locations: Location[];
-};
-
 export const getLocation = (id: string): Promise<Location | undefined> => {
-  return (
-    firestore()
-      .collection('Locations')
-      .doc(id)
-      .get()
-      .then(documentSnapshot => {
-        if (documentSnapshot.exists) {
-          const location = {
-            ...documentSnapshot.data(),
-            id,
-          };
-          return location as Location;
-        } else {
-          return;
-        }
-      })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch((e: any) => {
-        log.error(`Failed to get location document: ${e.message}`);
-        throw e;
-      })
-  );
+  return getDocument('Locations', id);
 };
 
-export const getLocations = (
-  limit: number,
-  lastDocument?: FirebaseFirestoreTypes.DocumentData,
-): Promise<LocationsQueryResult> => {
-  let query = firestore().collection('Locations').orderBy('name', 'asc');
-
-  if (lastDocument) {
-    query = query.startAfter(lastDocument);
-  }
-
-  return (
-    query
-      .limit(limit || 1) // Must be positive value
-      .get()
-      .then(querySnapshot => {
-        const locations: Location[] = [];
-        querySnapshot.forEach(doc => {
-          const location = <Location>doc.data();
-          location.id = doc.id;
-          locations.push(location);
-        });
-        return {
-          lastDocument: querySnapshot.docs[querySnapshot.docs.length - 1],
-          locations,
-        };
-      })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch((e: any) => {
-        log.error(`Failed to get location documents: ${e.message}`);
-        throw e;
-      })
-  );
+export const getLocations = (opts?: {
+  limit?: number;
+  lastDocument?: FirebaseFirestoreTypes.DocumentData;
+  orderBy?: QueryOrderBy;
+}): Promise<QueryResult<Location>> => {
+  const {
+    lastDocument,
+    limit = 10,
+    orderBy = { fieldPath: 'name', directionStr: 'asc' },
+  } = opts || {};
+  return getDocuments('Locations', { orderBy, limit, lastDocument });
 };
 
 export const addLocation = (location: Location): Promise<Location> => {
+  console.log('here', location);
+
   return (
     firestore()
       .collection('Locations')
       .add(location)
       .then(documentSnapshot => {
+        console.log('here');
         location.id = documentSnapshot.id;
         return location;
       })
@@ -107,6 +71,14 @@ export const updateLocation = (location: Location): Promise<Location> => {
   );
 };
 
+export const saveLocation = (location: Location): Promise<Location> => {
+  if (location.id) {
+    return updateLocation(location);
+  } else {
+    return addLocation(location);
+  }
+};
+
 export const deleteLocation = (id: string): Promise<void> => {
   return (
     firestore()
@@ -119,4 +91,26 @@ export const deleteLocation = (id: string): Promise<void> => {
         throw e;
       })
   );
+};
+
+export const locationsCollectionChangeListener = (
+  handler: (
+    snapshot: FirebaseFirestoreTypes.QuerySnapshot<FirebaseFirestoreTypes.DocumentData>,
+  ) => void,
+  opts: {
+    lastDocument?: FirebaseFirestoreTypes.DocumentData;
+    limit?: number;
+    orderBy?: QueryOrderBy;
+  },
+): (() => void) => {
+  const {
+    lastDocument,
+    limit,
+    orderBy = { fieldPath: 'name', directionStr: 'asc' },
+  } = opts;
+  return collectionChangeListener('Locations', handler, {
+    lastDocument,
+    limit,
+    orderBy,
+  });
 };

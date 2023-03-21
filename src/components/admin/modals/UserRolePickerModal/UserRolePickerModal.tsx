@@ -5,7 +5,7 @@ import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/typ
 import { Modal } from '@react-native-ajp-elements/ui';
 import ModalHeader from 'components/molecules/ModalHeader';
 import { UserRole } from 'types/user';
-import UserRoleView from './UserRoleView';
+import UserRolePickerView from './UserRolePickerView';
 
 type UserRolePickerModal = UserRolePickerModalMethods;
 
@@ -44,7 +44,7 @@ const UserRolePickerModal = React.forwardRef<
         rightButtonIcon={'close'}
         onRightButtonPress={() => dismiss(userRole)}
       />
-      <UserRoleView
+      <UserRolePickerView
         value={userRole}
         disabled={disabled}
         onChange={setUserRole}

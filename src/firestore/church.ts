@@ -23,8 +23,8 @@ export const addChurch = (): Promise<Church> => {
     shortName: '',
     values: '',
     beliefs: '',
+    photoUrl: '',
   };
-
   return (
     firestore()
       .collection('Church')
@@ -35,22 +35,36 @@ export const addChurch = (): Promise<Church> => {
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((e: any) => {
-        log.error(`Failed to add church document: ${e.message}`);
+        log.error(`Failed to add pasteur document: ${e.message}`);
         throw e;
       })
   );
 };
 
-export const updateChurch = (church: Church): Promise<void> => {
+export const updateChurch = (church: Church): Promise<Church> => {
   return (
     firestore()
       .collection('Church')
       .doc('Church')
       .update(church)
+      .then(() => {
+        return church;
+      })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((e: any) => {
-        log.error(`Failed to update Church document: ${e.message}`);
+        if (e.message.includes('firestore/not-found')) {
+          return addChurch();
+        }
+        log.error(`Failed to update church document: ${e.message}`);
         throw e;
       })
   );
+};
+
+export const saveChurch = (church: Church): Promise<Church> => {
+  if (church.id) {
+    return updateChurch(church);
+  } else {
+    return addChurch();
+  }
 };

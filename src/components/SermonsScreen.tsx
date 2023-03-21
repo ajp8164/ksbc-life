@@ -27,6 +27,7 @@ const SermonsScreen = ({ navigation }: Props) => {
 
   const [lastDocument, setLastDocument] =
     useState<FirebaseFirestoreTypes.DocumentData>();
+  const [isLoading, setIsLoading] = useState(false);
   const [videos, setVideos] = useState<YouTubeVideo[]>([]);
 
   const [showVideo, setShowVideo] = useState<string | undefined>(undefined);
@@ -43,9 +44,11 @@ const SermonsScreen = ({ navigation }: Props) => {
 
   const getMoreSermons = async (limit = 3) => {
     try {
+      setIsLoading(true);
       const v = await getVideos(limit, lastDocument);
       setLastDocument(v.lastDocument);
       setVideos(([] as YouTubeVideo[]).concat(v.videos, videos));
+      setIsLoading(false);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-empty
     } catch (e: any) {}
   };
@@ -113,6 +116,7 @@ const SermonsScreen = ({ navigation }: Props) => {
   };
 
   const renderListEmptyComponent = () => {
+    if (isLoading) return null;
     return (
       <View style={s.emptyListContainer}>
         <Text style={theme.styles.textNormal}>{'No sermons yet'}</Text>

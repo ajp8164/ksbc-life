@@ -4,17 +4,3 @@ export class AppError extends Error {
     this.name = 'AppError';
   }
 }
-
-export class ImportedKeyProfileNotVerifiedError extends AppError {
-  constructor(message: string) {
-    super(message);
-    this.name = 'ImportedKeyProfileNotVerifiedError';
-  }
-}
-
-export class KeyError extends AppError {
-  constructor(message: string) {
-    super(message);
-    this.name = 'KeyError';
-  }
-}

@@ -8,7 +8,7 @@ import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/typ
 import { Modal } from '@react-native-ajp-elements/ui';
 import ModalHeader from 'components/molecules/ModalHeader';
 import { UserStatus } from 'types/user';
-import UserStatusView from './UserStatusView';
+import UserStatusPickerView from './UserStatusPickerView';
 
 type UserStatusPickerModal = UserStatusPickerModalMethods;
 
@@ -47,7 +47,7 @@ const UserStatusPickerModal = React.forwardRef<
         rightButtonIcon={'close'}
         onRightButtonPress={() => dismiss(userStatus)}
       />
-      <UserStatusView
+      <UserStatusPickerView
         value={userStatus}
         disabled={disabled}
         onChange={setUserStatus}

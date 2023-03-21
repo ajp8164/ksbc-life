@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sermon } from 'types/church';
+import { Sermon } from 'types/sermon';
 
 export declare type EditSermonModal = EditSermonModalMethods;
 

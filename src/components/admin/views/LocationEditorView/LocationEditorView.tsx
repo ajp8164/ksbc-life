@@ -26,14 +26,15 @@ import {
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import React, { useEffect, useImperativeHandle, useRef } from 'react';
 import { deleteImage, saveImage, selectImage } from 'lib/imageSelect';
-import { log, useSetState } from '@react-native-ajp-elements/core';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import FormikEffect from 'components/atoms/FormikEffect';
+import { Location } from 'types/location';
 import { StreetAddress } from 'types/common';
 import { appConfig } from 'config';
+import { saveLocation as commitLocation } from 'firestore/locations';
 import { makeStyles } from '@rneui/themed';
-import { updateLocation } from 'firestore/locations';
+import { useSetState } from '@react-native-ajp-elements/core';
 
 enum Fields {
   name,
@@ -123,31 +124,31 @@ const LocationEditorView = React.forwardRef<
     // Saving the image updates the form but form values are already passed in.
     // Overwrite the image value after saving the image to storage.
     values.photoUrl = formikRef.current?.values.photoUrl || '';
-    return (
-      updateLocation({
-        id: location?.id,
-        name: values.name,
-        address: values.address,
-        email: values.email,
-        phone: values.phone,
-        photoUrl: values.photoUrl,
-      })
-        .then(() => {
-          resetForm({ values });
-          setEditorState({ isSubmitting: false });
-        })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .catch((e: any) => {
-          log.error(`Failed to save location: ${e.message}`);
-          Alert.alert(
-            'Location Not Saved',
-            'Please try again. If this problem persists please contact support.',
-            [{ text: 'OK' }],
-            { cancelable: false },
-          );
-          setEditorState({ isSubmitting: false });
-        })
-    );
+
+    const l: Location = {
+      name: values.name,
+      address: values.address,
+      email: values.email,
+      phone: values.phone,
+      photoUrl: values.photoUrl,
+    };
+
+    if (location?.id) {
+      l.id = location.id;
+    }
+
+    try {
+      await commitLocation(l);
+      resetForm({ values });
+      setEditorState({ isSubmitting: false });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+      setEditorState({ isSubmitting: false });
+      Alert.alert('Location Not Saved', 'Please try again.', [{ text: 'OK' }], {
+        cancelable: false,
+      });
+      throw e;
+    }
   };
 
   const selectLocationImage = () => {

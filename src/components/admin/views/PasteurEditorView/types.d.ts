@@ -1,4 +1,4 @@
-import { Pasteur } from 'types/church';
+import { Pasteur } from 'types/pasteur';
 import React from 'react';
 
 export declare type PasteurEditorView = PasteurEditorViewMethods;
@@ -10,7 +10,7 @@ declare const PasteurView: React.MemoExoticComponent<
 >;
 
 export interface PasteurEditorViewProps {
-  onChange?: (editorState: EditorState) => void;
+  onEditorStateChange?: (editorState: EditorState) => void;
   pasteur?: Pasteur;
 }
 

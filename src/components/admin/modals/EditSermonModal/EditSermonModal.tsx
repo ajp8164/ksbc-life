@@ -7,7 +7,7 @@ import SermonEditorView, {
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { Modal } from '@react-native-ajp-elements/ui';
 import ModalHeader from 'components/molecules/ModalHeader';
-import { Sermon } from 'types/church';
+import { Sermon } from 'types/sermon';
 
 type EditSermonModal = EditSermonModalMethods;
 

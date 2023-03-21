@@ -4,7 +4,7 @@ import React from 'react';
 export declare type BibleReferencePickerModal =
   BibleReferencePickerModalMethods;
 
-declare const BibleReferenceModal: React.MemoExoticComponent<
+declare const BibleReferencePickerModal: React.MemoExoticComponent<
   React.ForwardRefExoticComponent<
     BibleReferencePickerModalProps &
       React.RefAttributes<BibleReferencePickerModalMethods>

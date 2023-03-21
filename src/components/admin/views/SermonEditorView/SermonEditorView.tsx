@@ -24,7 +24,7 @@ import {
   SermonEditorViewProps,
 } from './types';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
-import { LifeApplication, Sermon } from 'types/church';
+import { LifeApplication, Sermon, SermonVideo } from 'types/sermon';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
@@ -34,8 +34,10 @@ import { DatePickerModal } from 'components/modals/DatePickerModal';
 import { DateTime } from 'luxon';
 import FormikEffect from 'components/atoms/FormikEffect';
 import { ItemPickerModal } from 'components/modals/ItemPickerModal';
+import { SermonVideoPickerModal } from 'components/admin/modals/SermonVideoPickerModal';
 import { saveSermon as commitSermon } from 'firestore/sermons';
 import { getPasteurs } from 'firestore/pasteurs';
+import { getSermonVideo } from 'firestore/sermonVideos';
 import lodash from 'lodash';
 import { makeStyles } from '@rneui/themed';
 import { useSetState } from '@react-native-ajp-elements/core';
@@ -44,7 +46,6 @@ enum Fields {
   title,
   seriesTitle,
   lifeApplicationTitle,
-  videoId,
 }
 
 type FormValues = {
@@ -52,8 +53,8 @@ type FormValues = {
   pasteur: string;
   title: string;
   seriesTitle: string;
+  bibleReference: BibleReference;
   lifeApplication?: LifeApplication;
-  videoId: string;
 };
 
 const MAX_LA = 5;
@@ -72,11 +73,13 @@ const SermonEditorView = React.forwardRef<
   const bibleReferencePickerModalRef = useRef<ItemPickerModal>(null);
   const pasteurPickerModalRef = useRef<ItemPickerModal>(null);
   const sermonDatePickerModalRef = useRef<DatePickerModal>(null);
+  const sermonVideoPickerModalRef = useRef<SermonVideoPickerModal>(null);
 
   const [bibleReference, setBibleReference] = useState<BibleReference>(
     {} as BibleReference,
   );
   const [pasteurItems, setPasteurItems] = useState<PickerItem[]>([]);
+  const [sermonVideo, setSermonVideo] = useState<SermonVideo | undefined>();
 
   const formikRef = useRef<FormikProps<FormValues>>(null);
   const refTitle = useRef<TextInput>(null);
@@ -106,14 +109,24 @@ const SermonEditorView = React.forwardRef<
 
   useEffect(() => {
     (async () => {
-      const items: PickerItem[] = [{ label: 'Select  Pastuer', value: '' }];
-      const p = await getPasteurs(100);
-      p.pasteurs.forEach(p => {
+      const items: PickerItem[] = [{ label: 'Select  Pasteur', value: '' }];
+      const p = await getPasteurs();
+      p.result.forEach(p => {
         const name = `${p.firstName} ${p.lastName}`;
         items.push({ label: name, value: name });
       });
       setPasteurItems(items);
     })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      if (sermon?.videoId) {
+        const video = await getSermonVideo(sermon.videoId);
+        setSermonVideo(video);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -140,7 +153,7 @@ const SermonEditorView = React.forwardRef<
       bibleReference: !lodash.isEmpty(bibleReference)
         ? bibleReference
         : { book: '', chapter: '', verse: { start: '', end: '' } },
-      videoId: values.videoId,
+      videoId: sermonVideo?.id.videoId || '',
       lifeApplication: values.lifeApplication,
     };
 
@@ -170,10 +183,14 @@ const SermonEditorView = React.forwardRef<
     formikRef.current?.setFieldValue('pasteur', pasteur);
   };
 
-  const onBibleReferenceChange = (bibleReference: BibleReference): void => {
-    if (!lodash.isEmpty(bibleReference)) {
-      setBibleReference(bibleReference);
-    }
+  const onBibleReferenceChange = (bibleReference?: BibleReference): void => {
+    setBibleReference(bibleReference || ({} as BibleReference));
+    formikRef.current?.setFieldValue('bibleReference', bibleReference);
+  };
+
+  const onSermonVideoChange = (video?: SermonVideo): void => {
+    setSermonVideo(video);
+    formikRef.current?.setFieldValue('videoId', video ? video.id.videoId : '');
   };
 
   const bibleReferenceToString = (bibleReference: BibleReference): string => {
@@ -190,6 +207,16 @@ const SermonEditorView = React.forwardRef<
     pasteur: Yup.string().required('Pasteur is required'),
     title: Yup.string().required('Title is required'),
     seriesTitle: Yup.string(),
+    bibleReference: Yup.object().shape({
+      book: Yup.string(),
+      chapter: Yup.string(),
+      verse: Yup.object().shape({
+        start: Yup.string(),
+        end: Yup.string().notRequired(),
+      }),
+      title: Yup.string(),
+      items: Yup.array().of(Yup.string()),
+    }),
     lifeApplication: Yup.object().shape({
       title: Yup.string(),
       items: Yup.array().of(Yup.string()),
@@ -210,6 +237,7 @@ const SermonEditorView = React.forwardRef<
               pasteur: sermon?.pasteur || '',
               title: sermon?.title || '',
               seriesTitle: sermon?.seriesTitle || '',
+              bibleReference: sermon?.bibleReference || ({} as BibleReference),
               lifeApplication:
                 sermon?.lifeApplication ||
                 ({ title: '', items: [] } as LifeApplication),
@@ -255,7 +283,7 @@ const SermonEditorView = React.forwardRef<
                   }
                   onPress={() => pasteurPickerModalRef.current?.present()}
                 />
-                <Divider />
+                <Divider text={'MESSAGE'} />
                 <ListItemInput
                   refInner={refTitle}
                   placeholder={'Title'}
@@ -292,10 +320,35 @@ const SermonEditorView = React.forwardRef<
                     setEditorState({ focusedField: Fields.seriesTitle })
                   }
                 />
+                <Divider />
                 <ListItem
-                  title={'Bible Reference'}
+                  title={
+                    bibleReference.book?.length
+                      ? bibleReferenceToString(bibleReference)
+                      : 'Scripture Reference'
+                  }
+                  leftImage={'book-cross'}
+                  leftImageType={'material-community'}
                   placeholder={''}
-                  value={bibleReferenceToString(bibleReference)}
+                  containerStyle={{
+                    backgroundColor: theme.colors.listItemBackgroundAlt,
+                  }}
+                  position={['first', 'last']}
+                  drawerRightItems={[
+                    {
+                      width: 50,
+                      background: theme.colors.assertive,
+                      customElement: (
+                        <Icon
+                          name="link-off"
+                          type={'material-community'}
+                          color={theme.colors.stickyWhite}
+                          size={28}
+                        />
+                      ),
+                      onPress: onBibleReferenceChange,
+                    },
+                  ]}
                   onPress={() =>
                     bibleReferencePickerModalRef.current?.present()
                   }
@@ -414,32 +467,38 @@ const SermonEditorView = React.forwardRef<
                     )}
                 </View>
                 <Divider text={'VIDEO'} />
-                <ListItemInput
-                  refInner={refVideoId}
-                  placeholder={'Video Id'}
-                  placeholderTextColor={theme.colors.textPlaceholder}
-                  value={formik.values.videoId}
-                  errorText={
-                    formik.values.videoId !== formik.initialValues.videoId
-                      ? formik.errors.videoId
-                      : undefined
+                <ListItem
+                  title={
+                    sermonVideo
+                      ? sermonVideo.snippet.title
+                      : 'No video assigned'
                   }
-                  errorColor={theme.colors.error}
-                  autoCapitalize={'none'}
-                  autoCorrect={false}
-                  onBlur={() => {
-                    formik.handleBlur('videoId');
-                    formik.setTouched({ videoId: true });
-                    setEditorState({ focusedField: undefined });
+                  subtitle={
+                    sermonVideo &&
+                    DateTime.fromISO(sermonVideo.snippet.publishedAt).toFormat(
+                      'MMM d, yyyy',
+                    )
+                  }
+                  containerStyle={{
+                    backgroundColor: theme.colors.listItemBackgroundAlt,
                   }}
-                  onChangeText={formik.handleChange('videoId')}
-                  onFocus={() =>
-                    setEditorState({ focusedField: Fields.videoId })
-                  }
-                />
-                <Divider
-                  type={'note'}
-                  text={'Get the video id from YouTube.'}
+                  position={['first', 'last']}
+                  drawerRightItems={[
+                    {
+                      width: 50,
+                      background: theme.colors.assertive,
+                      customElement: (
+                        <Icon
+                          name="link-off"
+                          type={'material-community'}
+                          color={theme.colors.stickyWhite}
+                          size={28}
+                        />
+                      ),
+                      onPress: () => onSermonVideoChange(),
+                    },
+                  ]}
+                  onPress={() => sermonVideoPickerModalRef.current?.present()}
                 />
               </View>
             )}
@@ -465,6 +524,11 @@ const SermonEditorView = React.forwardRef<
       <BibleReferencePickerModal
         ref={bibleReferencePickerModalRef}
         onDismiss={onBibleReferenceChange}
+      />
+      <SermonVideoPickerModal
+        ref={sermonVideoPickerModalRef}
+        value={sermonVideo}
+        onChange={onSermonVideoChange}
       />
       {/* This isn't working inside bottomsheet.
       {Platform.OS === 'ios' && (

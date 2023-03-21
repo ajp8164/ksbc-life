@@ -3,7 +3,7 @@ import { UserRole } from 'types/user';
 
 export declare type UserRolePickerModal = UserRolePickerModalMethods;
 
-declare const UserRoleModal: React.MemoExoticComponent<
+declare const UserRolePickerModal: React.MemoExoticComponent<
   React.ForwardRefExoticComponent<
     UserRolePickerModalProps & React.RefAttributes<UserRolePickerModalMethods>
   >

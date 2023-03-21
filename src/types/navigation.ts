@@ -18,6 +18,7 @@ export type MoreNavigatorParamList = {
   AdminHome: undefined;
   AdminPasteursList: undefined;
   AdminSermonsList: undefined;
+  AdminSermonVideosList: undefined;
   AdminUsersList: undefined;
   AppSettings: undefined;
   Content: {

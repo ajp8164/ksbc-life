@@ -3,61 +3,61 @@ import React, { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 
 import { CheckBox } from '@rneui/base';
-import { UserRole } from 'types/user';
+import { UserStatus } from 'types/user';
 import { makeStyles } from '@rneui/themed';
 
-interface UserRoleInterface {
+interface UserStatusPickerInterface {
   disabled: boolean;
-  onChange: (userRole: UserRole) => void;
-  value: UserRole;
+  onChange: (userStatus: UserStatus) => void;
+  value: UserStatus;
 }
 
 const descriptions = {
-  [UserRole.Admin]:
-    'All privileges of User plus access the administration area of the app.',
-  [UserRole.Owner]:
-    'All privileges of Administrator plus ability to convey Administrator role to users.',
-  [UserRole.User]: 'Can access the app.',
+  [UserStatus.Active]: 'User is able to sign in.',
+  [UserStatus.Disabled]: 'User is not able to sign in.',
 };
 
-const UserRoleView = ({ disabled, onChange, value }: UserRoleInterface) => {
+const UserStatusPickerView = ({
+  disabled,
+  onChange,
+  value,
+}: UserStatusPickerInterface) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
-  const [userRole, setUserRole] = useState<UserRole>(value);
+  const [userStatus, setUserStatus] = useState<UserStatus>(value);
 
   useEffect(() => {
-    onChange(userRole);
+    onChange(userStatus);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userRole]);
+  }, [userStatus]);
 
   return (
     <View style={theme.styles.viewAlt}>
-      {(Object.keys(UserRole) as Array<keyof typeof UserRole>).map(
-        (r, index) => {
+      {(Object.keys(UserStatus) as Array<keyof typeof UserStatus>).map(
+        (st, index) => {
           return (
             <View key={index}>
               <CheckBox
-                title={UserRole[r]}
+                title={UserStatus[st]}
                 textStyle={theme.styles.textNormal}
                 containerStyle={{
                   borderWidth: 1,
                   padding: 0,
                 }}
-                // Owner role is always disabled. Changing requires direct database access by support.
-                disabled={disabled || UserRole[r] === UserRole.Owner}
+                disabled={disabled}
                 checkedColor={theme.colors.brandSecondary}
-                checked={value === UserRole[r]}
-                onPress={() => setUserRole(UserRole[r])}
+                checked={value === UserStatus[st]}
+                onPress={() => setUserStatus(UserStatus[st])}
               />
-              <Text style={s.description}>{descriptions[UserRole[r]]}</Text>
+              <Text style={s.description}>{descriptions[UserStatus[st]]}</Text>
             </View>
           );
         },
       )}
       {disabled && (
         <Text style={s.note}>
-          {'Note: Owners and administrators cannot change their own role.'}
+          {'Note: Owners and administrators cannot change their own status.'}
         </Text>
       )}
     </View>
@@ -78,4 +78,4 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   },
 }));
 
-export default UserRoleView;
+export default UserStatusPickerView;

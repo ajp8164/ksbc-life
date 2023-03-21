@@ -1,13 +1,20 @@
-import { Alert, ScrollView } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  ListRenderItem,
+  Platform,
+  View,
+} from 'react-native';
 import { AppTheme, useTheme } from 'theme';
 import { Button, Icon } from '@rneui/base';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  collectionChangeListener,
-  documentChangeListener,
-} from 'firestore/events';
-import { deleteLocation, getLocations } from 'firestore/locations';
+  deleteLocation,
+  getLocations,
+  locationsCollectionChangeListener,
+} from 'firestore/locations';
 
 import { Church } from 'types/church';
 import { EditChurchModal } from 'components/admin/modals/EditChurchModal';
@@ -15,16 +22,24 @@ import { EditLocationModal } from 'components/admin/modals/EditLocationModal';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { Location } from 'types/location';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { documentChangeListener } from 'firestore/events';
 import { makeStyles } from '@rneui/themed';
+import { useHeaderHeight } from '@react-navigation/elements';
 
 const AdminChurchScreen = () => {
   const theme = useTheme();
   const s = useStyles(theme);
 
+  const headerHeight = useHeaderHeight();
+  const iosLargeTitleHeight = Platform.OS === 'ios' ? 52 : 0;
+  const contentTop = headerHeight + iosLargeTitleHeight;
+
   const editChurchModalRef = useRef<EditChurchModal>(null);
   const editLocationModalRef = useRef<EditLocationModal>(null);
 
   const [church, setChurch] = useState<Church>();
+  const [allLoaded, setAllLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [lastDocument, setLastDocument] =
     useState<FirebaseFirestoreTypes.DocumentData>();
   const [locations, setLocations] = useState<Location[]>([]);
@@ -37,26 +52,35 @@ const AdminChurchScreen = () => {
         setChurch(documentSnapshot.data() as Church);
       },
     );
-
     return subscription;
   }, []);
 
   useEffect(() => {
-    const subscription = collectionChangeListener('Locations', () => {
-      getMoreLocations();
-    });
-
+    const subscription = locationsCollectionChangeListener(
+      snapshot => {
+        const updated: Location[] = [];
+        snapshot.docs.forEach(d => {
+          updated.push({ ...d.data(), id: d.id } as Location);
+        });
+        setLocations(updated);
+        setLastDocument(snapshot.docs[snapshot.docs.length - 1]);
+        setAllLoaded(false);
+      },
+      { lastDocument },
+    );
     return subscription;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const getMoreLocations = async (limit = 10) => {
-    try {
-      const l = await getLocations(limit, lastDocument);
-      setLastDocument(l.lastDocument);
-      setLocations(l.locations);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-empty
-    } catch (e: any) {}
+  const getMoreLocations = async () => {
+    if (!allLoaded) {
+      setIsLoading(true);
+      const s = await getLocations({ lastDocument });
+      setLastDocument(s.lastDocument);
+      setLocations(locations.concat(s.result));
+      setAllLoaded(s.allLoaded);
+      setIsLoading(false);
+    }
   };
 
   const confirmDeleteLocation = async (id: string) => {
@@ -75,11 +99,67 @@ const AdminChurchScreen = () => {
     );
   };
 
+  const renderLocation: ListRenderItem<Location> = ({ item, index }) => {
+    return (
+      <ListItem
+        key={index}
+        title={item.name}
+        position={[
+          index === 0 ? 'first' : undefined,
+          index === locations.length - 1 ? 'last' : undefined,
+        ]}
+        leftImage={'map-marker-radius-outline'}
+        leftImageType={'material-community'}
+        drawerRightItems={[
+          {
+            width: 50,
+            background: theme.colors.assertive,
+            customElement: (
+              <Icon
+                name="delete"
+                type={'material-community'}
+                color={theme.colors.stickyWhite}
+                size={28}
+              />
+            ),
+            onPress: () => confirmDeleteLocation(item.id || ''),
+          },
+        ]}
+        onPress={() =>
+          editLocationModalRef.current?.present('Edit Location', item)
+        }
+      />
+    );
+  };
+
+  const renderListEmptyComponent = () => {
+    if (isLoading) return null;
+    return (
+      <ListItem
+        title={'Add a church location'}
+        position={['first', 'last']}
+        leftImage={'map-marker-radius-outline'}
+        leftImageType={'material-community'}
+        onPress={() => editLocationModalRef.current?.present('New Location')}
+      />
+    );
+  };
+
+  const renderListFooterComponent = () => {
+    if (isLoading) {
+      return (
+        <View style={s.activityIndicator}>
+          <ActivityIndicator color={theme.colors.brandPrimary} size={'large'} />
+        </View>
+      );
+    } else {
+      return <Divider />;
+    }
+  };
+
   return (
     <SafeAreaView edges={['left', 'right']} style={theme.styles.view}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentInsetAdjustmentBehavior={'automatic'}>
+      <View style={{ marginTop: contentTop }}>
         <Divider />
         <ListItem
           title={church?.name}
@@ -108,71 +188,31 @@ const AdminChurchScreen = () => {
             />
           }
         />
-        {locations.length ? (
-          <>
-            {locations
-              .sort((a, b) => (a.name > b.name ? 1 : -1))
-              .map((location, index) => {
-                return (
-                  <ListItem
-                    key={index}
-                    title={location.name}
-                    position={[
-                      index === 0 ? 'first' : undefined,
-                      index === locations.length - 1 ? 'last' : undefined,
-                    ]}
-                    leftImage={'map-marker-radius-outline'}
-                    leftImageType={'material-community'}
-                    drawerRightItems={[
-                      {
-                        width: 50,
-                        background: theme.colors.assertive,
-                        customElement: (
-                          <Icon
-                            name="delete"
-                            type={'material-community'}
-                            color={theme.colors.stickyWhite}
-                            size={28}
-                          />
-                        ),
-                        onPress: () => confirmDeleteLocation(location.id || ''),
-                      },
-                    ]}
-                    onPress={() =>
-                      editLocationModalRef.current?.present(
-                        'Edit Location',
-                        location,
-                      )
-                    }
-                  />
-                );
-              })}
-          </>
-        ) : (
-          <ListItem
-            title={'Add a church location'}
-            position={['first', 'last']}
-            leftImage={'map-marker-radius-outline'}
-            leftImageType={'material-community'}
-            onPress={() =>
-              editLocationModalRef.current?.present('New Location')
-            }
-          />
-        )}
-      </ScrollView>
+      </View>
+      <FlatList
+        data={locations}
+        renderItem={renderLocation}
+        keyExtractor={(_item, index) => `${index}`}
+        ListEmptyComponent={renderListEmptyComponent}
+        ListFooterComponent={renderListFooterComponent}
+        contentInsetAdjustmentBehavior={'automatic'}
+        showsVerticalScrollIndicator={false}
+        onEndReached={getMoreLocations}
+        onEndReachedThreshold={0.2}
+      />
       <EditChurchModal ref={editChurchModalRef} />
       <EditLocationModal ref={editLocationModalRef} />
     </SafeAreaView>
   );
 };
 
-const useStyles = makeStyles((_theme, theme: AppTheme) => ({
-  noLocations: {
-    ...theme.styles.textNormal,
-  },
+const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
   addLocationButton: {
     paddingHorizontal: 0,
     paddingVertical: 0,
+  },
+  activityIndicator: {
+    marginVertical: 15,
   },
 }));
 
