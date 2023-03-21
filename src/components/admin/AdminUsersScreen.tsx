@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { UserProfile } from 'types/user';
 import { makeStyles } from '@rneui/themed';
 
-const AdminUsersListScreen = () => {
+const AdminUsersScreen = () => {
   const theme = useTheme();
   const s = useStyles(theme);
 
@@ -121,4 +121,4 @@ const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
   },
 }));
 
-export default AdminUsersListScreen;
+export default AdminUsersScreen;

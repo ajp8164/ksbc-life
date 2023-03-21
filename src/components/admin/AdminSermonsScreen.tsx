@@ -30,7 +30,7 @@ import { makeStyles } from '@rneui/themed';
 
 type Props = NativeStackScreenProps<MoreNavigatorParamList, 'AdminSermonsList'>;
 
-const AdminSermonsListScreen = ({ navigation }: Props) => {
+const AdminSermonsScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
@@ -238,4 +238,4 @@ const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
   },
 }));
 
-export default AdminSermonsListScreen;
+export default AdminSermonsScreen;

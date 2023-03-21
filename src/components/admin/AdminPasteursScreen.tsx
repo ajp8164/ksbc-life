@@ -25,7 +25,7 @@ type Props = NativeStackScreenProps<
   'AdminPasteursList'
 >;
 
-const AdminPasteursListScreen = ({ navigation }: Props) => {
+const AdminPasteursScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
@@ -187,4 +187,4 @@ const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
   },
 }));
 
-export default AdminPasteursListScreen;
+export default AdminPasteursScreen;
