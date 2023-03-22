@@ -109,7 +109,7 @@ const SermonVideoPickerView = ({
     if (isLoading) {
       return (
         <View style={s.activityIndicator}>
-          <ActivityIndicator color={theme.colors.brandPrimary} size={'large'} />
+          <ActivityIndicator color={theme.colors.brandPrimary} />
         </View>
       );
     } else {
