@@ -13,11 +13,6 @@ import firestore, {
 import { Pasteur } from 'types/pasteur';
 import { log } from '@react-native-ajp-elements/core';
 
-export type PasteursQueryResult = {
-  lastDocument: FirebaseFirestoreTypes.DocumentData;
-  pasteurs: Pasteur[];
-};
-
 export const getPasteur = (id: string): Promise<Pasteur | undefined> => {
   return getDocument('Pasteurs', id);
 };
