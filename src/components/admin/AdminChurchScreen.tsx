@@ -201,7 +201,7 @@ const AdminChurchScreen = () => {
         keyExtractor={(_item, index) => `${index}`}
         ListEmptyComponent={renderListEmptyComponent}
         ListFooterComponent={renderListFooterComponent}
-        contentInsetAdjustmentBehavior={'automatic'}
+        // contentInsetAdjustmentBehavior={'automatic'}
         showsVerticalScrollIndicator={false}
         onEndReached={getMoreLocations}
         onEndReachedThreshold={0.2}
