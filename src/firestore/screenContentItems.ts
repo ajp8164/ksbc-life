@@ -10,7 +10,7 @@ import firestore, {
   FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';
 
-import { ScreenContentItem } from 'types/screenContent';
+import { ScreenContentItem } from 'types/screenContentItem';
 import { log } from '@react-native-ajp-elements/core';
 
 export const getScreenContentItem = (
@@ -27,7 +27,7 @@ export const getScreenContentItems = (opts?: {
   const {
     lastDocument,
     limit = 10,
-    orderBy = { fieldPath: 'firstName', directionStr: 'asc' },
+    orderBy = { fieldPath: 'name', directionStr: 'asc' },
   } = opts || {};
   return getDocuments('ScreenContentItems', { orderBy, limit, lastDocument });
 };
@@ -53,13 +53,14 @@ export const addScreenContentItem = (
 export const updateScreenContentItem = (
   screenContentItem: ScreenContentItem,
 ): Promise<ScreenContentItem> => {
-  const id = screenContentItem.id;
-  delete screenContentItem.id; // Not storing the doc id in the object.
+  const updated = Object.assign({}, screenContentItem); // Don't mutate input.
+  const id = updated.id;
+  delete updated.id; // Not storing the doc id in the object.
   return (
     firestore()
       .collection('ScreenContentItems')
       .doc(id)
-      .update(screenContentItem)
+      .update(updated)
       .then(() => {
         return screenContentItem;
       })
@@ -115,7 +116,7 @@ export const screenContentItemCollectionChangeListener = (
   const {
     lastDocument,
     limit,
-    orderBy = { fieldPath: 'firstName', directionStr: 'asc' },
+    orderBy = { fieldPath: 'name', directionStr: 'asc' },
   } = opts || {};
   return collectionChangeListener('ScreenContentItems', handler, {
     lastDocument,

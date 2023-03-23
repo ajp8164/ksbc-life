@@ -38,7 +38,6 @@ export const getSermonVideos = (opts?: {
 
 export const addSermonVideos = (videos: SermonVideo[]): Promise<void> => {
   const batch = firestore().batch();
-
   // Set the video document id to the YouTube video id.
   videos.forEach(video => {
     const doc = firestore().collection('SermonVideos').doc(video.id.videoId);

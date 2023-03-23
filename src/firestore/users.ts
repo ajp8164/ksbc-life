@@ -31,13 +31,14 @@ export const getUsers = (opts?: {
 };
 
 export const updateUser = (user: UserProfile): Promise<UserProfile> => {
-  const id = user.id;
-  delete user.id; // Not storing the doc id in the object.
+  const updated = Object.assign({}, user); // Don't mutate input.
+  const id = updated.id;
+  delete updated.id; // Not storing the doc id in the object.
   return (
     firestore()
       .collection('Users')
       .doc(id)
-      .update(user)
+      .update(updated)
       .then(() => {
         return user;
       })

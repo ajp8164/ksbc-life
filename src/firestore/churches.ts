@@ -47,13 +47,14 @@ export const addChurch = (church: Church): Promise<Church> => {
 };
 
 export const updateChurch = (church: Church): Promise<Church> => {
-  const id = church.id;
-  delete church.id; // Not storing the doc id in the object.
+  const updated = Object.assign({}, church); // Don't mutate input.
+  const id = updated.id;
+  delete updated.id; // Not storing the doc id in the object.
   return (
     firestore()
       .collection('Churches')
       .doc(id)
-      .update(church)
+      .update(updated)
       .then(() => {
         return church;
       })
