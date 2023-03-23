@@ -1,10 +1,12 @@
-import { ScreenContentItem } from 'types/screenContentItem';
+import { EditorState } from 'components/admin/views/ScreenContentItemEditorView';
 import React from 'react';
+import { ScreenContentItem } from 'types/screenContentItem';
+import { ViewStyle } from 'react-native';
 
 export declare type ScreenContentItemEditorView =
   ScreenContentItemEditorViewMethods;
 
-declare const ScreenContentItemEditorView: React.MemoExoticComponent<
+declare const ScreenContentItemView: React.MemoExoticComponent<
   React.ForwardRefExoticComponent<
     ScreenContentItemEditorViewProps &
       React.RefAttributes<ScreenContentItemEditorViewMethods>
@@ -12,17 +14,11 @@ declare const ScreenContentItemEditorView: React.MemoExoticComponent<
 >;
 
 export interface ScreenContentItemEditorViewProps {
-  screenContentItem?: ScreenContentItem;
+  contentContainerStyle?: ViewStyle | ViewStyle[];
   onChange?: (editorState: EditorState) => void;
+  screenContentItem?: ScreenContentItem;
 }
 
 export interface ScreenContentItemEditorViewMethods {
   saveScreenContentItem: () => Promise<void>;
-}
-
-export interface EditorState {
-  fieldCount: number;
-  focusedField?: number;
-  isSubmitting: boolean;
-  changed: boolean;
 }

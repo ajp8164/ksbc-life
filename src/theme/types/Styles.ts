@@ -1,6 +1,8 @@
-import { TextStyle, ViewStyle } from 'react-native';
+import { ViewStyle } from 'react-native';
 
 export type Styles = {
-  example: TextStyle;
+  bottomSheetHandle: ViewStyle;
+  modalHeader: ViewStyle;
+  topTabBar: ViewStyle;
   viewWidth: ViewStyle;
 };

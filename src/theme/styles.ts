@@ -3,10 +3,18 @@ import { makeStyles } from '@rneui/themed';
 import { viewport } from '@react-native-ajp-elements/ui';
 
 export const useStyles = makeStyles(
-  (theme): Styles => ({
-    example: {
-      color: theme.colors.assertive,
+  (_theme): Styles => ({
+    // Constants
+    bottomSheetHandle: {
+      height: 24,
     },
+    modalHeader: {
+      height: 81,
+    },
+    topTabBar: {
+      height: 48,
+    },
+    //
     // Aligns items in viewport.width without using view padding (which clips shadows).
     viewWidth: {
       width: viewport.width - 2 * 20, // Left/right padding in views is 20
