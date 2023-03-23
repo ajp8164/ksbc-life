@@ -452,6 +452,7 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
     height: ((viewport.width - 30) * 9) / 16,
     borderWidth: 1,
     borderColor: theme.colors.subtleGray,
+    borderRadius: 10,
   },
   imageButton: {
     backgroundColor: theme.colors.whiteTransparentMid,
