@@ -31,8 +31,8 @@ const EditScreenContentItemModal = React.forwardRef<
 
   const contentContainerHeight =
     Math.ceil(viewport.height * 0.921) -
-    Number(theme.styles.modalHeader.height) +
-    Number(theme.styles.bottomSheetHandle.height);
+    (theme.styles.modalHeader.height as number) +
+    (theme.styles.bottomSheetHandle.height as number);
 
   useImperativeHandle(ref, () => ({
     //  These functions exposed to the parent component through the ref.
