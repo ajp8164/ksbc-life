@@ -180,9 +180,9 @@ const LocationEditorView = React.forwardRef<
   };
 
   const deleteLocationImage = async () => {
-    if (location?.photoUrl) {
+    if (formikRef.current?.values.photoUrl) {
       await deleteImage({
-        filename: location.photoUrl,
+        filename: formikRef.current?.values.photoUrl,
         storagePath: appConfig.storageImageLocations,
       })
         .then(() => {

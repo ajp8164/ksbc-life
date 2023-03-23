@@ -168,9 +168,9 @@ const ChurchEditorView = React.forwardRef<
   };
 
   const deleteChurchImage = async () => {
-    if (church?.photoUrl) {
+    if (formikRef.current?.values.photoUrl) {
       await deleteImage({
-        filename: church.photoUrl,
+        filename: formikRef.current?.values.photoUrl,
         storagePath: appConfig.storageImageChurch,
       })
         .then(() => {
