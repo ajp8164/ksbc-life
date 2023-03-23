@@ -13,6 +13,7 @@ export interface TextModalProps {
   headerTitle?: string;
   onDismiss: (text: string) => void;
   placeholder?: string;
+  snapPoints?: (string | number)[];
   textContainerStyle?: ViewStyle | ViewStyle[];
   value?: string;
 }

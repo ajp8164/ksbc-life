@@ -54,7 +54,7 @@ const Card = ({
 }: CardInterface) => {
   const theme = useTheme();
   const s = useStyles(theme);
-  const hasText = title || body || footer;
+  const hasText = title || header || body || footer;
 
   return (
     <RNULCard
@@ -107,7 +107,8 @@ const Card = ({
         imageStyle={{
           width: imageWidth,
           height: imageHeight,
-          resizeMode: hasText ? 'cover' : 'contain',
+          // resizeMode: hasText ? 'cover' : 'contain',
+          resizeMode: 'cover',
         }}
       />
     </RNULCard>
@@ -116,7 +117,7 @@ const Card = ({
 
 const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   card: {
-    marginTop: 15,
+    // marginTop: 15,
     backgroundColor: theme.colors.cardBackground,
   },
   cardContent: {

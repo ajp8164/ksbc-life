@@ -35,6 +35,9 @@ const TextView = React.forwardRef<TextView, TextViewProps>((props, ref) => {
 
   return (
     <>
+      {characterLimit ? (
+        <Text style={s.remaining}>{`Characters left: ${countRemaining}`}</Text>
+      ) : null}
       <View
         style={[
           theme.styles.viewAlt,
@@ -55,9 +58,6 @@ const TextView = React.forwardRef<TextView, TextViewProps>((props, ref) => {
           }}
         />
       </View>
-      {characterLimit ? (
-        <Text style={s.remaining}>{`Characters left: ${countRemaining}`}</Text>
-      ) : null}
     </>
   );
 });
@@ -65,7 +65,6 @@ const TextView = React.forwardRef<TextView, TextViewProps>((props, ref) => {
 const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   view: {
     paddingHorizontal: 5,
-    // borderWidth: 1,
   },
   text: {
     ...theme.styles.textNormal,
@@ -74,8 +73,8 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   remaining: {
     ...theme.styles.textSmall,
     ...theme.styles.textDim,
-    textAlign: 'right',
-    paddingRight: 15,
+    textAlign: 'left',
+    paddingLeft: 15,
   },
 }));
 

@@ -8,6 +8,7 @@ export const theme = createTheme(
     darkColors: {
       brandPrimary: '#194E6A',
       brandSecondary: '#80BFE1',
+      calm: '#B260EA',
       cardBackground: '#202020',
       listItemBackgroundAlt: '#101010',
       shadowColor: '#00000000',
@@ -20,6 +21,7 @@ export const theme = createTheme(
     lightColors: {
       brandPrimary: '#194E6A',
       brandSecondary: '#80BFE1',
+      calm: '#B260EA',
       cardBackground: '#FFFFFF',
       listItemBackgroundAlt: '#f7f7f7',
       shadowColor: '#000000',

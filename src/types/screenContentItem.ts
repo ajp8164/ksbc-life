@@ -15,6 +15,7 @@ export type ScreenContentItem = {
   ordinal: number;
   content: ScreenCardContentItem;
   schedule: ScreenContentSchedule;
+  status: 'active' | 'archive';
 };
 
 export type ScreenCardContentItem = {

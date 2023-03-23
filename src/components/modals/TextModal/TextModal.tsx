@@ -16,6 +16,7 @@ const TextModal = React.forwardRef<TextModal, TextModalProps>((props, ref) => {
     headerTitle,
     onDismiss,
     placeholder,
+    snapPoints = ['92%'],
     textContainerStyle,
     value,
   } = props;
@@ -56,12 +57,13 @@ const TextModal = React.forwardRef<TextModal, TextModalProps>((props, ref) => {
   return (
     <Modal
       ref={innerRef}
-      snapPoints={['92%']}
+      snapPoints={snapPoints}
       onDismiss={() => onDismiss(text.current)}>
       {headerTitle && (
         <ModalHeader
           title={headerTitle}
-          rightButtonText={'Done'}
+          rightButtonIcon={'close'}
+          size={'small'}
           onRightButtonPress={dismiss}
           onLayout={onHeaderLayout}
         />

@@ -7,7 +7,7 @@ import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 
 import React, { useEffect, useRef, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ActivityIndicator, Platform, View } from 'react-native';
+import { ActivityIndicator, Alert, Platform, Text, View } from 'react-native';
 import { AppTheme, useTheme } from 'theme';
 import { Button, Icon } from '@rneui/base';
 import { makeStyles } from '@rneui/themed';
@@ -18,6 +18,7 @@ import {
   getScreenContentItems,
   screenContentItemCollectionChangeListener,
   updateScreenContentItem,
+  deleteScreenContentItem,
 } from 'firestore/screenContentItems';
 import { EditScreenContentItemModal } from 'components/admin/modals/EditScreenContentItemModal';
 
@@ -97,6 +98,27 @@ const AdminContentScreen = () => {
     setScreenContentItems(data);
   };
 
+  const archiveScreenContent = (item: ScreenContentItem) => {
+    item.status = 'archive';
+    updateScreenContentItem(item);
+  };
+
+  const confirmDeleteScreenContent = async (id: string) => {
+    Alert.alert(
+      'Confirm Delete Content',
+      'Are you sure you want to delete this content?',
+      [
+        {
+          text: 'Yes, delete',
+          onPress: () => deleteScreenContentItem(id),
+          style: 'destructive',
+        },
+        { text: 'No', style: 'cancel' },
+      ],
+      { cancelable: false },
+    );
+  };
+
   const renderScreenContentItem = ({
     item,
     getIndex,
@@ -131,17 +153,45 @@ const AdminContentScreen = () => {
           delayLongPress={300}
           drawerRightItems={[
             {
-              width: 50,
+              width: 60,
               background: theme.colors.assertive,
+              style: { paddingHorizontal: 0 },
               customElement: (
-                <Icon
-                  name="delete"
-                  type={'material-community'}
-                  color={theme.colors.stickyWhite}
-                  size={28}
-                />
+                <>
+                  <Icon
+                    name={'delete'}
+                    type={'material-community'}
+                    color={theme.colors.stickyWhite}
+                    size={28}
+                  />
+                  <Text style={s.drawerText}>{'Delete'}</Text>
+                </>
               ),
-              // onPress: () => confirmDeletePasteur(item.id || ''),
+              onPress: () => confirmDeleteScreenContent(item.id || ''),
+            },
+            {
+              width: 60,
+              background: theme.colors.calm,
+              style: { paddingHorizontal: 0 },
+              customElement: (
+                <View style={{}}>
+                  <Icon
+                    name={'archive'}
+                    type={'material-community'}
+                    color={theme.colors.stickyWhite}
+                    size={28}
+                  />
+                  <Text
+                    style={[
+                      theme.styles.textTiny,
+                      theme.styles.textBold,
+                      { color: theme.colors.stickyWhite },
+                    ]}>
+                    {'Archive'}
+                  </Text>
+                </View>
+              ),
+              onPress: () => archiveScreenContent(item),
             },
           ]}
         />
@@ -250,13 +300,18 @@ const AdminContentScreen = () => {
   );
 };
 
-const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
+const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   addAnnouncementButton: {
     paddingHorizontal: 0,
     paddingVertical: 0,
   },
   activityIndicator: {
     marginVertical: 15,
+  },
+  drawerText: {
+    ...theme.styles.textTiny,
+    ...theme.styles.textBold,
+    color: theme.colors.stickyWhite,
   },
 }));
 
