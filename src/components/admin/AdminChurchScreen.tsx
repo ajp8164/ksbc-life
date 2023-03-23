@@ -3,7 +3,6 @@ import {
   Alert,
   FlatList,
   ListRenderItem,
-  Platform,
   Text,
   View,
 } from 'react-native';
@@ -32,7 +31,7 @@ const AdminChurchScreen = () => {
   const s = useStyles(theme);
 
   const headerHeight = useHeaderHeight();
-  const iosLargeTitleHeight = Platform.OS === 'ios' ? 52 : 0;
+  const iosLargeTitleHeight = theme.styles.iosLargeHeader.height as number;
   const contentTop = headerHeight + iosLargeTitleHeight;
 
   const editChurchModalRef = useRef<EditChurchModal>(null);

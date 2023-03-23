@@ -1,6 +1,6 @@
 import { AppTheme, useTheme } from 'theme';
 import { Divider, ListItem, viewport } from '@react-native-ajp-elements/ui';
-import { Platform, ScrollView, Text } from 'react-native';
+import { ScrollView, Text } from 'react-native';
 
 import { MoreNavigatorParamList } from 'types/navigation';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -21,7 +21,7 @@ const AboutScreen = ({ navigation }: Props) => {
 
   const headerHeight = useHeaderHeight();
   const tabBarHeight = useBottomTabBarHeight();
-  const iosLargeTitleHeight = Platform.OS === 'ios' ? 52 : 0;
+  const iosLargeTitleHeight = theme.styles.iosLargeHeader.height as number;
   const visibleViewHeight =
     viewport.height - headerHeight - tabBarHeight - iosLargeTitleHeight;
 

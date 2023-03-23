@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { Styles } from 'theme/types/Styles';
 import { makeStyles } from '@rneui/themed';
 import { viewport } from '@react-native-ajp-elements/ui';
@@ -7,6 +8,16 @@ export const useStyles = makeStyles(
     // Constants
     bottomSheetHandle: {
       height: 24,
+    },
+    iosLargeHeader: {
+      ...Platform.select({
+        android: {
+          height: 0,
+        },
+        ios: {
+          height: 52,
+        },
+      }),
     },
     modalHeader: {
       height: 81,

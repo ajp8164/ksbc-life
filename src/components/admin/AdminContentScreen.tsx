@@ -1,33 +1,33 @@
+import { ActivityIndicator, Alert, Text, View } from 'react-native';
+import { AppTheme, useTheme } from 'theme';
+import { Button, Icon } from '@rneui/base';
+import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import DraggableFlatList, {
   DragEndParams,
   RenderItemParams,
   ShadowDecorator,
 } from 'react-native-draggable-flatlist';
-import { Divider, ListItem } from '@react-native-ajp-elements/ui';
-
 import React, { useEffect, useRef, useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { ActivityIndicator, Alert, Platform, Text, View } from 'react-native';
-import { AppTheme, useTheme } from 'theme';
-import { Button, Icon } from '@rneui/base';
-import { makeStyles } from '@rneui/themed';
-import { useHeaderHeight } from '@react-navigation/elements';
-import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
-import { ScreenContentItem } from 'types/screenContentItem';
 import {
+  deleteScreenContentItem,
   getScreenContentItems,
   screenContentItemCollectionChangeListener,
   updateScreenContentItem,
-  deleteScreenContentItem,
 } from 'firestore/screenContentItems';
+
 import { EditScreenContentItemModal } from 'components/admin/modals/EditScreenContentItemModal';
+import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScreenContentItem } from 'types/screenContentItem';
+import { makeStyles } from '@rneui/themed';
+import { useHeaderHeight } from '@react-navigation/elements';
 
 const AdminContentScreen = () => {
   const theme = useTheme();
   const s = useStyles(theme);
 
   const headerHeight = useHeaderHeight();
-  const iosLargeTitleHeight = Platform.OS === 'ios' ? 52 : 0;
+  const iosLargeTitleHeight = theme.styles.iosLargeHeader.height as number;
   const contentTop = headerHeight + iosLargeTitleHeight;
 
   const editScreenContentItemModalRef =
