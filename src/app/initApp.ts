@@ -24,6 +24,7 @@ export const initApp = async (): Promise<InitStatus> => {
       firestore().useEmulator('localhost', 8080);
       storage().useEmulator('localhost', 9199);
       console.log('Firestore emulator running at localhost:8080');
+      // firestore().clearPersistence();
     }
 
     // Disable Android hardware back button.

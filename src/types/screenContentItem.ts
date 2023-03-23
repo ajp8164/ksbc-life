@@ -1,5 +1,4 @@
 import { TextStyle, ViewStyle } from 'react-native';
-import { ImageSource } from 'react-native-vector-icons/Icon';
 import { ISODateString } from 'types/common';
 
 type ScreenContentItemKind = 'card';
@@ -11,7 +10,9 @@ type ScreenContentSchedule = {
 
 export type ScreenContentItem = {
   id?: string;
+  name: string;
   kind: ScreenContentItemKind;
+  ordinal: number;
   content: ScreenCardContentItem;
   schedule: ScreenContentSchedule;
 };
@@ -29,7 +30,7 @@ export type ScreenCardContentItem = {
   footerStyle?: TextStyle | TextStyle[];
   header?: string;
   headerStyle?: TextStyle | TextStyle[];
-  imageSource?: ImageSource;
+  photoUrl?: string;
   title?: string;
   titleStyle?: TextStyle | TextStyle[];
 };

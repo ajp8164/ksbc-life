@@ -42,7 +42,7 @@ const AdminHomeScreen = ({ navigation }: Props) => {
         <ListItem
           title={'Content'}
           position={['first', 'last']}
-          leftImage={'file-document-edit-outline'}
+          leftImage={'card-multiple-outline'}
           leftImageType={'material-community'}
           onPress={() => navigation.navigate('AdminContent')}
         />
