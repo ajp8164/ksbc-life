@@ -3,6 +3,7 @@ import {
   Alert,
   FlatList,
   ListRenderItem,
+  Text,
   View,
 } from 'react-native';
 import { AppTheme, useTheme } from 'theme';
@@ -114,15 +115,19 @@ const AdminPasteursScreen = ({ navigation }: Props) => {
         leftImageType={'material-community'}
         drawerRightItems={[
           {
-            width: 50,
+            width: 60,
             background: theme.colors.assertive,
+            style: { paddingHorizontal: 0 },
             customElement: (
-              <Icon
-                name="delete"
-                type={'material-community'}
-                color={theme.colors.stickyWhite}
-                size={28}
-              />
+              <>
+                <Icon
+                  name={'delete'}
+                  type={'material-community'}
+                  color={theme.colors.stickyWhite}
+                  size={28}
+                />
+                <Text style={s.drawerText}>{'Delete'}</Text>
+              </>
             ),
             onPress: () => confirmDeletePasteur(item.id || ''),
           },
@@ -178,9 +183,14 @@ const AdminPasteursScreen = ({ navigation }: Props) => {
   );
 };
 
-const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
+const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   activityIndicator: {
     marginVertical: 15,
+  },
+  drawerText: {
+    ...theme.styles.textTiny,
+    ...theme.styles.textBold,
+    color: theme.colors.stickyWhite,
   },
 }));
 

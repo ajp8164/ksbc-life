@@ -318,15 +318,18 @@ const SermonEditorView = React.forwardRef<
                   position={['first', 'last']}
                   drawerRightItems={[
                     {
-                      width: 50,
+                      width: 60,
                       background: theme.colors.assertive,
                       customElement: (
-                        <Icon
-                          name="link-off"
-                          type={'material-community'}
-                          color={theme.colors.stickyWhite}
-                          size={28}
-                        />
+                        <>
+                          <Icon
+                            name={'link-off'}
+                            type={'material-community'}
+                            color={theme.colors.stickyWhite}
+                            size={28}
+                          />
+                          <Text style={s.drawerText}>{'Unlink'}</Text>
+                        </>
                       ),
                       onPress: onBibleReferenceChange,
                     },
@@ -467,15 +470,18 @@ const SermonEditorView = React.forwardRef<
                   position={['first', 'last']}
                   drawerRightItems={[
                     {
-                      width: 50,
+                      width: 60,
                       background: theme.colors.assertive,
                       customElement: (
-                        <Icon
-                          name="link-off"
-                          type={'material-community'}
-                          color={theme.colors.stickyWhite}
-                          size={28}
-                        />
+                        <>
+                          <Icon
+                            name={'link-off'}
+                            type={'material-community'}
+                            color={theme.colors.stickyWhite}
+                            size={28}
+                          />
+                          <Text style={s.drawerText}>{'Unlink'}</Text>
+                        </>
                       ),
                       onPress: () => onSermonVideoChange(),
                     },
@@ -525,9 +531,14 @@ const SermonEditorView = React.forwardRef<
   );
 });
 
-const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
+const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   addLifeApplication: {
     flexDirection: 'row',
+  },
+  drawerText: {
+    ...theme.styles.textTiny,
+    ...theme.styles.textBold,
+    color: theme.colors.stickyWhite,
   },
 }));
 

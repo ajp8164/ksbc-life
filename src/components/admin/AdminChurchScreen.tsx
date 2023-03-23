@@ -4,6 +4,7 @@ import {
   FlatList,
   ListRenderItem,
   Platform,
+  Text,
   View,
 } from 'react-native';
 import { AppTheme, useTheme } from 'theme';
@@ -118,15 +119,19 @@ const AdminChurchScreen = () => {
         leftImageType={'material-community'}
         drawerRightItems={[
           {
-            width: 50,
+            width: 60,
             background: theme.colors.assertive,
+            style: { paddingHorizontal: 0 },
             customElement: (
-              <Icon
-                name="delete"
-                type={'material-community'}
-                color={theme.colors.stickyWhite}
-                size={28}
-              />
+              <>
+                <Icon
+                  name={'delete'}
+                  type={'material-community'}
+                  color={theme.colors.stickyWhite}
+                  size={28}
+                />
+                <Text style={s.drawerText}>{'Delete'}</Text>
+              </>
             ),
             onPress: () => confirmDeleteLocation(item.id || ''),
           },
@@ -201,7 +206,6 @@ const AdminChurchScreen = () => {
         keyExtractor={(_item, index) => `${index}`}
         ListEmptyComponent={renderListEmptyComponent}
         ListFooterComponent={renderListFooterComponent}
-        // contentInsetAdjustmentBehavior={'automatic'}
         showsVerticalScrollIndicator={false}
         onEndReached={getMoreLocations}
         onEndReachedThreshold={0.2}
@@ -212,13 +216,18 @@ const AdminChurchScreen = () => {
   );
 };
 
-const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
+const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   addLocationButton: {
     paddingHorizontal: 0,
     paddingVertical: 0,
   },
   activityIndicator: {
     marginVertical: 15,
+  },
+  drawerText: {
+    ...theme.styles.textTiny,
+    ...theme.styles.textBold,
+    color: theme.colors.stickyWhite,
   },
 }));
 
