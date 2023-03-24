@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import { AppTheme, useTheme } from 'theme';
-import { Button, Icon, Image } from '@rneui/base';
+import { Button, Icon, Image, Tab, TabView } from '@rneui/base';
 import {
   Divider,
   ListItem,
@@ -33,7 +33,6 @@ import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import Card from 'components/molecules/Card';
 import FormikEffect from 'components/atoms/FormikEffect';
 import { ScreenContentItem } from 'types/screenContentItem';
-import { TabController } from 'react-native-ui-lib';
 import { TextModal } from 'components/modals/TextModal';
 import { appConfig } from 'config';
 import { saveScreenContentItem as commitScreenContentItem } from 'firestore/screenContentItems';
@@ -60,6 +59,8 @@ const ScreenContentItemEditorView = React.forwardRef<
 
   const theme = useTheme();
   const s = useStyles(theme);
+
+  const [tabIndex, setTabIndex] = React.useState(0);
 
   const bodyTextModalRef = useRef<TextModal>(null);
 
@@ -254,7 +255,7 @@ const ScreenContentItemEditorView = React.forwardRef<
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 50 }}>
           {renderCardPreview(formik)}
-          <View style={theme.styles.viewAlt}>
+          <View style={[theme.styles.viewAlt, { flex: 1 }]}>
             <ListItemInput
               refInner={refName}
               placeholder={'Content name'}
@@ -392,15 +393,20 @@ const ScreenContentItemEditorView = React.forwardRef<
   const renderScheduleEditor = (formik: FormikProps<FormValues>) => {
     return (
       <BottomSheetScrollView
-        style={theme.styles.view}
-        showsVerticalScrollIndicator={false}>
-        <Divider />
-        <ListItemSwitch
-          title={'Schedule enabled'}
-          value={formik.values.schedule.enabled}
-          position={['first', 'last']}
-          onValueChange={toggleScheduleEnabled}
-        />
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flex: 1 }}>
+        <View style={[theme.styles.viewAlt, { flex: 1 }]}>
+          <Divider />
+          <ListItemSwitch
+            title={'Schedule enabled'}
+            value={formik.values.schedule.enabled}
+            containerStyle={{
+              backgroundColor: theme.colors.listItemBackgroundAlt,
+            }}
+            position={['first', 'last']}
+            onValueChange={toggleScheduleEnabled}
+          />
+        </View>
       </BottomSheetScrollView>
     );
   };
@@ -408,7 +414,7 @@ const ScreenContentItemEditorView = React.forwardRef<
   return (
     <AvoidSoftInputView
       style={[
-        theme.styles.view,
+        theme.styles.viewAlt,
         {
           paddingHorizontal: 0,
           height:
@@ -439,26 +445,53 @@ const ScreenContentItemEditorView = React.forwardRef<
                 }
               }}
             />
-            <TabController items={[{ label: 'Editor' }, { label: 'Schedule' }]}>
-              <TabController.TabBar
-                backgroundColor={theme.colors.viewBackground}
-                indicatorStyle={{
-                  backgroundColor: theme.colors.brandSecondary,
-                }}
-                labelColor={theme.colors.text}
-                selectedLabelColor={theme.colors.text}
-              />
-              <TabController.TabPage index={0}>
-                <View style={[s.tabContainer]}>
-                  {renderContentEditor(formik)}
-                </View>
-              </TabController.TabPage>
-              <TabController.TabPage index={1}>
-                <View style={s.tabContainer}>
-                  {renderScheduleEditor(formik)}
-                </View>
-              </TabController.TabPage>
-            </TabController>
+            <View style={{ height: '100%' }}>
+              <Tab
+                indicatorStyle={s.tabIndicator}
+                containerStyle={s.tabContainer}
+                value={tabIndex}
+                onChange={e => setTabIndex(e)}>
+                <Tab.Item
+                  title={'Content'}
+                  titleStyle={(active: boolean) =>
+                    active ? s.activeTabTitle : s.inactiveTabTitle
+                  }
+                  iconPosition={'left'}
+                  icon={{
+                    name: 'card-text-outline',
+                    type: 'material-community',
+                    color: theme.colors.icon,
+                  }}
+                />
+                <Tab.Item
+                  title={'Schedule'}
+                  titleStyle={(active: boolean) =>
+                    active ? s.activeTabTitle : s.inactiveTabTitle
+                  }
+                  iconPosition={'left'}
+                  icon={{
+                    name: 'calendar-clock-outline',
+                    type: 'material-community',
+                    color: theme.colors.icon,
+                  }}
+                />
+              </Tab>
+              <TabView
+                animationType={'spring'}
+                value={tabIndex}
+                onChange={setTabIndex}>
+                <TabView.Item style={{ width: '100%' }}>
+                  <View style={[s.tabContentContainer]}>
+                    {renderContentEditor(formik)}
+                  </View>
+                </TabView.Item>
+                <TabView.Item style={{ width: '100%' }}>
+                  <View style={[s.tabContentContainer]}>
+                    {renderScheduleEditor(formik)}
+                  </View>
+                </TabView.Item>
+              </TabView>
+            </View>
           </>
         )}
       </Formik>
@@ -467,12 +500,23 @@ const ScreenContentItemEditorView = React.forwardRef<
 });
 
 const useStyles = makeStyles((_theme, theme: AppTheme) => ({
-  tabContainer: {
-    marginTop: theme.styles.topTabBar.height,
+  tabContentContainer: {
     flex: 1,
     marginBottom: 50,
-    borderWidth: 1,
-    borderColor: 'red',
+  },
+  tabContainer: {
+    backgroundColor: theme.colors.white,
+  },
+  tabIndicator: {
+    backgroundColor: theme.colors.brandSecondary,
+    height: 3,
+  },
+  activeTabTitle: {
+    ...theme.styles.textNormal,
+  },
+  inactiveTabTitle: {
+    ...theme.styles.textNormal,
+    ...theme.styles.textDim,
   },
   cardPreview: {
     backgroundColor: theme.colors.viewBackground,
