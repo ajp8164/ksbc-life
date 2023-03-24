@@ -1,9 +1,11 @@
 import { TextStyle, ViewStyle } from 'react-native';
+
 import { ISODateString } from 'types/common';
 
 type ScreenContentItemKind = 'card';
 
 type ScreenContentSchedule = {
+  enabled: boolean;
   startDate: ISODateString;
   endDate: ISODateString;
 };
@@ -19,19 +21,19 @@ export type ScreenContentItem = {
 };
 
 export type ScreenCardContentItem = {
-  body?: string;
+  body: string;
   bodyStyle?: TextStyle | TextStyle[];
   buttons?: {
     label?: string;
     icon?: string;
     iconType?: string;
   }[];
-  cardStyle?: ViewStyle | ViewStyle[];
-  footer?: string;
+  cardStyle: ViewStyle | ViewStyle[];
+  footer: string;
   footerStyle?: TextStyle | TextStyle[];
-  header?: string;
+  header: string;
   headerStyle?: TextStyle | TextStyle[];
-  photoUrl?: string;
-  title?: string;
+  photoUrl: string;
+  title: string;
   titleStyle?: TextStyle | TextStyle[];
 };

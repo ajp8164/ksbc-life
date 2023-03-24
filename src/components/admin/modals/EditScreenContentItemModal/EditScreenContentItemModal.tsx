@@ -1,15 +1,16 @@
 import {
   EditScreenContentItemModalMethods,
   EditScreenContentItemModalProps,
-  EditorState,
 } from './types';
 import { Modal, viewport } from '@react-native-ajp-elements/ui';
 import React, { useImperativeHandle, useRef, useState } from 'react';
+import ScreenContentItemEditorView, {
+  EditorState,
+} from 'components/admin/views/ScreenContentItemEditorView';
 
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import ModalHeader from 'components/molecules/ModalHeader';
 import { ScreenContentItem } from 'types/screenContentItem';
-import ScreenContentItemEditorView from 'components/admin/views/ScreenContentItemEditorView';
 import { useTheme } from 'theme';
 
 type EditScreenContentItemModal = EditScreenContentItemModalMethods;
@@ -21,7 +22,7 @@ const EditScreenContentItemModal = React.forwardRef<
   const theme = useTheme();
 
   const innerRef = useRef<BottomSheetModalMethods>(null);
-  const screenContentItemEditorViewRef =
+  const ScreenContentItemEditorViewRef =
     useRef<ScreenContentItemEditorView>(null);
 
   const [editorState, setEditorState] = useState({} as EditorState);
@@ -31,7 +32,7 @@ const EditScreenContentItemModal = React.forwardRef<
 
   const contentContainerHeight =
     Math.ceil(viewport.height * 0.921) -
-    (theme.styles.modalHeader.height as number) +
+    (theme.styles.modalHeader.height as number) -
     (theme.styles.bottomSheetHandle.height as number);
 
   useImperativeHandle(ref, () => ({
@@ -44,20 +45,20 @@ const EditScreenContentItemModal = React.forwardRef<
     innerRef.current?.dismiss();
   };
 
-  const present = (title: string, screenContentItem?: ScreenContentItem) => {
+  const present = (title: string, screenContent?: ScreenContentItem) => {
     setTitle(title);
-    setScreenContentItem(screenContentItem);
+    setScreenContentItem(screenContent);
     innerRef.current?.present();
   };
 
   return (
-    <Modal ref={innerRef} scrollEnabled={false}>
+    <Modal ref={innerRef}>
       <ModalHeader
         title={title}
         rightButtonText={'Save'}
         rightButtonDisabled={!editorState.changed}
         onRightButtonPress={() =>
-          screenContentItemEditorViewRef.current
+          ScreenContentItemEditorViewRef.current
             ?.saveScreenContentItem()
             .then(dismiss)
             .catch(() => {
@@ -66,8 +67,8 @@ const EditScreenContentItemModal = React.forwardRef<
         }
       />
       <ScreenContentItemEditorView
-        ref={screenContentItemEditorViewRef}
-        contentContainerStyle={{ height: contentContainerHeight }}
+        ref={ScreenContentItemEditorViewRef}
+        contentContainerHeight={contentContainerHeight}
         screenContentItem={screenContentItem}
         onChange={setEditorState}
       />

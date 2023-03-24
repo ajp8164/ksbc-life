@@ -1,6 +1,4 @@
-import { EditorState as ContentEditorState } from 'components/admin/views/ScreenContentItemContentEditorView';
 import React from 'react';
-import { EditorState as ScheduleEditorState } from 'components/admin/views/ScreenContentItemScheduleEditorView';
 import { ScreenContentItem } from 'types/screenContentItem';
 
 export declare type EditScreenContentItemModal =
@@ -20,5 +18,3 @@ export interface EditScreenContentItemModalMethods {
   dismiss: () => void;
   present: (title: string, screenContentItem?: ScreenContentItem) => void;
 }
-
-export type EditorState = ContentEditorState & ScheduleEditorState;
