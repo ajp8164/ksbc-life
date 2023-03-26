@@ -57,8 +57,10 @@ const EditScreenContentItemModal = React.forwardRef<
         size={'small'}
         title={title}
         leftButtonText={'Cancel'}
+        leftButtonDisabled={editorState.isSubmitting}
         onLeftButtonPress={dismiss}
         rightButtonText={'Save'}
+        rightButtonBusy={editorState.isSubmitting}
         rightButtonDisabled={!editorState.changed}
         onRightButtonPress={() =>
           ScreenContentItemEditorViewRef.current

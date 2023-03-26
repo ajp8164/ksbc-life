@@ -5,6 +5,7 @@ import { LayoutChangeEvent, Text, View } from 'react-native';
 import { makeStyles } from '@rneui/themed';
 
 interface ModalHeaderInterface {
+  leftButtonBusy?: boolean;
   leftButtonDisabled?: boolean;
   leftButtonText?: string;
   leftButtonIcon?: string;
@@ -14,6 +15,7 @@ interface ModalHeaderInterface {
   onLayout?: (event: LayoutChangeEvent) => void;
   onLeftButtonPress?: () => void;
   onRightButtonPress?: () => void;
+  rightButtonBusy?: boolean;
   rightButtonDisabled?: boolean;
   rightButtonText?: string;
   rightButtonIcon?: string;
@@ -25,6 +27,7 @@ interface ModalHeaderInterface {
 }
 
 const ModalHeader = ({
+  leftButtonBusy,
   leftButtonDisabled,
   leftButtonText,
   leftButtonIcon,
@@ -34,6 +37,7 @@ const ModalHeader = ({
   onLayout,
   onLeftButtonPress,
   onRightButtonPress,
+  rightButtonBusy,
   rightButtonDisabled,
   rightButtonText,
   rightButtonIcon,
@@ -64,6 +68,7 @@ const ModalHeader = ({
         }
         buttonStyle={size === 'large' ? s.buttonLarge : s.buttonSmall}
         title={leftButtonText}
+        loading={leftButtonBusy}
         icon={
           leftButtonIcon ? (
             <Icon
@@ -84,6 +89,7 @@ const ModalHeader = ({
         }
         buttonStyle={size === 'large' ? s.buttonLarge : s.buttonSmall}
         title={rightButtonText}
+        loading={rightButtonBusy}
         icon={
           rightButtonIcon ? (
             <Icon
