@@ -15,6 +15,7 @@ import {
   updateScreenContentItem,
 } from 'firestore/screenContentItems';
 
+import { DateTime } from 'luxon';
 import { EditScreenContentItemModal } from 'components/admin/modals/EditScreenContentItemModal';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -125,10 +126,24 @@ const AdminContentScreen = () => {
     drag,
   }: RenderItemParams<ScreenContentItem>) => {
     const index = getIndex();
+    const startDate = DateTime.fromISO(item.schedule.startDate).toFormat(
+      'MMM d, yyyy',
+    );
+    const endDate = DateTime.fromISO(item.schedule.endDate).toFormat(
+      'MMM d, yyyy',
+    );
+
     return (
       <ShadowDecorator opacity={0.1} radius={10}>
         <ListItem
           title={item.name}
+          subtitle={
+            item.schedule.enabled
+              ? endDate
+                ? `${startDate} to ${endDate}`
+                : `Starting on ${startDate}`
+              : 'Not scheduled'
+          }
           position={[
             index === 0 ? 'first' : undefined,
             index === screenContentItems.length - 1 ? 'last' : undefined,
