@@ -147,7 +147,7 @@ const AdminContentScreen = () => {
           }
           onPress={() =>
             !sortEnabled &&
-            editScreenContentItemModalRef.current?.present('Edit Content', item)
+            editScreenContentItemModalRef.current?.present('Edit Card', item)
           }
           onLongPress={drag}
           delayLongPress={300}
@@ -208,7 +208,7 @@ const AdminContentScreen = () => {
         leftImage={'card-plus-outline'}
         leftImageType={'material-community'}
         onPress={() =>
-          editScreenContentItemModalRef.current?.present('New Content')
+          editScreenContentItemModalRef.current?.present('New Card')
         }
       />
     );
@@ -237,7 +237,7 @@ const AdminContentScreen = () => {
       <View style={{ marginTop: contentTop, flex: 1 }}>
         <View style={{ justifyContent: 'space-around' }}>
           <Divider
-            text={'HOME ANNOUNCEMENTS'}
+            text={'CARDS'}
             rightComponent={
               <View style={{ flexDirection: 'row' }}>
                 <Button
@@ -270,9 +270,7 @@ const AdminContentScreen = () => {
                     />
                   }
                   onPress={() =>
-                    editScreenContentItemModalRef.current?.present(
-                      'New Content',
-                    )
+                    editScreenContentItemModalRef.current?.present('New Card')
                   }
                 />
               </View>
