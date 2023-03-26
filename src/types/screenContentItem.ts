@@ -2,7 +2,14 @@ import { TextStyle, ViewStyle } from 'react-native';
 
 import { ISODateString } from 'types/common';
 
-type ScreenContentItemKind = 'card';
+export type ScreenContentItemKind = 'Card';
+
+export enum ScreenContentItemAssignment {
+  Home = 'Home',
+  Sermons = 'Sermons',
+  Giving = 'Giving',
+  None = 'None',
+}
 
 type ScreenContentSchedule = {
   enabled: boolean;
@@ -14,6 +21,7 @@ export type ScreenContentItem = {
   id?: string;
   name: string;
   kind: ScreenContentItemKind;
+  assignment: ScreenContentItemAssignment;
   ordinal: number;
   content: ScreenCardContentItem;
   schedule: ScreenContentSchedule;

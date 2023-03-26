@@ -109,7 +109,7 @@ const SermonEditorView = React.forwardRef<
 
   useEffect(() => {
     (async () => {
-      const items: PickerItem[] = [{ label: 'Select  Pasteur', value: '' }];
+      const items: PickerItem[] = [{ label: 'Select Pasteur', value: '' }];
       const p = await getPasteurs();
       p.result.forEach(p => {
         const name = `${p.firstName} ${p.lastName}`;

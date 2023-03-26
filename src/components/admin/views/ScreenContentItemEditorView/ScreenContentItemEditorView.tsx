@@ -5,6 +5,7 @@ import {
   Alert,
   Keyboard,
   NativeSyntheticEvent,
+  Text,
   TextInput,
   TextInputFocusEventData,
   View,
@@ -16,6 +17,7 @@ import {
   ListItem,
   ListItemInput,
   ListItemSwitch,
+  PickerItem,
   viewport,
 } from '@react-native-ajp-elements/ui';
 import {
@@ -24,7 +26,7 @@ import {
   ScreenContentItemEditorViewProps,
 } from './types';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
-import React, { useEffect, useImperativeHandle, useRef } from 'react';
+import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import ScrollableTabView, {
   DefaultTabBar,
 } from 'react-native-scrollable-tab-view';
@@ -37,7 +39,9 @@ import Card from 'components/molecules/Card';
 import DateRangePicker from 'components/atoms/DateRangePicker';
 import { DateTime } from 'luxon';
 import FormikEffect from 'components/atoms/FormikEffect';
+import { ItemPickerModal } from 'components/modals/ItemPickerModal';
 import { ScreenContentItem } from 'types/screenContentItem';
+import { ScreenContentItemAssignment } from 'types/screenContentItem';
 import { TabView } from 'components/atoms/TabView';
 import { TextModal } from 'components/modals/TextModal';
 import { appConfig } from 'config';
@@ -46,7 +50,8 @@ import { makeStyles } from '@rneui/themed';
 
 const initialScreenContentItem: ScreenContentItem = {
   name: '',
-  kind: 'card',
+  kind: 'Card',
+  assignment: ScreenContentItemAssignment.None,
   ordinal: -1,
   content: {
     body: '',
@@ -64,6 +69,7 @@ const initialScreenContentItem: ScreenContentItem = {
 };
 
 enum Fields {
+  assignment,
   body,
   footer,
   header,
@@ -86,25 +92,23 @@ const ScreenContentItemEditorView = React.forwardRef<
   const s = useStyles(theme);
 
   const bodyTextModalRef = useRef<TextModal>(null);
+  const itemAssignmentPickerModalRef = useRef<ItemPickerModal>(null);
 
   const formikRef = useRef<FormikProps<FormValues>>(null);
-  const refBody = useRef<TextInput>(null);
   const refName = useRef<TextInput>(null);
   const refFooter = useRef<TextInput>(null);
   const refHeader = useRef<TextInput>(null);
-  const refPhotoUrl = useRef<TextInput>(null);
   const refTitle = useRef<TextInput>(null);
 
   const screenContentImageAsset = useRef<ImagePicker.Asset>();
+  const [assignmentItems, setAssignmentItems] = useState<PickerItem[]>([]);
 
   // Same order as on form.
   const fieldRefs = [
     refName.current,
     refTitle.current,
-    refFooter.current,
-    refBody.current,
     refHeader.current,
-    refPhotoUrl.current,
+    refFooter.current,
   ];
 
   const [editorState, setEditorState] = useSetState<EditorState>({
@@ -124,6 +128,18 @@ const ScreenContentItemEditorView = React.forwardRef<
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorState]);
 
+  useEffect(() => {
+    const items: PickerItem[] = [{ label: 'Select Assignment', value: 'None' }];
+    Object.keys(ScreenContentItemAssignment).forEach(key => {
+      items.push({
+        label: key,
+        value: key,
+      });
+    });
+    console.log(Object.keys(ScreenContentItemAssignment), items);
+    setAssignmentItems(items);
+  }, []);
+
   const saveScreenContentItem = async () => {
     return formikRef.current?.submitForm();
   };
@@ -140,9 +156,10 @@ const ScreenContentItemEditorView = React.forwardRef<
     values.content.photoUrl = formikRef.current?.values.content.photoUrl || '';
 
     const s: ScreenContentItem = {
-      ordinal: screenContentItem?.ordinal || initialScreenContentItem.ordinal,
       name: values.name,
       kind: initialScreenContentItem.kind,
+      assignment: values.assignment,
+      ordinal: screenContentItem?.ordinal || initialScreenContentItem.ordinal,
       status: initialScreenContentItem.status,
       content: values.content,
       schedule: values.schedule,
@@ -238,7 +255,13 @@ const ScreenContentItemEditorView = React.forwardRef<
     }
   };
 
+  const onAssignmentChange = (assignment: string): void => {
+    console.log(assignment);
+    formikRef.current?.setFieldValue('assignment', assignment);
+  };
+
   const validationSchema = Yup.object().shape({
+    assignment: Yup.string(),
     body: Yup.string(),
     footer: Yup.string(),
     header: Yup.string(),
@@ -249,41 +272,87 @@ const ScreenContentItemEditorView = React.forwardRef<
 
   const renderCardPreview = (formik: FormikProps<FormValues>) => {
     const content = formik.values.content;
+    const startDate = DateTime.fromISO(
+      formik.values.schedule.startDate,
+    ).toFormat('MMM d, yyyy');
+    const endDate = DateTime.fromISO(formik.values.schedule.endDate).toFormat(
+      'MMM d, yyyy',
+    );
+
     return (
-      <BottomSheetScrollView style={s.cardPreview}>
-        <Card
-          title={content.title?.length > 0 ? content.title : undefined}
-          header={content.header?.length > 0 ? content.header : undefined}
-          body={content.body?.length > 0 ? content.body : undefined}
-          footer={content.footer?.length > 0 ? content.footer : undefined}
-          imageSource={
-            content.photoUrl?.length > 0 ? { uri: content.photoUrl } : undefined
-          }
-          imageHeight={100}
-          cardStyle={[theme.styles.viewWidth, { paddingVertical: 0 }]}
-          titleStyle={{ textAlign: 'left' }}
-          // buttons={[
-          //   {
-          //     label: 'Share',
-          //     icon: 'share-variant',
-          //     onPress: () => {
-          //       openShareSheet({
-          //         title: 'John 3:16 CSB',
-          //         message:
-          //           'For God loved the world in this way: He gave his one and only Son, so that everyone who believes in him will not perish but have eternal life.',
-          //       });
-          //     },
-          //   },
-          //   {
-          //     label: 'Read',
-          //     icon: 'book-open-variant',
-          //     onPress: () => {
-          //       openURL('https://www.bible.com/bible/1713/JHN.3.CSB');
-          //     },
-          //   },
-          // ]}
-        />
-      </BottomSheetScrollView>
+      <>
+        <BottomSheetScrollView style={s.cardPreview}>
+          <View
+            style={{
+              backgroundColor: theme.colors.viewBackground,
+              paddingHorizontal: 15,
+            }}>
+            <Divider
+              type={'note'}
+              text={`This is what your card will look like on the ${formik.values.assignment} page.`}
+            />
+          </View>
+          <Card
+            title={content.title?.length > 0 ? content.title : undefined}
+            header={content.header?.length > 0 ? content.header : undefined}
+            body={content.body?.length > 0 ? content.body : undefined}
+            footer={content.footer?.length > 0 ? content.footer : undefined}
+            imageSource={
+              content.photoUrl?.length > 0
+                ? { uri: content.photoUrl }
+                : undefined
+            }
+            imageHeight={100}
+            cardStyle={[theme.styles.viewWidth, { paddingVertical: 0 }]}
+            titleStyle={{ textAlign: 'left' }}
+            // buttons={[
+            //   {
+            //     label: 'Share',
+            //     icon: 'share-variant',
+            //     onPress: () => {
+            //       openShareSheet({
+            //         title: 'John 3:16 CSB',
+            //         message:
+            //           'For God loved the world in this way: He gave his one and only Son, so that everyone who believes in him will not perish but have eternal life.',
+            //       });
+            //     },
+            //   },
+            //   {
+            //     label: 'Read',
+            //     icon: 'book-open-variant',
+            //     onPress: () => {
+            //       openURL('https://www.bible.com/bible/1713/JHN.3.CSB');
+            //     },
+            //   },
+            // ]}
+          />
+          <View
+            style={{
+              backgroundColor: theme.colors.viewBackground,
+              paddingHorizontal: 15,
+            }}>
+            <Divider />
+            <ListItem
+              title={'Page assignment'}
+              subtitle={'The app page on which this card\nwill be seen.'}
+              value={formik.values.assignment || 'None'}
+              position={['first', 'last']}
+              onPress={() => itemAssignmentPickerModalRef.current?.present()}
+            />
+            {formik.values.schedule.enabled ? (
+              <Text style={[theme.styles.textSmall, { marginTop: 15 }]}>
+                {endDate
+                  ? `This card will only be shown between ${startDate} and ${endDate}.`
+                  : `This card will be shown starting on ${startDate}.`}
+              </Text>
+            ) : (
+              <Text style={[theme.styles.textSmall, { marginTop: 15 }]}>
+                {'This card is not scheduled to be shown.'}
+              </Text>
+            )}
+          </View>
+        </BottomSheetScrollView>
+      </>
     );
   };
 
@@ -294,6 +363,12 @@ const ScreenContentItemEditorView = React.forwardRef<
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ marginTop: 15, paddingBottom: 50 }}>
           <View style={[theme.styles.viewAlt, { flex: 1 }]}>
+            <Divider
+              type={'note'}
+              text={
+                'Changes made here are immediatley applied to the card preview on the Preview tab.'
+              }
+            />
             <ListItemInput
               refInner={refName}
               title={'Content name'}
@@ -447,7 +522,12 @@ const ScreenContentItemEditorView = React.forwardRef<
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flex: 1 }}>
         <View style={[theme.styles.viewAlt, { flex: 1 }]}>
-          <Divider />
+          <Divider
+            type={'note'}
+            text={
+              'You can schedule when and how long this card is shown. This card will be shown to users during the selected time period only. An unscheduled card will not be shown.'
+            }
+          />
           <ListItemSwitch
             title={'Schedule enabled'}
             value={formik.values.schedule.enabled}
@@ -519,69 +599,78 @@ const ScreenContentItemEditorView = React.forwardRef<
   };
 
   return (
-    <AvoidSoftInputView
-      style={[
-        theme.styles.viewAlt,
-        {
-          paddingHorizontal: 0,
-          height:
-            (contentContainerHeight || 0) +
-            (theme.styles.topTabBar.height as number),
-        },
-      ]}>
-      <Formik
-        innerRef={formikRef}
-        initialValues={screenContentItem || initialScreenContentItem}
-        validateOnChange={true}
-        validateOnMount={true}
-        validateOnBlur={true}
-        validationSchema={validationSchema}
-        onSubmit={save}>
-        {formik => (
-          <>
-            <FormikEffect
-              formik={formik}
-              onChange={(currentState, previousState) => {
-                if (
-                  currentState.dirty !== previousState?.dirty ||
-                  currentState.isValid !== previousState?.isValid
-                ) {
-                  setEditorState({
-                    changed: currentState.dirty && currentState.isValid,
-                  });
-                }
-              }}
-            />
-            <View style={{ height: '100%' }}>
-              <ScrollableTabView
-                initialPage={0}
-                renderTabBar={() => (
-                  <DefaultTabBar
-                    // @ts-ignore property is incorrectly typed
-                    tabBarUnderlineStyle={{
-                      backgroundColor: theme.colors.brandSecondary,
-                    }}
-                    tabStyle={{ paddingBottom: 0 }}
-                    textStyle={theme.styles.textNormal}
-                    inactiveTextColor={theme.colors.textDim}
-                    style={{ borderBottomColor: theme.colors.subtleGray }}
-                  />
-                )}>
-                <TabView tabLabel={'Preview'} style={{ flex: 1 }}>
-                  {renderCardPreview(formik)}
-                </TabView>
-                <TabView tabLabel={'Edit'} style={{ flex: 1 }}>
-                  {renderContentEditor(formik)}
-                </TabView>
-                <TabView tabLabel={'Schedule'} style={{ flex: 1 }}>
-                  {renderScheduleEditor(formik)}
-                </TabView>
-              </ScrollableTabView>
-            </View>
-          </>
-        )}
-      </Formik>
-    </AvoidSoftInputView>
+    <>
+      <AvoidSoftInputView
+        style={[
+          theme.styles.viewAlt,
+          {
+            paddingHorizontal: 0,
+            height:
+              (contentContainerHeight || 0) +
+              (theme.styles.topTabBar.height as number),
+          },
+        ]}>
+        <Formik
+          innerRef={formikRef}
+          initialValues={screenContentItem || initialScreenContentItem}
+          validateOnChange={true}
+          validateOnMount={true}
+          validateOnBlur={true}
+          validationSchema={validationSchema}
+          onSubmit={save}>
+          {formik => (
+            <>
+              <FormikEffect
+                formik={formik}
+                onChange={(currentState, previousState) => {
+                  if (
+                    currentState.dirty !== previousState?.dirty ||
+                    currentState.isValid !== previousState?.isValid
+                  ) {
+                    setEditorState({
+                      changed: currentState.dirty && currentState.isValid,
+                    });
+                  }
+                }}
+              />
+              <View style={{ height: '100%' }}>
+                <ScrollableTabView
+                  initialPage={0}
+                  renderTabBar={() => (
+                    <DefaultTabBar
+                      // @ts-ignore property is incorrectly typed
+                      tabBarUnderlineStyle={{
+                        backgroundColor: theme.colors.brandSecondary,
+                      }}
+                      tabStyle={{ paddingBottom: 0 }}
+                      textStyle={theme.styles.textNormal}
+                      inactiveTextColor={theme.colors.textDim}
+                      style={{ borderBottomColor: theme.colors.subtleGray }}
+                    />
+                  )}>
+                  <TabView tabLabel={'Preview'} style={{ flex: 1 }}>
+                    {renderCardPreview(formik)}
+                  </TabView>
+                  <TabView tabLabel={'Edit'} style={{ flex: 1 }}>
+                    {renderContentEditor(formik)}
+                  </TabView>
+                  <TabView tabLabel={'Schedule'} style={{ flex: 1 }}>
+                    {renderScheduleEditor(formik)}
+                  </TabView>
+                </ScrollableTabView>
+              </View>
+            </>
+          )}
+        </Formik>
+      </AvoidSoftInputView>
+      <ItemPickerModal
+        ref={itemAssignmentPickerModalRef}
+        placeholder={'none'}
+        items={assignmentItems}
+        value={formikRef.current?.values.assignment}
+        onValueChange={onAssignmentChange}
+      />
+    </>
   );
 });
 

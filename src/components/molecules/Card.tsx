@@ -117,7 +117,6 @@ const Card = ({
 
 const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   card: {
-    // marginTop: 15,
     backgroundColor: theme.colors.cardBackground,
   },
   cardContent: {

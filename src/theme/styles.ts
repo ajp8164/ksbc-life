@@ -28,7 +28,7 @@ export const useStyles = makeStyles(
     //
     // Aligns items in viewport.width without using view padding (which clips shadows).
     viewWidth: {
-      width: viewport.width - 2 * 20, // Left/right padding in views is 20
+      width: viewport.width - 2 * 15, // Left/right padding in views is 15
       alignSelf: 'center',
     },
   }),
