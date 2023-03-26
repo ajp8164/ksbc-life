@@ -223,15 +223,19 @@ const ScreenContentItemEditorView = React.forwardRef<
     formikRef.current?.setFieldValue('schedule.enabled', value);
   };
 
-  const onDateRangeSelect = (startDate: string, endDate: string) => {
+  const onDateRangeSelect = (startDate: string, endDate?: string) => {
     formikRef.current?.setFieldValue(
       'schedule.startDate',
       DateTime.fromFormat(startDate, 'yyyy-MM-dd').toISO(),
     );
-    formikRef.current?.setFieldValue(
-      'schedule.endDate',
-      DateTime.fromFormat(endDate, 'yyyy-MM-dd').toISO(),
-    );
+    if (endDate) {
+      formikRef.current?.setFieldValue(
+        'schedule.endDate',
+        DateTime.fromFormat(endDate, 'yyyy-MM-dd').toISO(),
+      );
+    } else {
+      formikRef.current?.setFieldValue('schedule.endDate', undefined);
+    }
   };
 
   const validationSchema = Yup.object().shape({

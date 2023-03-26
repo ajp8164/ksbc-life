@@ -10,7 +10,7 @@ interface DateRangePickerInterface extends CalendarProps {
     fromDate: Date;
     toDate: Date;
   };
-  onSuccess: (fromDate: string, day: string) => void;
+  onSuccess: (fromDate: string, day?: string) => void;
   theme: Theme & { markColor: string; markTextColor: string };
 }
 
@@ -56,10 +56,12 @@ const DateRangePicker = ({
     const mFromDate = DateTime.fromFormat(fromDate, 'yyyy-MM-dd');
     const mToDate = DateTime.fromFormat(toDate, 'yyyy-MM-dd');
     const range = mToDate.diff(mFromDate, 'days').days;
+    console.log(range);
     if (range >= 0) {
       if (range === 0) {
         markedDates = {
           [toDate]: {
+            endingDay: true,
             color: theme.markColor,
             textColor: theme.markTextColor,
           },
@@ -112,6 +114,7 @@ const DateRangePicker = ({
       (rangeData.isFromDatePicked && rangeData.isToDatePicked)
     ) {
       setupStartMarker(day);
+      onSuccess(day.dateString);
     } else if (!rangeData.isToDatePicked && rangeData.fromDate) {
       const md = { ...rangeData.markedDates };
       const { markedDates, range } = setupMarkedDates(
