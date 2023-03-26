@@ -292,7 +292,7 @@ const ScreenContentItemEditorView = React.forwardRef<
       <>
         <BottomSheetScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 50 }}>
+          contentContainerStyle={{ marginTop: 15, paddingBottom: 50 }}>
           <View style={[theme.styles.viewAlt, { flex: 1 }]}>
             <ListItemInput
               refInner={refName}
@@ -345,20 +345,6 @@ const ScreenContentItemEditorView = React.forwardRef<
               onChangeText={formik.handleChange('content.header')}
               onFocus={() => setEditorState({ focusedField: Fields.header })}
             />
-            <ListItem
-              title={
-                formik.values.content.body.length > 0
-                  ? ellipsis(formik.values.content.body, 35)
-                  : 'Body'
-              }
-              titleStyle={
-                formik.values.content.body.length > 0
-                  ? theme.styles.textNormal
-                  : theme.styles.textPlaceholder
-              }
-              containerStyle={{ borderBottomWidth: 0 }}
-              onPress={() => bodyTextModalRef.current?.present()}
-            />
             <ListItemInput
               refInner={refFooter}
               title={'Footer'}
@@ -375,6 +361,21 @@ const ScreenContentItemEditorView = React.forwardRef<
               }}
               onChangeText={formik.handleChange('content.footer')}
               onFocus={() => setEditorState({ focusedField: Fields.footer })}
+            />
+            <Divider text={'BODY'} />
+            <ListItem
+              title={
+                formik.values.content.body.length > 0
+                  ? ellipsis(formik.values.content.body, 35)
+                  : 'Body'
+              }
+              titleStyle={
+                formik.values.content.body.length > 0
+                  ? theme.styles.textNormal
+                  : theme.styles.textPlaceholder
+              }
+              containerStyle={{ borderBottomWidth: 0 }}
+              onPress={() => bodyTextModalRef.current?.present()}
             />
             {formik.values.content.photoUrl?.length ? (
               <>
