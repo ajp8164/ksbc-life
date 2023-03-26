@@ -21,9 +21,9 @@ export const initApp = async (): Promise<InitStatus> => {
   try {
     // Initialize firestore for dev as necessary.
     if (__DEV__) {
-      firestore().useEmulator('localhost', 8080);
-      storage().useEmulator('localhost', 9199);
-      console.log('Firestore emulator running at localhost:8080');
+      firestore().useEmulator('10.6.9.225', 8080);
+      storage().useEmulator('10.6.9.225', 9199);
+      console.log('Firestore emulator running at 10.6.9.225:8080');
       // firestore().clearPersistence();
     }
 

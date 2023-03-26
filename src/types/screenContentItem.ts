@@ -28,7 +28,7 @@ export type ScreenCardContentItem = {
     icon?: string;
     iconType?: string;
   }[];
-  cardStyle: ViewStyle | ViewStyle[];
+  cardStyle?: ViewStyle | ViewStyle[];
   footer: string;
   footerStyle?: TextStyle | TextStyle[];
   header: string;

@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import { AppTheme, useTheme } from 'theme';
-import { Button, Icon, Image, Tab, TabView } from '@rneui/base';
+import { Button, Icon, Image } from '@rneui/base';
 import {
   Divider,
   ListItem,
@@ -25,18 +25,43 @@ import {
 } from './types';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import React, { useEffect, useImperativeHandle, useRef } from 'react';
+import ScrollableTabView, {
+  DefaultTabBar,
+} from 'react-native-scrollable-tab-view';
 import { deleteImage, saveImage, selectImage } from 'lib/imageSelect';
 import { ellipsis, useSetState } from '@react-native-ajp-elements/core';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import Card from 'components/molecules/Card';
+import DateRangePicker from 'components/atoms/DateRangePicker';
+import { DateTime } from 'luxon';
 import FormikEffect from 'components/atoms/FormikEffect';
 import { ScreenContentItem } from 'types/screenContentItem';
+import { TabView } from 'components/atoms/TabView';
 import { TextModal } from 'components/modals/TextModal';
 import { appConfig } from 'config';
 import { saveScreenContentItem as commitScreenContentItem } from 'firestore/screenContentItems';
 import { makeStyles } from '@rneui/themed';
+
+const initialScreenContentItem: ScreenContentItem = {
+  name: '',
+  kind: 'card',
+  ordinal: -1,
+  content: {
+    body: '',
+    footer: '',
+    header: '',
+    photoUrl: '',
+    title: '',
+  },
+  schedule: {
+    enabled: false,
+    startDate: '',
+    endDate: '',
+  },
+  status: 'active',
+};
 
 enum Fields {
   body,
@@ -59,8 +84,6 @@ const ScreenContentItemEditorView = React.forwardRef<
 
   const theme = useTheme();
   const s = useStyles(theme);
-
-  const [tabIndex, setTabIndex] = React.useState(0);
 
   const bodyTextModalRef = useRef<TextModal>(null);
 
@@ -117,10 +140,10 @@ const ScreenContentItemEditorView = React.forwardRef<
     values.content.photoUrl = formikRef.current?.values.content.photoUrl || '';
 
     const s: ScreenContentItem = {
-      ordinal: screenContentItem?.ordinal || -1,
+      ordinal: screenContentItem?.ordinal || initialScreenContentItem.ordinal,
       name: values.name,
-      kind: 'card',
-      status: 'active',
+      kind: initialScreenContentItem.kind,
+      status: initialScreenContentItem.status,
       content: values.content,
       schedule: values.schedule,
     };
@@ -200,6 +223,17 @@ const ScreenContentItemEditorView = React.forwardRef<
     formikRef.current?.setFieldValue('schedule.enabled', value);
   };
 
+  const onDateRangeSelect = (startDate: string, endDate: string) => {
+    formikRef.current?.setFieldValue(
+      'schedule.startDate',
+      DateTime.fromFormat(startDate, 'yyyy-MM-dd').toISO(),
+    );
+    formikRef.current?.setFieldValue(
+      'schedule.endDate',
+      DateTime.fromFormat(endDate, 'yyyy-MM-dd').toISO(),
+    );
+  };
+
   const validationSchema = Yup.object().shape({
     body: Yup.string(),
     footer: Yup.string(),
@@ -212,14 +246,14 @@ const ScreenContentItemEditorView = React.forwardRef<
   const renderCardPreview = (formik: FormikProps<FormValues>) => {
     const content = formik.values.content;
     return (
-      <View style={s.cardPreview}>
+      <BottomSheetScrollView style={s.cardPreview}>
         <Card
           title={content.title?.length > 0 ? content.title : undefined}
-          header={content.header.length > 0 ? content.header : undefined}
-          body={content.body.length > 0 ? content.body : undefined}
-          footer={content.footer.length > 0 ? content.footer : undefined}
+          header={content.header?.length > 0 ? content.header : undefined}
+          body={content.body?.length > 0 ? content.body : undefined}
+          footer={content.footer?.length > 0 ? content.footer : undefined}
           imageSource={
-            content.photoUrl.length > 0 ? { uri: content.photoUrl } : undefined
+            content.photoUrl?.length > 0 ? { uri: content.photoUrl } : undefined
           }
           imageHeight={100}
           cardStyle={[theme.styles.viewWidth, { paddingVertical: 0 }]}
@@ -245,19 +279,22 @@ const ScreenContentItemEditorView = React.forwardRef<
           //   },
           // ]}
         />
-      </View>
+      </BottomSheetScrollView>
     );
   };
+
   const renderContentEditor = (formik: FormikProps<FormValues>) => {
     return (
       <>
         <BottomSheetScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 50 }}>
-          {renderCardPreview(formik)}
           <View style={[theme.styles.viewAlt, { flex: 1 }]}>
             <ListItemInput
               refInner={refName}
+              title={'Content name'}
+              titleStyle={{ color: theme.colors.brandSecondary }}
+              titleType={'material'}
               placeholder={'Content name'}
               placeholderTextColor={theme.colors.textPlaceholder}
               value={formik.values.name}
@@ -272,6 +309,9 @@ const ScreenContentItemEditorView = React.forwardRef<
             />
             <ListItemInput
               refInner={refTitle}
+              title={'Title'}
+              titleStyle={{ color: theme.colors.brandSecondary }}
+              titleType={'material'}
               placeholder={'Title'}
               placeholderTextColor={theme.colors.textPlaceholder}
               value={formik.values.content.title}
@@ -286,6 +326,9 @@ const ScreenContentItemEditorView = React.forwardRef<
             />
             <ListItemInput
               refInner={refHeader}
+              title={'Header'}
+              titleStyle={{ color: theme.colors.brandSecondary }}
+              titleType={'material'}
               placeholder={'Header'}
               placeholderTextColor={theme.colors.textPlaceholder}
               value={formik.values.content.header}
@@ -314,6 +357,9 @@ const ScreenContentItemEditorView = React.forwardRef<
             />
             <ListItemInput
               refInner={refFooter}
+              title={'Footer'}
+              titleStyle={{ color: theme.colors.brandSecondary }}
+              titleType={'material'}
               placeholder={'Footer'}
               placeholderTextColor={theme.colors.textPlaceholder}
               value={formik.values.content.footer}
@@ -326,7 +372,7 @@ const ScreenContentItemEditorView = React.forwardRef<
               onChangeText={formik.handleChange('content.footer')}
               onFocus={() => setEditorState({ focusedField: Fields.footer })}
             />
-            {formik.values.content.photoUrl.length ? (
+            {formik.values.content.photoUrl?.length ? (
               <>
                 <Divider />
                 <Image
@@ -403,8 +449,64 @@ const ScreenContentItemEditorView = React.forwardRef<
             containerStyle={{
               backgroundColor: theme.colors.listItemBackgroundAlt,
             }}
-            position={['first', 'last']}
+            position={['first']}
             onValueChange={toggleScheduleEnabled}
+          />
+          <ListItem
+            title={'Start date'}
+            containerStyle={{
+              backgroundColor: theme.colors.listItemBackgroundAlt,
+            }}
+            value={
+              formik.values.schedule.startDate
+                ? DateTime.fromISO(formik.values.schedule.startDate).toFormat(
+                    'MMM d, yyyy',
+                  )
+                : 'None'
+            }
+            rightImage={false}
+          />
+          <ListItem
+            title={'End date'}
+            containerStyle={{
+              backgroundColor: theme.colors.listItemBackgroundAlt,
+            }}
+            value={
+              formik.values.schedule.endDate
+                ? DateTime.fromISO(formik.values.schedule.endDate).toFormat(
+                    'MMM d, yyyy',
+                  )
+                : 'None'
+            }
+            rightImage={false}
+            position={['last']}
+          />
+          <Divider />
+          <DateRangePicker
+            style={{
+              backgroundColor: theme.colors.listItemBackgroundAlt,
+              borderRadius: 10,
+              paddingBottom: 10,
+            }}
+            theme={{
+              markColor: theme.colors.brandSecondary,
+              markTextColor: theme.colors.white,
+              calendarBackground: theme.colors.listItemBackgroundAlt,
+              backgroundColor: 'red',
+            }}
+            initialRange={
+              formik.values.schedule.startDate && formik.values.schedule.endDate
+                ? {
+                    fromDate: DateTime.fromISO(
+                      formik.values.schedule.startDate,
+                    ).toJSDate(),
+                    toDate: DateTime.fromISO(
+                      formik.values.schedule.endDate,
+                    ).toJSDate(),
+                  }
+                : undefined
+            }
+            onSuccess={onDateRangeSelect}
           />
         </View>
       </BottomSheetScrollView>
@@ -424,7 +526,7 @@ const ScreenContentItemEditorView = React.forwardRef<
       ]}>
       <Formik
         innerRef={formikRef}
-        initialValues={screenContentItem || ({} as ScreenContentItem)}
+        initialValues={screenContentItem || initialScreenContentItem}
         validateOnChange={true}
         validateOnMount={true}
         validateOnBlur={true}
@@ -436,8 +538,8 @@ const ScreenContentItemEditorView = React.forwardRef<
               formik={formik}
               onChange={(currentState, previousState) => {
                 if (
-                  currentState?.dirty !== previousState?.dirty ||
-                  currentState?.isValid !== previousState?.isValid
+                  currentState.dirty !== previousState?.dirty ||
+                  currentState.isValid !== previousState?.isValid
                 ) {
                   setEditorState({
                     changed: currentState.dirty && currentState.isValid,
@@ -446,51 +548,30 @@ const ScreenContentItemEditorView = React.forwardRef<
               }}
             />
             <View style={{ height: '100%' }}>
-              <Tab
-                indicatorStyle={s.tabIndicator}
-                containerStyle={s.tabContainer}
-                value={tabIndex}
-                onChange={e => setTabIndex(e)}>
-                <Tab.Item
-                  title={'Content'}
-                  titleStyle={(active: boolean) =>
-                    active ? s.activeTabTitle : s.inactiveTabTitle
-                  }
-                  iconPosition={'left'}
-                  icon={{
-                    name: 'card-text-outline',
-                    type: 'material-community',
-                    color: theme.colors.icon,
-                  }}
-                />
-                <Tab.Item
-                  title={'Schedule'}
-                  titleStyle={(active: boolean) =>
-                    active ? s.activeTabTitle : s.inactiveTabTitle
-                  }
-                  iconPosition={'left'}
-                  icon={{
-                    name: 'calendar-clock-outline',
-                    type: 'material-community',
-                    color: theme.colors.icon,
-                  }}
-                />
-              </Tab>
-              <TabView
-                animationType={'spring'}
-                value={tabIndex}
-                onChange={setTabIndex}>
-                <TabView.Item style={{ width: '100%' }}>
-                  <View style={[s.tabContentContainer]}>
-                    {renderContentEditor(formik)}
-                  </View>
-                </TabView.Item>
-                <TabView.Item style={{ width: '100%' }}>
-                  <View style={[s.tabContentContainer]}>
-                    {renderScheduleEditor(formik)}
-                  </View>
-                </TabView.Item>
-              </TabView>
+              <ScrollableTabView
+                initialPage={0}
+                renderTabBar={() => (
+                  <DefaultTabBar
+                    // @ts-ignore property is incorrectly typed
+                    tabBarUnderlineStyle={{
+                      backgroundColor: theme.colors.brandSecondary,
+                    }}
+                    tabStyle={{ paddingBottom: 0 }}
+                    textStyle={theme.styles.textNormal}
+                    inactiveTextColor={theme.colors.textDim}
+                    style={{ borderBottomColor: theme.colors.subtleGray }}
+                  />
+                )}>
+                <TabView tabLabel={'Preview'} style={{ flex: 1 }}>
+                  {renderCardPreview(formik)}
+                </TabView>
+                <TabView tabLabel={'Edit'} style={{ flex: 1 }}>
+                  {renderContentEditor(formik)}
+                </TabView>
+                <TabView tabLabel={'Schedule'} style={{ flex: 1 }}>
+                  {renderScheduleEditor(formik)}
+                </TabView>
+              </ScrollableTabView>
             </View>
           </>
         )}
@@ -512,10 +593,10 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
     height: 3,
   },
   activeTabTitle: {
-    ...theme.styles.textNormal,
+    ...theme.styles.textSmall,
   },
   inactiveTabTitle: {
-    ...theme.styles.textNormal,
+    ...theme.styles.textSmall,
     ...theme.styles.textDim,
   },
   cardPreview: {
