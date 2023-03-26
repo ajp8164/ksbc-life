@@ -52,9 +52,12 @@ const EditScreenContentItemModal = React.forwardRef<
   };
 
   return (
-    <Modal ref={innerRef}>
+    <Modal ref={innerRef} enableGestureBehavior={false}>
       <ModalHeader
+        size={'small'}
         title={title}
+        leftButtonText={'Cancel'}
+        onLeftButtonPress={dismiss}
         rightButtonText={'Save'}
         rightButtonDisabled={!editorState.changed}
         onRightButtonPress={() =>

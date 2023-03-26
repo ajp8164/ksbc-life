@@ -5,7 +5,14 @@ import { LayoutChangeEvent, Text, View } from 'react-native';
 import { makeStyles } from '@rneui/themed';
 
 interface ModalHeaderInterface {
+  leftButtonDisabled?: boolean;
+  leftButtonText?: string;
+  leftButtonIcon?: string;
+  leftButtonIconColor?: string;
+  leftButtonIconSize?: number;
+  leftButtonIconType?: string;
   onLayout?: (event: LayoutChangeEvent) => void;
+  onLeftButtonPress?: () => void;
   onRightButtonPress?: () => void;
   rightButtonDisabled?: boolean;
   rightButtonText?: string;
@@ -18,7 +25,14 @@ interface ModalHeaderInterface {
 }
 
 const ModalHeader = ({
+  leftButtonDisabled,
+  leftButtonText,
+  leftButtonIcon,
+  leftButtonIconColor,
+  leftButtonIconSize = 28,
+  leftButtonIconType = 'material-community',
   onLayout,
+  onLeftButtonPress,
   onRightButtonPress,
   rightButtonDisabled,
   rightButtonText,
@@ -45,7 +59,29 @@ const ModalHeader = ({
       </Text>
       <Button
         type={'clear'}
-        containerStyle={size === 'large' ? s.containerLarge : s.containerSmall}
+        containerStyle={
+          size === 'large' ? s.containerLeftLarge : s.containerLeftSmall
+        }
+        buttonStyle={size === 'large' ? s.buttonLarge : s.buttonSmall}
+        title={leftButtonText}
+        icon={
+          leftButtonIcon ? (
+            <Icon
+              name={leftButtonIcon}
+              type={leftButtonIconType}
+              color={leftButtonIconColor}
+              size={leftButtonIconSize}
+            />
+          ) : undefined
+        }
+        disabled={leftButtonDisabled}
+        onPress={onLeftButtonPress}
+      />
+      <Button
+        type={'clear'}
+        containerStyle={
+          size === 'large' ? s.containerRightLarge : s.containerRightSmall
+        }
         buttonStyle={size === 'large' ? s.buttonLarge : s.buttonSmall}
         title={rightButtonText}
         icon={
@@ -73,29 +109,36 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   viewSmall: {
     paddingHorizontal: 15,
     justifyContent: 'center',
+    alignItems: 'center',
   },
-  containerLarge: {
+  containerLeftLarge: {
     position: 'absolute',
-    right: 15,
+    left: 5,
   },
-  containerSmall: {
+  containerLeftSmall: {
     position: 'absolute',
-    right: 15,
+    left: 5,
+  },
+  containerRightLarge: {
+    position: 'absolute',
+    right: 10,
+  },
+  containerRightSmall: {
+    position: 'absolute',
+    right: 10,
   },
   buttonLarge: {},
-  buttonSmall: {
-    paddingHorizontal: 0,
-    paddingVertical: 0,
-  },
+  buttonSmall: {},
   titleLarge: {
     ...theme.styles.textHeading1,
     fontSize: 34.5,
     letterSpacing: -1.7,
-    marginTop: 30,
+    marginTop: 45,
   },
   titleSmall: {
-    ...theme.styles.textHeading4,
-    marginVertical: 10,
+    ...theme.styles.textLarge,
+    ...theme.styles.textBold,
+    marginVertical: 8,
   },
 }));
 
