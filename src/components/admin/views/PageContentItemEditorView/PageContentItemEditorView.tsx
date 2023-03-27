@@ -22,8 +22,8 @@ import {
 } from '@react-native-ajp-elements/ui';
 import {
   EditorState,
-  ScreenContentItemEditorViewMethods,
-  ScreenContentItemEditorViewProps,
+  PageContentItemEditorViewMethods,
+  PageContentItemEditorViewProps,
 } from './types';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
@@ -40,18 +40,18 @@ import DateRangePicker from 'components/atoms/DateRangePicker';
 import { DateTime } from 'luxon';
 import FormikEffect from 'components/atoms/FormikEffect';
 import { ItemPickerModal } from 'components/modals/ItemPickerModal';
-import { ScreenContentItem } from 'types/screenContentItem';
-import { ScreenContentItemAssignment } from 'types/screenContentItem';
+import { PageContentItem } from 'types/pageContentItem';
+import { PageContentItemAssignment } from 'types/pageContentItem';
 import { TabView } from 'components/atoms/TabView';
 import { TextModal } from 'components/modals/TextModal';
 import { appConfig } from 'config';
-import { saveScreenContentItem as commitScreenContentItem } from 'firestore/screenContentItems';
+import { savePageContentItem as commitPageContentItem } from 'firestore/pageContentItems';
 import { makeStyles } from '@rneui/themed';
 
-const initialScreenContentItem: ScreenContentItem = {
+const initialPageContentItem: PageContentItem = {
   name: '',
   kind: 'Card',
-  assignment: ScreenContentItemAssignment.None,
+  assignment: PageContentItemAssignment.None,
   ordinal: -1,
   content: {
     body: '',
@@ -78,15 +78,15 @@ enum Fields {
   title,
 }
 
-type FormValues = ScreenContentItem;
+type FormValues = PageContentItem;
 
-type ScreenContentItemEditorView = ScreenContentItemEditorViewMethods;
+type PageContentItemEditorView = PageContentItemEditorViewMethods;
 
-const ScreenContentItemEditorView = React.forwardRef<
-  ScreenContentItemEditorView,
-  ScreenContentItemEditorViewProps
+const PageContentItemEditorView = React.forwardRef<
+  PageContentItemEditorView,
+  PageContentItemEditorViewProps
 >((props, ref) => {
-  const { contentContainerHeight, screenContentItem, onChange } = props;
+  const { contentContainerHeight, pageContentItem, onChange } = props;
 
   const theme = useTheme();
   const s = useStyles(theme);
@@ -100,7 +100,7 @@ const ScreenContentItemEditorView = React.forwardRef<
   const refHeader = useRef<TextInput>(null);
   const refTitle = useRef<TextInput>(null);
 
-  const screenContentImageAsset = useRef<ImagePicker.Asset>();
+  const pageContentImageAsset = useRef<ImagePicker.Asset>();
   const [assignmentItems, setAssignmentItems] = useState<PickerItem[]>([]);
 
   // Same order as on form.
@@ -120,7 +120,7 @@ const ScreenContentItemEditorView = React.forwardRef<
 
   useImperativeHandle(ref, () => ({
     //  These functions exposed to the parent component through the ref.
-    saveScreenContentItem,
+    savePageContentItem,
   }));
 
   useEffect(() => {
@@ -130,17 +130,17 @@ const ScreenContentItemEditorView = React.forwardRef<
 
   useEffect(() => {
     const items: PickerItem[] = [{ label: 'Select Assignment', value: 'None' }];
-    Object.keys(ScreenContentItemAssignment).forEach(key => {
+    Object.keys(PageContentItemAssignment).forEach(key => {
       items.push({
         label: key,
         value: key,
       });
     });
-    console.log(Object.keys(ScreenContentItemAssignment), items);
+    console.log(Object.keys(PageContentItemAssignment), items);
     setAssignmentItems(items);
   }, []);
 
-  const saveScreenContentItem = async () => {
+  const savePageContentItem = async () => {
     return formikRef.current?.submitForm();
   };
 
@@ -150,27 +150,27 @@ const ScreenContentItemEditorView = React.forwardRef<
   ) => {
     Keyboard.dismiss();
     setEditorState({ isSubmitting: true });
-    await saveScreenContentImage();
+    await savePageContentImage();
     // Saving the image updates the form but form values are already passed in.
     // Overwrite the image value after saving the image to storage.
     values.content.photoUrl = formikRef.current?.values.content.photoUrl || '';
 
-    const s: ScreenContentItem = {
+    const s: PageContentItem = {
       name: values.name,
-      kind: initialScreenContentItem.kind,
+      kind: initialPageContentItem.kind,
       assignment: values.assignment,
-      ordinal: screenContentItem?.ordinal || initialScreenContentItem.ordinal,
-      status: initialScreenContentItem.status,
+      ordinal: pageContentItem?.ordinal || initialPageContentItem.ordinal,
+      status: initialPageContentItem.status,
       content: values.content,
       schedule: values.schedule,
     };
 
-    if (screenContentItem?.id) {
-      s.id = screenContentItem.id;
+    if (pageContentItem?.id) {
+      s.id = pageContentItem.id;
     }
 
     try {
-      await commitScreenContentItem(s);
+      await commitPageContentItem(s);
       resetForm({ values });
       setEditorState({ isSubmitting: false });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -186,10 +186,10 @@ const ScreenContentItemEditorView = React.forwardRef<
     formikRef.current?.setFieldValue('content.body', text);
   };
 
-  const selectScreenContentImage = () => {
+  const selectPageContentImage = () => {
     selectImage({
       onSuccess: imageAsset => {
-        screenContentImageAsset.current = imageAsset;
+        pageContentImageAsset.current = imageAsset;
         formikRef.current?.setFieldValue('content.photoUrl', imageAsset.uri);
       },
       onError: () => {
@@ -203,12 +203,12 @@ const ScreenContentItemEditorView = React.forwardRef<
     });
   };
 
-  const saveScreenContentImage = async () => {
-    if (screenContentImageAsset.current) {
+  const savePageContentImage = async () => {
+    if (pageContentImageAsset.current) {
       await saveImage({
-        imageAsset: screenContentImageAsset.current,
-        storagePath: appConfig.storageImageScreenContentItems,
-        oldImage: screenContentItem?.content.photoUrl,
+        imageAsset: pageContentImageAsset.current,
+        storagePath: appConfig.storageImagePageContentItems,
+        oldImage: pageContentItem?.content.photoUrl,
         onSuccess: url =>
           formikRef.current?.setFieldValue('content.photoUrl', url),
         onError: () => formikRef.current?.setFieldValue('content.photoUrl', ''),
@@ -216,11 +216,11 @@ const ScreenContentItemEditorView = React.forwardRef<
     }
   };
 
-  const deleteScreenContentImage = async () => {
+  const deletePageContentImage = async () => {
     if (formikRef.current?.values.content.photoUrl) {
       await deleteImage({
         filename: formikRef.current?.values.content.photoUrl,
-        storagePath: appConfig.storageImageScreenContentItems,
+        storagePath: appConfig.storageImagePageContentItems,
       })
         .then(() => {
           formikRef.current?.setFieldValue('content.photoUrl', '');
@@ -468,7 +468,7 @@ const ScreenContentItemEditorView = React.forwardRef<
                         size={28}
                       />
                     }
-                    onPress={selectScreenContentImage}
+                    onPress={selectPageContentImage}
                   />
                   <Button
                     buttonStyle={s.imageButton}
@@ -480,7 +480,7 @@ const ScreenContentItemEditorView = React.forwardRef<
                         size={28}
                       />
                     }
-                    onPress={deleteScreenContentImage}
+                    onPress={deletePageContentImage}
                   />
                 </Image>
               </>
@@ -489,7 +489,7 @@ const ScreenContentItemEditorView = React.forwardRef<
                 title={'Add a photo'}
                 titleStyle={theme.styles.textPlaceholder}
                 containerStyle={{ borderBottomWidth: 0 }}
-                onPress={selectScreenContentImage}
+                onPress={selectPageContentImage}
               />
             )}
           </View>
@@ -612,7 +612,7 @@ const ScreenContentItemEditorView = React.forwardRef<
         ]}>
         <Formik
           innerRef={formikRef}
-          initialValues={screenContentItem || initialScreenContentItem}
+          initialValues={pageContentItem || initialPageContentItem}
           validateOnChange={true}
           validateOnMount={true}
           validateOnBlur={true}
@@ -716,4 +716,4 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   },
 }));
 
-export default ScreenContentItemEditorView;
+export default PageContentItemEditorView;

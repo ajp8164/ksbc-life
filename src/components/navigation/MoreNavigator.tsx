@@ -1,11 +1,12 @@
 import AboutScreen from 'components/AboutScreen';
 import AdminChurchScreen from 'components/admin/AdminChurchScreen';
+import AdminContentScreen from 'components/admin/AdminContentScreen';
 import AdminHomeScreen from 'components/admin/AdminHomeScreen';
+import AdminNotificationsScreen from 'components/admin/AdminNotificationsScreen';
+import AdminPageContentScreen from 'components/admin/AdminPageContentScreen';
 import AdminPasteursScreen from 'components/admin/AdminPasteursScreen';
 import AdminSermonsScreen from 'components/admin/AdminSermonsScreen';
 import AdminUsersScreen from 'components/admin/AdminUsersScreen';
-import AdminContentScreen from 'components/admin/AdminContentScreen';
-import AdminNotificationsScreen from 'components/admin/AdminNotificationsScreen';
 import AppSettingsScreen from 'components/AppSettingsScreen';
 import ContentScreen from 'components/ContentScreen';
 import { MoreNavigatorParamList } from 'types/navigation';
@@ -119,6 +120,15 @@ const MoreNavigator = () => {
         component={AdminContentScreen}
         options={{
           title: 'Content',
+          headerLeft: () => null,
+          headerLargeTitle: true,
+        }}
+      />
+      <MoreStack.Screen
+        name="AdminPageContent"
+        component={AdminPageContentScreen}
+        options={{
+          title: 'Page Content',
           headerLeft: () => null,
           headerLargeTitle: true,
         }}

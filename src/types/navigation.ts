@@ -1,5 +1,6 @@
 import { ContentView } from 'types/content';
 import { NavigatorScreenParams } from '@react-navigation/core';
+import { PageContentItemAssignment } from 'types/pageContentItem';
 import { Sermon } from 'types/sermon';
 
 export enum StartupScreen {
@@ -19,6 +20,9 @@ export type MoreNavigatorParamList = {
   AdminContent: undefined;
   AdminHome: undefined;
   AdminNotifications: undefined;
+  AdminPageContent: {
+    pageName: PageContentItemAssignment;
+  };
   AdminPasteurs: undefined;
   AdminSermons: undefined;
   AdminSermonVideos: undefined;

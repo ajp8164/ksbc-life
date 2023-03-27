@@ -2,29 +2,29 @@ import { TextStyle, ViewStyle } from 'react-native';
 
 import { ISODateString } from 'types/common';
 
-export type ScreenContentItemKind = 'Card';
+export type PageContentItemKind = 'Card';
 
-export enum ScreenContentItemAssignment {
+export enum PageContentItemAssignment {
   Home = 'Home',
   Sermons = 'Sermons',
   Giving = 'Giving',
   None = 'None',
 }
 
-type ScreenContentSchedule = {
+type PageContentSchedule = {
   enabled: boolean;
   startDate: ISODateString;
   endDate: ISODateString;
 };
 
-export type ScreenContentItem = {
+export type PageContentItem = {
   id?: string;
   name: string;
-  kind: ScreenContentItemKind;
-  assignment: ScreenContentItemAssignment;
+  kind: PageContentItemKind;
+  assignment: PageContentItemAssignment;
   ordinal: number;
   content: ScreenCardContentItem;
-  schedule: ScreenContentSchedule;
+  schedule: PageContentSchedule;
   status: 'active' | 'archive';
 };
 

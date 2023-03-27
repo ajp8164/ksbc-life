@@ -1,33 +1,31 @@
 import {
-  EditScreenContentItemModalMethods,
-  EditScreenContentItemModalProps,
+  EditPageContentItemModalMethods,
+  EditPageContentItemModalProps,
 } from './types';
 import { Modal, viewport } from '@react-native-ajp-elements/ui';
-import React, { useImperativeHandle, useRef, useState } from 'react';
-import ScreenContentItemEditorView, {
+import PageContentItemEditorView, {
   EditorState,
-} from 'components/admin/views/ScreenContentItemEditorView';
+} from 'components/admin/views/PageContentItemEditorView';
+import React, { useImperativeHandle, useRef, useState } from 'react';
 
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import ModalHeader from 'components/molecules/ModalHeader';
-import { ScreenContentItem } from 'types/screenContentItem';
+import { PageContentItem } from 'types/pageContentItem';
 import { useTheme } from 'theme';
 
-type EditScreenContentItemModal = EditScreenContentItemModalMethods;
+type EditPageContentItemModal = EditPageContentItemModalMethods;
 
-const EditScreenContentItemModal = React.forwardRef<
-  EditScreenContentItemModal,
-  EditScreenContentItemModalProps
+const EditPageContentItemModal = React.forwardRef<
+  EditPageContentItemModal,
+  EditPageContentItemModalProps
 >((_props, ref) => {
   const theme = useTheme();
 
   const innerRef = useRef<BottomSheetModalMethods>(null);
-  const ScreenContentItemEditorViewRef =
-    useRef<ScreenContentItemEditorView>(null);
+  const PageContentItemEditorViewRef = useRef<PageContentItemEditorView>(null);
 
   const [editorState, setEditorState] = useState({} as EditorState);
-  const [screenContentItem, setScreenContentItem] =
-    useState<ScreenContentItem>();
+  const [pageContentItem, setPageContentItem] = useState<PageContentItem>();
   const [title, setTitle] = useState('');
 
   const contentContainerHeight =
@@ -45,9 +43,9 @@ const EditScreenContentItemModal = React.forwardRef<
     innerRef.current?.dismiss();
   };
 
-  const present = (title: string, screenContent?: ScreenContentItem) => {
+  const present = (title: string, pageContent?: PageContentItem) => {
     setTitle(title);
-    setScreenContentItem(screenContent);
+    setPageContentItem(pageContent);
     innerRef.current?.present();
   };
 
@@ -63,22 +61,22 @@ const EditScreenContentItemModal = React.forwardRef<
         rightButtonBusy={editorState.isSubmitting}
         rightButtonDisabled={!editorState.changed}
         onRightButtonPress={() =>
-          ScreenContentItemEditorViewRef.current
-            ?.saveScreenContentItem()
+          PageContentItemEditorViewRef.current
+            ?.savePageContentItem()
             .then(dismiss)
             .catch(() => {
               // Nothing to do. Prevent unhandled promise.
             })
         }
       />
-      <ScreenContentItemEditorView
-        ref={ScreenContentItemEditorViewRef}
+      <PageContentItemEditorView
+        ref={PageContentItemEditorViewRef}
         contentContainerHeight={contentContainerHeight}
-        screenContentItem={screenContentItem}
+        pageContentItem={pageContentItem}
         onChange={setEditorState}
       />
     </Modal>
   );
 });
 
-export { EditScreenContentItemModal };
+export { EditPageContentItemModal };
