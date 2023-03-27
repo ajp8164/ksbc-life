@@ -8,7 +8,6 @@ export enum PageContentItemAssignment {
   Home = 'Home',
   Sermons = 'Sermons',
   Giving = 'Giving',
-  None = 'None',
 }
 
 type PageContentSchedule = {

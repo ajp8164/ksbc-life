@@ -5,7 +5,6 @@ import {
   Alert,
   Keyboard,
   NativeSyntheticEvent,
-  Text,
   TextInput,
   TextInputFocusEventData,
   View,
@@ -36,9 +35,10 @@ import { ellipsis, useSetState } from '@react-native-ajp-elements/core';
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import Card from 'components/molecules/Card';
-import DateRangePicker from 'components/atoms/DateRangePicker';
+import { DatePickerModal } from 'components/modals/DatePickerModal';
 import { DateTime } from 'luxon';
 import FormikEffect from 'components/atoms/FormikEffect';
+import InfoMessage from 'components/atoms/InfoMessage';
 import { ItemPickerModal } from 'components/modals/ItemPickerModal';
 import { PageContentItem } from 'types/pageContentItem';
 import { PageContentItemAssignment } from 'types/pageContentItem';
@@ -51,7 +51,7 @@ import { makeStyles } from '@rneui/themed';
 const initialPageContentItem: PageContentItem = {
   name: '',
   kind: 'Card',
-  assignment: PageContentItemAssignment.None,
+  assignment: PageContentItemAssignment.Home,
   ordinal: -1,
   content: {
     body: '',
@@ -93,6 +93,8 @@ const PageContentItemEditorView = React.forwardRef<
 
   const bodyTextModalRef = useRef<TextModal>(null);
   const itemAssignmentPickerModalRef = useRef<ItemPickerModal>(null);
+  const startDatePickerModalRef = useRef<DatePickerModal>(null);
+  const endDatePickerModalRef = useRef<DatePickerModal>(null);
 
   const formikRef = useRef<FormikProps<FormValues>>(null);
   const refName = useRef<TextInput>(null);
@@ -129,7 +131,7 @@ const PageContentItemEditorView = React.forwardRef<
   }, [editorState]);
 
   useEffect(() => {
-    const items: PickerItem[] = [{ label: 'Select Assignment', value: 'None' }];
+    const items: PickerItem[] = [];
     Object.keys(PageContentItemAssignment).forEach(key => {
       items.push({
         label: key,
@@ -240,19 +242,18 @@ const PageContentItemEditorView = React.forwardRef<
     formikRef.current?.setFieldValue('schedule.enabled', value);
   };
 
-  const onDateRangeSelect = (startDate: string, endDate?: string) => {
+  const onStartDateChange = (date: Date) => {
     formikRef.current?.setFieldValue(
       'schedule.startDate',
-      DateTime.fromFormat(startDate, 'yyyy-MM-dd').toISO(),
+      DateTime.fromJSDate(date).toISO(),
     );
-    if (endDate) {
-      formikRef.current?.setFieldValue(
-        'schedule.endDate',
-        DateTime.fromFormat(endDate, 'yyyy-MM-dd').toISO(),
-      );
-    } else {
-      formikRef.current?.setFieldValue('schedule.endDate', undefined);
-    }
+  };
+
+  const onEndDateChange = (date: Date) => {
+    formikRef.current?.setFieldValue(
+      'schedule.endDate',
+      DateTime.fromJSDate(date).toISO(),
+    );
   };
 
   const onAssignmentChange = (assignment: string): void => {
@@ -275,9 +276,9 @@ const PageContentItemEditorView = React.forwardRef<
     const startDate = DateTime.fromISO(
       formik.values.schedule.startDate,
     ).toFormat('MMM d, yyyy');
-    const endDate = DateTime.fromISO(formik.values.schedule.endDate).toFormat(
-      'MMM d, yyyy',
-    );
+    const endDate = formik.values.schedule.endDate
+      ? DateTime.fromISO(formik.values.schedule.endDate).toFormat('MMM d, yyyy')
+      : undefined;
 
     return (
       <>
@@ -289,7 +290,7 @@ const PageContentItemEditorView = React.forwardRef<
             }}>
             <Divider
               type={'note'}
-              text={`This is what your card will look like on the ${formik.values.assignment} page.`}
+              text={`This is what your card will look like when it is shown.`}
             />
           </View>
           <Card
@@ -340,15 +341,17 @@ const PageContentItemEditorView = React.forwardRef<
               onPress={() => itemAssignmentPickerModalRef.current?.present()}
             />
             {formik.values.schedule.enabled ? (
-              <Text style={[theme.styles.textSmall, { marginTop: 15 }]}>
-                {endDate
-                  ? `This card will only be shown between ${startDate} and ${endDate}.`
-                  : `This card will be shown starting on ${startDate}.`}
-              </Text>
+              <InfoMessage
+                text={
+                  startDate === endDate
+                    ? `This card will be shown on ${startDate} only.`
+                    : !endDate
+                    ? `This card will be shown starting on ${startDate}.`
+                    : `This card will be shown between ${startDate} and ${endDate}.`
+                }
+              />
             ) : (
-              <Text style={[theme.styles.textSmall, { marginTop: 15 }]}>
-                {'This card is not scheduled to be shown.'}
-              </Text>
+              <InfoMessage text={`This card is not scheduled to be shown.`} />
             )}
           </View>
         </BottomSheetScrollView>
@@ -529,7 +532,7 @@ const PageContentItemEditorView = React.forwardRef<
             }
           />
           <ListItemSwitch
-            title={'Schedule enabled'}
+            title={'Scheduled'}
             value={formik.values.schedule.enabled}
             containerStyle={{
               backgroundColor: theme.colors.listItemBackgroundAlt,
@@ -538,7 +541,7 @@ const PageContentItemEditorView = React.forwardRef<
             onValueChange={toggleScheduleEnabled}
           />
           <ListItem
-            title={'Start date'}
+            title={'From'}
             containerStyle={{
               backgroundColor: theme.colors.listItemBackgroundAlt,
             }}
@@ -547,12 +550,12 @@ const PageContentItemEditorView = React.forwardRef<
                 ? DateTime.fromISO(formik.values.schedule.startDate).toFormat(
                     'MMM d, yyyy',
                   )
-                : 'None'
+                : 'Today'
             }
-            rightImage={false}
+            onPress={() => startDatePickerModalRef.current?.present()}
           />
           <ListItem
-            title={'End date'}
+            title={'To'}
             containerStyle={{
               backgroundColor: theme.colors.listItemBackgroundAlt,
             }}
@@ -561,37 +564,10 @@ const PageContentItemEditorView = React.forwardRef<
                 ? DateTime.fromISO(formik.values.schedule.endDate).toFormat(
                     'MMM d, yyyy',
                   )
-                : 'None'
+                : 'Indefinite'
             }
-            rightImage={false}
             position={['last']}
-          />
-          <Divider />
-          <DateRangePicker
-            style={{
-              backgroundColor: theme.colors.listItemBackgroundAlt,
-              borderRadius: 10,
-              paddingBottom: 10,
-            }}
-            theme={{
-              markColor: theme.colors.brandSecondary,
-              markTextColor: theme.colors.white,
-              calendarBackground: theme.colors.listItemBackgroundAlt,
-              backgroundColor: 'red',
-            }}
-            initialRange={
-              formik.values.schedule.startDate && formik.values.schedule.endDate
-                ? {
-                    fromDate: DateTime.fromISO(
-                      formik.values.schedule.startDate,
-                    ).toJSDate(),
-                    toDate: DateTime.fromISO(
-                      formik.values.schedule.endDate,
-                    ).toJSDate(),
-                  }
-                : undefined
-            }
-            onSuccess={onDateRangeSelect}
+            onPress={() => endDatePickerModalRef.current?.present()}
           />
         </View>
       </BottomSheetScrollView>
@@ -669,6 +645,28 @@ const PageContentItemEditorView = React.forwardRef<
         items={assignmentItems}
         value={formikRef.current?.values.assignment}
         onValueChange={onAssignmentChange}
+      />
+      <DatePickerModal
+        ref={startDatePickerModalRef}
+        value={
+          formikRef.current?.values.schedule.startDate
+            ? DateTime.fromISO(
+                formikRef.current.values.schedule.startDate,
+              ).toJSDate()
+            : new Date()
+        }
+        onValueChange={onStartDateChange}
+      />
+      <DatePickerModal
+        ref={endDatePickerModalRef}
+        value={
+          formikRef.current?.values.schedule.endDate
+            ? DateTime.fromISO(
+                formikRef.current.values.schedule.endDate,
+              ).toJSDate()
+            : new Date()
+        }
+        onValueChange={onEndDateChange}
       />
     </>
   );

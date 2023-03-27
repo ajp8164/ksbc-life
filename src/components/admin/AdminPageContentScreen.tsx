@@ -15,6 +15,7 @@ import {
   updatePageContentItem,
 } from 'firestore/pageContentItems';
 
+import { ActionSheet } from 'react-native-ui-lib';
 import { DateTime } from 'luxon';
 import { EditPageContentItemModal } from 'components/admin/modals/EditPageContentItemModal';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
@@ -22,8 +23,11 @@ import { MoreNavigatorParamList } from 'types/navigation';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { PageContentItem } from 'types/pageContentItem';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import lodash from 'lodash';
 import { makeStyles } from '@rneui/themed';
 import { useHeaderHeight } from '@react-navigation/elements';
+
+type ContentItemFilter = 'active-only' | 'archive-only' | 'all';
 
 export type Props = NativeStackScreenProps<
   MoreNavigatorParamList,
@@ -40,6 +44,9 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
   const iosLargeTitleHeight = theme.styles.iosLargeHeader.height as number;
   const contentTop = headerHeight + iosLargeTitleHeight;
 
+  const [cardFilterActionSheetVisible, setCardFilterActionSheetVisible] =
+    useState(false);
+
   const editPageContentItemModalRef = useRef<EditPageContentItemModal>(null);
 
   const [allLoaded, setAllLoaded] = useState(false);
@@ -52,10 +59,13 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
   const [pageContentItems, setPageContentItems] = useState<PageContentItem[]>(
     [],
   );
+  const [filteredPageContentItems, setFilteredPageContentItems] = useState<
+    PageContentItem[]
+  >([]);
 
   useEffect(() => {
     navigation.setOptions({
-      title: pageName,
+      title: pageName || 'All Page Content',
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -68,7 +78,7 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
           snapshot.docs.forEach(d => {
             updated.push({ ...d.data(), id: d.id } as PageContentItem);
           });
-          setPageContentItems(sort(updated));
+          setPageContentItems(sortFilterContentItems(updated));
           setLastDocument(snapshot.docs[snapshot.docs.length - 1]);
           setAllLoaded(false);
         } else {
@@ -86,16 +96,33 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
       setIsLoading(true);
       const s = await getPageContentItems({ lastDocument });
       setLastDocument(s.lastDocument);
-      setPageContentItems(sort(pageContentItems.concat(s.result)));
+      setPageContentItems(
+        sortFilterContentItems(pageContentItems.concat(s.result)),
+      );
       setAllLoaded(s.allLoaded);
       setIsLoading(false);
     }
   };
 
-  const sort = (items: PageContentItem[]) => {
-    return items.sort((a, b) => {
-      return a.ordinal - b.ordinal;
+  const sortFilterContentItems = (items: PageContentItem[]) => {
+    return lodash
+      .filter(items, p => {
+        return p.assignment === pageName;
+      })
+      .sort((a, b) => {
+        return a.ordinal - b.ordinal;
+      });
+  };
+
+  const applyFilterToContentItems = (filter: ContentItemFilter) => {
+    const items = lodash.filter(pageContentItems, p => {
+      return (
+        (filter === 'active-only' && p.status === 'active') ||
+        (filter === 'archive-only' && p.status === 'archive') ||
+        filter === 'all'
+      );
     });
+    setFilteredPageContentItems(items);
   };
 
   const onDragEnd = ({ data }: DragEndParams<PageContentItem>) => {
@@ -106,7 +133,7 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
     orderChangeCount.current = 0;
     data.forEach((item, index) => {
       item.ordinal = index;
-      if (item.name !== pageContentItems[index].name) {
+      if (item.name !== filteredPageContentItems[index].name) {
         updatePageContentItem(item);
         orderChangeCount.current++;
       }
@@ -147,7 +174,6 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
     const endDate = DateTime.fromISO(item.schedule.endDate).toFormat(
       'MMM d, yyyy',
     );
-
     return (
       <ShadowDecorator opacity={0.1} radius={10}>
         <ListItem
@@ -161,7 +187,7 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
           }
           position={[
             index === 0 ? 'first' : undefined,
-            index === pageContentItems.length - 1 ? 'last' : undefined,
+            index === filteredPageContentItems.length - 1 ? 'last' : undefined,
           ]}
           leftImage={'card-text-outline'}
           leftImageType={'material-community'}
@@ -271,7 +297,25 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
                 <Button
                   type={'clear'}
                   buttonStyle={s.addAnnouncementButton}
-                  containerStyle={{ marginRight: 10, marginTop: 1 }}
+                  containerStyle={{ marginRight: 15 }}
+                  icon={
+                    <Icon
+                      name={'filter-outline'}
+                      type={'material-community'}
+                      color={theme.colors.brandSecondary}
+                      size={26}
+                    />
+                  }
+                  onPress={() =>
+                    setCardFilterActionSheetVisible(
+                      !cardFilterActionSheetVisible,
+                    )
+                  }
+                />
+                <Button
+                  type={'clear'}
+                  buttonStyle={s.addAnnouncementButton}
+                  containerStyle={{ marginRight: 15, marginTop: 1 }}
                   icon={
                     <Icon
                       name={'sort'}
@@ -309,7 +353,7 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
           <DraggableFlatList
             keyExtractor={item => `${item.name}${item.ordinal}`}
             showsVerticalScrollIndicator={false}
-            data={pageContentItems}
+            data={filteredPageContentItems}
             renderItem={renderPageContentItem}
             ListEmptyComponent={renderListEmptyComponent}
             ListFooterComponent={renderListFooterComponent}
@@ -322,6 +366,28 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
         </View>
       </View>
       <EditPageContentItemModal ref={editPageContentItemModalRef} />
+      <ActionSheet
+        title={'Filter Cards'}
+        cancelButtonIndex={3}
+        options={[
+          {
+            label: 'Active Content ',
+            onPress: () => applyFilterToContentItems('active-only'),
+          },
+          {
+            label: 'Archived Content',
+            onPress: () => applyFilterToContentItems('archive-only'),
+          },
+          {
+            label: 'All Content',
+            onPress: () => applyFilterToContentItems('all'),
+          },
+          { label: 'Cancel' },
+        ]}
+        useNativeIOS={true}
+        visible={cardFilterActionSheetVisible}
+        onDismiss={() => setCardFilterActionSheetVisible(false)}
+      />
     </SafeAreaView>
   );
 };

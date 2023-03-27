@@ -118,6 +118,7 @@ const Card = ({
 const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   card: {
     backgroundColor: theme.colors.cardBackground,
+    minHeight: 100,
   },
   cardContent: {
     padding: 20,
