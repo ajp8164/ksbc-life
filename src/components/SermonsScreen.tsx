@@ -153,7 +153,7 @@ const SermonsScreen = ({ navigation }: Props) => {
           onEndReached={() => getMoreSermons()}
           contentContainerStyle={{
             paddingVertical: 15,
-            ...theme.styles.viewWidth,
+            ...theme.styles.viewHorizontalInset,
           }}
           contentInsetAdjustmentBehavior={'automatic'}
         />

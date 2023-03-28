@@ -92,7 +92,7 @@ const PageContentItemEditorView = React.forwardRef<
   PageContentItemEditorView,
   PageContentItemEditorViewProps
 >((props, ref) => {
-  const { contentContainerHeight, pageContentItem, onChange } = props;
+  const { pageContentItem, onChange } = props;
 
   const theme = useTheme();
   const s = useStyles(theme);
@@ -295,58 +295,52 @@ const PageContentItemEditorView = React.forwardRef<
 
     return (
       <>
-        <BottomSheetScrollView style={s.cardPreview}>
-          <View
-            style={{
-              backgroundColor: theme.colors.viewBackground,
-              paddingHorizontal: 15,
-            }}>
-            <Divider
-              type={'note'}
-              text={`This is what your card will look like when it is shown.`}
+        <BottomSheetScrollView
+          style={{ backgroundColor: theme.colors.viewBackground }}>
+          <Divider
+            type={'note'}
+            text={`This is what your card will look like when it is shown.`}
+            subHeaderStyle={theme.styles.viewHorizontalInset}
+          />
+          <View style={s.cardPreview}>
+            <Card
+              title={content.title?.length > 0 ? content.title : undefined}
+              header={content.header?.length > 0 ? content.header : undefined}
+              body={content.body?.length > 0 ? content.body : undefined}
+              footer={content.footer?.length > 0 ? content.footer : undefined}
+              imageSource={
+                content.imageUrl?.length > 0
+                  ? { uri: content.imageUrl }
+                  : undefined
+              }
+              imageHeight={Number(
+                content.imageSize || PageContentItemImageSize.Short,
+              )}
+              cardStyle={theme.styles.pageContentCardStyle}
+              titleStyle={theme.styles.pageContentCardTitleStyle}
+              // buttons={[
+              //   {
+              //     label: 'Share',
+              //     icon: 'share-variant',
+              //     onPress: () => {
+              //       openShareSheet({
+              //         title: 'John 3:16 CSB',
+              //         message:
+              //           'For God loved the world in this way: He gave his one and only Son, so that everyone who believes in him will not perish but have eternal life.',
+              //       });
+              //     },
+              //   },
+              //   {
+              //     label: 'Read',
+              //     icon: 'book-open-variant',
+              //     onPress: () => {
+              //       openURL('https://www.bible.com/bible/1713/JHN.3.CSB');
+              //     },
+              //   },
+              // ]}
             />
           </View>
-          <Card
-            title={content.title?.length > 0 ? content.title : undefined}
-            header={content.header?.length > 0 ? content.header : undefined}
-            body={content.body?.length > 0 ? content.body : undefined}
-            footer={content.footer?.length > 0 ? content.footer : undefined}
-            imageSource={
-              content.imageUrl?.length > 0
-                ? { uri: content.imageUrl }
-                : undefined
-            }
-            imageHeight={Number(
-              content.imageSize || PageContentItemImageSize.Short,
-            )}
-            cardStyle={[theme.styles.viewWidth, { paddingVertical: 0 }]}
-            titleStyle={{ textAlign: 'left' }}
-            // buttons={[
-            //   {
-            //     label: 'Share',
-            //     icon: 'share-variant',
-            //     onPress: () => {
-            //       openShareSheet({
-            //         title: 'John 3:16 CSB',
-            //         message:
-            //           'For God loved the world in this way: He gave his one and only Son, so that everyone who believes in him will not perish but have eternal life.',
-            //       });
-            //     },
-            //   },
-            //   {
-            //     label: 'Read',
-            //     icon: 'book-open-variant',
-            //     onPress: () => {
-            //       openURL('https://www.bible.com/bible/1713/JHN.3.CSB');
-            //     },
-            //   },
-            // ]}
-          />
-          <View
-            style={{
-              backgroundColor: theme.colors.viewBackground,
-              paddingHorizontal: 15,
-            }}>
+          <View style={theme.styles.viewHorizontalInset}>
             <Divider />
             <ListItem
               title={'Page assignment'}
@@ -585,15 +579,7 @@ const PageContentItemEditorView = React.forwardRef<
   return (
     <>
       <AvoidSoftInputView
-        style={[
-          theme.styles.viewAlt,
-          {
-            paddingHorizontal: 0,
-            height:
-              (contentContainerHeight || 0) +
-              (theme.styles.topTabBar.height as number),
-          },
-        ]}>
+        style={[theme.styles.viewAlt, { paddingHorizontal: 0 }]}>
         <Formik
           innerRef={formikRef}
           initialValues={pageContentItem || initialPageContentItem}
@@ -700,7 +686,8 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   cardPreview: {
     backgroundColor: theme.colors.viewBackground,
     paddingVertical: 15,
-    paddingHorizontal: 0,
+    paddingHorizontal: 15,
+    // ...theme.styles.viewHorizontalInset,
   },
   imageContainer: {
     width: viewport.width - 30,

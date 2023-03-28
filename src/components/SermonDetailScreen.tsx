@@ -302,11 +302,11 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
     marginTop: 35,
     marginBottom: 30,
     backgroundColor: theme.colors.brandPrimary,
-    ...theme.styles.viewWidth,
+    ...theme.styles.viewHorizontalInset,
   },
   noteCard: {
     marginTop: 25,
-    ...theme.styles.viewWidth,
+    ...theme.styles.viewHorizontalInset,
   },
   noteFooter: {
     ...theme.styles.textSmall,

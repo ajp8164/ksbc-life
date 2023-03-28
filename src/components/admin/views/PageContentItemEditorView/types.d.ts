@@ -12,7 +12,6 @@ declare const PageContentItemEditorView: React.MemoExoticComponent<
 >;
 
 export interface PageContentItemEditorViewProps {
-  contentContainerHeight?: number;
   onChange?: (editorState: EditorState) => void;
   pageContentItem?: PageContentItem;
 }

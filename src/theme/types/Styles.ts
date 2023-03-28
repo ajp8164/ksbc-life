@@ -1,9 +1,9 @@
-import { ViewStyle } from 'react-native';
+import { TextStyle, ViewStyle } from 'react-native';
 
 export type Styles = {
-  bottomSheetHandle: ViewStyle;
   iosLargeHeader: ViewStyle;
   modalHeader: ViewStyle;
-  topTabBar: ViewStyle;
-  viewWidth: ViewStyle;
+  pageContentCardStyle: ViewStyle;
+  pageContentCardTitleStyle: TextStyle;
+  viewHorizontalInset: ViewStyle;
 };

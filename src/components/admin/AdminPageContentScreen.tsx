@@ -49,16 +49,18 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
 
   const editPageContentItemModalRef = useRef<EditPageContentItemModal>(null);
 
-  const [allLoaded, setAllLoaded] = useState(false);
+  const allLoaded = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [lastDocument, setLastDocument] =
-    useState<FirebaseFirestoreTypes.DocumentData>();
+  const lastDocument = useRef<FirebaseFirestoreTypes.DocumentData>();
+
   const [sortEnabled, setSortEnabled] = useState(false);
   const orderChangeCount = useRef(0);
 
   const [pageContentItems, setPageContentItems] = useState<PageContentItem[]>(
     [],
   );
+
+  const viewFilter = useRef<ContentItemFilter>('all');
   const [filteredPageContentItems, setFilteredPageContentItems] = useState<
     PageContentItem[]
   >([]);
@@ -79,27 +81,34 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
             updated.push({ ...d.data(), id: d.id } as PageContentItem);
           });
           setPageContentItems(sortFilterContentItems(updated));
-          setLastDocument(snapshot.docs[snapshot.docs.length - 1]);
-          setAllLoaded(false);
+          lastDocument.current = snapshot.docs[snapshot.docs.length - 1];
+          allLoaded.current = false;
         } else {
           orderChangeCount.current--;
         }
       },
-      { lastDocument },
+      { lastDocument: lastDocument.current },
     );
     return subscription;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    applyViewFilterToContentItems(viewFilter.current || 'all');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageContentItems]);
+
   const getMoreContentItems = async () => {
-    if (!allLoaded) {
+    if (!allLoaded.current) {
       setIsLoading(true);
-      const s = await getPageContentItems({ lastDocument });
-      setLastDocument(s.lastDocument);
+      const s = await getPageContentItems({
+        lastDocument: lastDocument.current,
+      });
+      lastDocument.current = s.lastDocument;
       setPageContentItems(
         sortFilterContentItems(pageContentItems.concat(s.result)),
       );
-      setAllLoaded(s.allLoaded);
+      allLoaded.current = s.allLoaded;
       setIsLoading(false);
     }
   };
@@ -114,7 +123,7 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
       });
   };
 
-  const applyFilterToContentItems = (filter: ContentItemFilter) => {
+  const applyViewFilterToContentItems = (filter: ContentItemFilter) => {
     const items = lodash.filter(pageContentItems, p => {
       return (
         (filter === 'active-only' && p.status === 'active') ||
@@ -123,6 +132,7 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
       );
     });
     setFilteredPageContentItems(items);
+    viewFilter.current = filter;
   };
 
   const onDragEnd = ({ data }: DragEndParams<PageContentItem>) => {
@@ -138,7 +148,7 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
         orderChangeCount.current++;
       }
     });
-    setPageContentItems(data);
+    setFilteredPageContentItems(data);
   };
 
   const archivePageContent = (item: PageContentItem) => {
@@ -372,15 +382,15 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
         options={[
           {
             label: 'Active Cards ',
-            onPress: () => applyFilterToContentItems('active-only'),
+            onPress: () => applyViewFilterToContentItems('active-only'),
           },
           {
             label: 'Archived Cards',
-            onPress: () => applyFilterToContentItems('archive-only'),
+            onPress: () => applyViewFilterToContentItems('archive-only'),
           },
           {
             label: 'All Cards',
-            onPress: () => applyFilterToContentItems('all'),
+            onPress: () => applyViewFilterToContentItems('all'),
           },
           { label: 'Cancel' },
         ]}

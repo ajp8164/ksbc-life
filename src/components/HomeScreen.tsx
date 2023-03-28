@@ -4,21 +4,24 @@ import {
   HomeNavigatorParamList,
   MoreNavigatorParamList,
 } from 'types/navigation';
-import React, { useContext, useEffect } from 'react';
-import { ScrollView, View } from 'react-native';
+import {
+  PageContentItem,
+  PageContentItemAssignment,
+} from 'types/pageContentItem';
+import React, { useContext, useEffect, useState } from 'react';
 import ScrollableTabView, {
   DefaultTabBar,
 } from 'react-native-scrollable-tab-view';
-import { openShareSheet, viewport } from '@react-native-ajp-elements/ui';
 
 import { AuthContext } from 'lib/auth';
 import Card from 'components/molecules/Card';
 import { CompositeScreenProps } from '@react-navigation/core';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScrollView } from 'react-native';
 import { TabView } from 'components/atoms/TabView';
 import { makeStyles } from '@rneui/themed';
-import { openURL } from '@react-native-ajp-elements/core';
+import { pageContentItemCollectionChangeListener } from 'firestore/pageContentItems';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { useSelector } from 'react-redux';
 
@@ -34,6 +37,10 @@ const HomeScreen = ({ navigation }: Props) => {
   const auth = useContext(AuthContext);
   const userProfile = useSelector(selectUserProfile);
 
+  const [pageContentItems, setPageContentItems] = useState<PageContentItem[]>(
+    [],
+  );
+
   useEffect(() => {
     setAvatar();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -43,6 +50,33 @@ const HomeScreen = ({ navigation }: Props) => {
     setAvatar();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userProfile]);
+
+  useEffect(() => {
+    const subscription = pageContentItemCollectionChangeListener(
+      snapshot => {
+        const items: PageContentItem[] = [];
+        snapshot.docs.forEach(d => {
+          items.push({ ...d.data(), id: d.id } as PageContentItem);
+        });
+        console.log(items);
+        setPageContentItems(sortContentItems(items));
+      },
+      {
+        where: {
+          fieldPath: 'assignment',
+          opStr: '==',
+          value: PageContentItemAssignment.Ministries,
+        },
+      },
+    );
+    return subscription;
+  }, []);
+
+  const sortContentItems = (items: PageContentItem[]) => {
+    return items.sort((a, b) => {
+      return a.ordinal - b.ordinal;
+    });
+  };
 
   const setAvatar = () => {
     navigation.setOptions({
@@ -84,15 +118,31 @@ const HomeScreen = ({ navigation }: Props) => {
   const renderPageContent = () => {
     return (
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 15 }}
+        contentContainerStyle={{ marginTop: 15, paddingBottom: 15 }}
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior={'automatic'}>
+        {pageContentItems.map((i, index) => {
+          return (
+            <Card
+              key={index}
+              title={i.content.title}
+              body={i.content.body}
+              header={i.content.header}
+              footer={i.content.footer}
+              imageSource={{ uri: i.content.imageUrl }}
+              imageHeight={Number(i.content.imageSize)}
+              cardStyle={theme.styles.pageContentCardStyle}
+              titleStyle={theme.styles.pageContentCardTitleStyle}
+            />
+          );
+        })}
+        {/* 
         <Card
           title={'Welcome'}
           body={'Worship 11:00 am\nLife Groups 9:30 am'}
           imageSource={require('img/ksbc-front.jpg')}
           imageHeight={300}
-          cardStyle={theme.styles.viewWidth}
+          cardStyle={theme.styles.viewHorizontalInset}
         />
         <Card
           title={'Daily Devotion'}
@@ -138,15 +188,13 @@ const HomeScreen = ({ navigation }: Props) => {
         <Card
           imageSource={require('img/life-kids.jpg')}
           cardStyle={s.lightCard}
-        />
+        /> */}
       </ScrollView>
     );
   };
 
   return (
-    <SafeAreaView
-      edges={['left', 'right']}
-      style={[theme.styles.view, { paddingHorizontal: 0 }]}>
+    <SafeAreaView edges={['left', 'right']} style={theme.styles.view}>
       <ScrollableTabView
         initialPage={0}
         renderTabBar={() => (
@@ -185,15 +233,15 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   cardRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    ...theme.styles.viewWidth,
+    ...theme.styles.viewHorizontalInset,
   },
   transparentCard: {
     backgroundColor: theme.colors.transparent,
-    ...theme.styles.viewWidth,
+    ...theme.styles.viewHorizontalInset,
   },
   lightCard: {
     backgroundColor: theme.colors.stickyWhite,
-    ...theme.styles.viewWidth,
+    ...theme.styles.viewHorizontalInset,
   },
 }));
 
