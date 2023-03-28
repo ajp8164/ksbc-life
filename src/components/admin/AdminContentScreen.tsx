@@ -19,15 +19,14 @@ const AdminContentScreen = ({ navigation }: Props) => {
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior={'automatic'}>
         <Divider text={'PAGES'} />
-
         <ListItem
-          title={'Home'}
+          title={'Ministries'}
           position={['first']}
-          leftImage={'home-circle'}
+          leftImage={'handshake-outline'}
           leftImageType={'material-community'}
           onPress={() =>
             navigation.navigate('AdminPageContent', {
-              pageName: PageContentItemAssignment.Home,
+              pageName: PageContentItemAssignment.Ministries,
             })
           }
         />

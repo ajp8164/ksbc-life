@@ -51,7 +51,7 @@ import { makeStyles } from '@rneui/themed';
 const initialPageContentItem: PageContentItem = {
   name: '',
   kind: 'Card',
-  assignment: PageContentItemAssignment.Home,
+  assignment: PageContentItemAssignment.Ministries,
   ordinal: -1,
   content: {
     body: '',
@@ -609,32 +609,30 @@ const PageContentItemEditorView = React.forwardRef<
                   }
                 }}
               />
-              <View style={{ height: '100%' }}>
-                <ScrollableTabView
-                  initialPage={0}
-                  renderTabBar={() => (
-                    <DefaultTabBar
-                      // @ts-ignore property is incorrectly typed
-                      tabBarUnderlineStyle={{
-                        backgroundColor: theme.colors.brandSecondary,
-                      }}
-                      tabStyle={{ paddingBottom: 0 }}
-                      textStyle={theme.styles.textNormal}
-                      inactiveTextColor={theme.colors.textDim}
-                      style={{ borderBottomColor: theme.colors.subtleGray }}
-                    />
-                  )}>
-                  <TabView tabLabel={'Preview'} style={{ flex: 1 }}>
-                    {renderCardPreview(formik)}
-                  </TabView>
-                  <TabView tabLabel={'Edit'} style={{ flex: 1 }}>
-                    {renderContentEditor(formik)}
-                  </TabView>
-                  <TabView tabLabel={'Schedule'} style={{ flex: 1 }}>
-                    {renderScheduleEditor(formik)}
-                  </TabView>
-                </ScrollableTabView>
-              </View>
+              <ScrollableTabView
+                initialPage={0}
+                renderTabBar={() => (
+                  <DefaultTabBar
+                    // @ts-ignore property is incorrectly typed
+                    tabBarUnderlineStyle={{
+                      backgroundColor: theme.colors.brandSecondary,
+                    }}
+                    tabStyle={{ paddingBottom: 0 }}
+                    textStyle={theme.styles.textNormal}
+                    inactiveTextColor={theme.colors.textDim}
+                    style={{ borderBottomColor: theme.colors.subtleGray }}
+                  />
+                )}>
+                <TabView tabLabel={'Preview'} style={{ flex: 1 }}>
+                  {renderCardPreview(formik)}
+                </TabView>
+                <TabView tabLabel={'Edit'} style={{ flex: 1 }}>
+                  {renderContentEditor(formik)}
+                </TabView>
+                <TabView tabLabel={'Schedule'} style={{ flex: 1 }}>
+                  {renderScheduleEditor(formik)}
+                </TabView>
+              </ScrollableTabView>
             </>
           )}
         </Formik>

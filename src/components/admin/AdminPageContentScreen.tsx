@@ -118,7 +118,7 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
     const items = lodash.filter(pageContentItems, p => {
       return (
         (filter === 'active-only' && p.status === 'active') ||
-        (filter === 'archive-only' && p.status === 'archive') ||
+        (filter === 'archive-only' && p.status === 'archived') ||
         filter === 'all'
       );
     });
@@ -142,7 +142,7 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
   };
 
   const archivePageContent = (item: PageContentItem) => {
-    item.status = 'archive';
+    item.status = 'archived';
     updatePageContentItem(item);
   };
 
@@ -371,15 +371,15 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
         cancelButtonIndex={3}
         options={[
           {
-            label: 'Active Content ',
+            label: 'Active Cards ',
             onPress: () => applyFilterToContentItems('active-only'),
           },
           {
-            label: 'Archived Content',
+            label: 'Archived Cards',
             onPress: () => applyFilterToContentItems('archive-only'),
           },
           {
-            label: 'All Content',
+            label: 'All Cards',
             onPress: () => applyFilterToContentItems('all'),
           },
           { label: 'Cancel' },

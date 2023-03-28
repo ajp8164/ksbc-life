@@ -6,6 +6,9 @@ import {
 } from 'types/navigation';
 import React, { useContext, useEffect } from 'react';
 import { ScrollView, View } from 'react-native';
+import ScrollableTabView, {
+  DefaultTabBar,
+} from 'react-native-scrollable-tab-view';
 import { openShareSheet, viewport } from '@react-native-ajp-elements/ui';
 
 import { AuthContext } from 'lib/auth';
@@ -13,6 +16,7 @@ import Card from 'components/molecules/Card';
 import { CompositeScreenProps } from '@react-navigation/core';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { TabView } from 'components/atoms/TabView';
 import { makeStyles } from '@rneui/themed';
 import { openURL } from '@react-native-ajp-elements/core';
 import { selectUserProfile } from 'store/selectors/userSelectors';
@@ -77,10 +81,8 @@ const HomeScreen = ({ navigation }: Props) => {
     }
   };
 
-  return (
-    <SafeAreaView
-      edges={['left', 'right']}
-      style={[theme.styles.view, { paddingHorizontal: 0 }]}>
+  const renderPageContent = () => {
+    return (
       <ScrollView
         contentContainerStyle={{ paddingBottom: 15 }}
         showsVerticalScrollIndicator={false}
@@ -138,6 +140,37 @@ const HomeScreen = ({ navigation }: Props) => {
           cardStyle={s.lightCard}
         />
       </ScrollView>
+    );
+  };
+
+  return (
+    <SafeAreaView
+      edges={['left', 'right']}
+      style={[theme.styles.view, { paddingHorizontal: 0 }]}>
+      <ScrollableTabView
+        initialPage={0}
+        renderTabBar={() => (
+          <DefaultTabBar
+            // @ts-ignore property is incorrectly typed
+            tabBarUnderlineStyle={{
+              backgroundColor: theme.colors.brandSecondary,
+            }}
+            tabStyle={{ paddingBottom: 0 }}
+            textStyle={theme.styles.textNormal}
+            inactiveTextColor={theme.colors.textDim}
+            style={{ borderBottomColor: theme.colors.subtleGray }}
+          />
+        )}>
+        <TabView tabLabel={'Ministries'} style={{ flex: 1 }}>
+          {renderPageContent()}
+        </TabView>
+        <TabView tabLabel={'Events'} style={{ flex: 1 }}>
+          {/* {renderContentEditor(formik)} */}
+        </TabView>
+        <TabView tabLabel={'My Feed'} style={{ flex: 1 }}>
+          {/* {renderScheduleEditor(formik)} */}
+        </TabView>
+      </ScrollableTabView>
     </SafeAreaView>
   );
 };

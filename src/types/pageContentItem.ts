@@ -5,7 +5,7 @@ import { ISODateString } from 'types/common';
 export type PageContentItemKind = 'Card';
 
 export enum PageContentItemAssignment {
-  Home = 'Home',
+  Ministries = 'Ministries',
   Sermons = 'Sermons',
   Giving = 'Giving',
 }
@@ -24,7 +24,7 @@ export type PageContentItem = {
   ordinal: number;
   content: ScreenCardContentItem;
   schedule: PageContentSchedule;
-  status: 'active' | 'archive';
+  status: 'active' | 'archived';
 };
 
 export type ScreenCardContentItem = {
