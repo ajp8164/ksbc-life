@@ -10,6 +10,12 @@ export enum PageContentItemAssignment {
   Giving = 'Giving',
 }
 
+export enum PageContentItemImageSize {
+  Short = '100',
+  Medium = '150',
+  Tall = '200',
+}
+
 type PageContentSchedule = {
   enabled: boolean;
   startDate: ISODateString;
@@ -40,7 +46,8 @@ export type ScreenCardContentItem = {
   footerStyle?: TextStyle | TextStyle[];
   header: string;
   headerStyle?: TextStyle | TextStyle[];
-  photoUrl: string;
+  imageUrl: string;
+  imageSize: PageContentItemImageSize;
   title: string;
   titleStyle?: TextStyle | TextStyle[];
 };

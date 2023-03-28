@@ -8,7 +8,7 @@
   },
   "emulators": {
     "firestore": {
-      "host":"10.6.9.225",
+      "host":"10.6.9.100",
       "port": 8080
     },
     "ui": {
@@ -16,7 +16,7 @@
     },
     "singleProjectMode": true,
     "storage": {
-      "host":"10.6.9.225",
+      "host":"10.6.9.100",
       "port": 9199
     }
   }

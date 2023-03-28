@@ -25,6 +25,10 @@ import {
   PageContentItemEditorViewProps,
 } from './types';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
+import {
+  PageContentItem,
+  PageContentItemImageSize,
+} from 'types/pageContentItem';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import ScrollableTabView, {
   DefaultTabBar,
@@ -38,9 +42,9 @@ import Card from 'components/molecules/Card';
 import { DatePickerModal } from 'components/modals/DatePickerModal';
 import { DateTime } from 'luxon';
 import FormikEffect from 'components/atoms/FormikEffect';
+import ImageEditMenu from 'components/atoms/ImageEditMenu';
 import InfoMessage from 'components/atoms/InfoMessage';
 import { ItemPickerModal } from 'components/modals/ItemPickerModal';
-import { PageContentItem } from 'types/pageContentItem';
 import { PageContentItemAssignment } from 'types/pageContentItem';
 import { TabView } from 'components/atoms/TabView';
 import { TextModal } from 'components/modals/TextModal';
@@ -57,12 +61,13 @@ const initialPageContentItem: PageContentItem = {
     body: '',
     footer: '',
     header: '',
-    photoUrl: '',
+    imageSize: PageContentItemImageSize.Short,
+    imageUrl: '',
     title: '',
   },
   schedule: {
     enabled: false,
-    startDate: '',
+    startDate: DateTime.now().toISO(),
     endDate: '',
   },
   status: 'active',
@@ -74,7 +79,8 @@ enum Fields {
   footer,
   header,
   name,
-  photoUrl,
+  imageSize,
+  imageUrl,
   title,
 }
 
@@ -155,7 +161,10 @@ const PageContentItemEditorView = React.forwardRef<
     await savePageContentImage();
     // Saving the image updates the form but form values are already passed in.
     // Overwrite the image value after saving the image to storage.
-    values.content.photoUrl = formikRef.current?.values.content.photoUrl || '';
+    values.content.imageSize =
+      formikRef.current?.values.content.imageSize ||
+      PageContentItemImageSize.Short;
+    values.content.imageUrl = formikRef.current?.values.content.imageUrl || '';
 
     const s: PageContentItem = {
       name: values.name,
@@ -192,7 +201,7 @@ const PageContentItemEditorView = React.forwardRef<
     selectImage({
       onSuccess: imageAsset => {
         pageContentImageAsset.current = imageAsset;
-        formikRef.current?.setFieldValue('content.photoUrl', imageAsset.uri);
+        formikRef.current?.setFieldValue('content.imageUrl', imageAsset.uri);
       },
       onError: () => {
         Alert.alert(
@@ -210,22 +219,22 @@ const PageContentItemEditorView = React.forwardRef<
       await saveImage({
         imageAsset: pageContentImageAsset.current,
         storagePath: appConfig.storageImagePageContentItems,
-        oldImage: pageContentItem?.content.photoUrl,
+        oldImage: pageContentItem?.content.imageUrl,
         onSuccess: url =>
-          formikRef.current?.setFieldValue('content.photoUrl', url),
-        onError: () => formikRef.current?.setFieldValue('content.photoUrl', ''),
+          formikRef.current?.setFieldValue('content.imageUrl', url),
+        onError: () => formikRef.current?.setFieldValue('content.imageUrl', ''),
       });
     }
   };
 
   const deletePageContentImage = async () => {
-    if (formikRef.current?.values.content.photoUrl) {
+    if (formikRef.current?.values.content.imageUrl) {
       await deleteImage({
-        filename: formikRef.current?.values.content.photoUrl,
+        filename: formikRef.current?.values.content.imageUrl,
         storagePath: appConfig.storageImagePageContentItems,
       })
         .then(() => {
-          formikRef.current?.setFieldValue('content.photoUrl', '');
+          formikRef.current?.setFieldValue('content.imageUrl', '');
         })
         .catch(() => {
           Alert.alert(
@@ -257,8 +266,11 @@ const PageContentItemEditorView = React.forwardRef<
   };
 
   const onAssignmentChange = (assignment: string): void => {
-    console.log(assignment);
     formikRef.current?.setFieldValue('assignment', assignment);
+  };
+
+  const selectImageSize = (size: PageContentItemImageSize) => {
+    formikRef.current?.setFieldValue('content.imageSize', size);
   };
 
   const validationSchema = Yup.object().shape({
@@ -267,7 +279,8 @@ const PageContentItemEditorView = React.forwardRef<
     footer: Yup.string(),
     header: Yup.string(),
     name: Yup.string().required('Content name is required'),
-    photoUrl: Yup.string(),
+    imageSize: Yup.string(),
+    imageUrl: Yup.string(),
     title: Yup.string(),
   });
 
@@ -299,11 +312,13 @@ const PageContentItemEditorView = React.forwardRef<
             body={content.body?.length > 0 ? content.body : undefined}
             footer={content.footer?.length > 0 ? content.footer : undefined}
             imageSource={
-              content.photoUrl?.length > 0
-                ? { uri: content.photoUrl }
+              content.imageUrl?.length > 0
+                ? { uri: content.imageUrl }
                 : undefined
             }
-            imageHeight={100}
+            imageHeight={Number(
+              content.imageSize || PageContentItemImageSize.Short,
+            )}
             cardStyle={[theme.styles.viewWidth, { paddingVertical: 0 }]}
             titleStyle={{ textAlign: 'left' }}
             // buttons={[
@@ -455,36 +470,29 @@ const PageContentItemEditorView = React.forwardRef<
               containerStyle={{ borderBottomWidth: 0 }}
               onPress={() => bodyTextModalRef.current?.present()}
             />
-            {formik.values.content.photoUrl?.length ? (
+            {formik.values.content.imageUrl?.length ? (
               <>
                 <Divider />
                 <Image
-                  source={{ uri: formik.values.content.photoUrl }}
+                  source={{ uri: formik.values.content.imageUrl }}
                   containerStyle={s.imageContainer}>
-                  <Button
-                    buttonStyle={s.imageButton}
-                    icon={
-                      <Icon
-                        name="image-edit-outline"
-                        type={'material-community'}
-                        color={theme.colors.darkGray}
-                        size={28}
-                      />
-                    }
-                    onPress={selectPageContentImage}
-                  />
-                  <Button
-                    buttonStyle={s.imageButton}
-                    icon={
-                      <Icon
-                        name="close-circle-outline"
-                        type={'material-community'}
-                        color={theme.colors.assertive}
-                        size={28}
-                      />
-                    }
-                    onPress={deletePageContentImage}
-                  />
+                  <ImageEditMenu
+                    heightValue={formik.values.content.imageSize}
+                    onChangeImage={selectPageContentImage}
+                    onHeightSelect={selectImageSize}
+                    onRemoveImage={deletePageContentImage}>
+                    <Button
+                      buttonStyle={s.imageButton}
+                      icon={
+                        <Icon
+                          name="image-edit-outline"
+                          type={'material-community'}
+                          color={theme.colors.darkGray}
+                          size={28}
+                        />
+                      }
+                    />
+                  </ImageEditMenu>
                 </Image>
               </>
             ) : (

@@ -37,6 +37,7 @@
     "@react-native-firebase/storage": "^17.3.2",
     "@react-native-google-signin/google-signin": "^9.0.2",
     "@react-native-masked-view/masked-view": "^0.2.8",
+    "@react-native-menu/menu": "^0.7.3",
     "@react-native-picker/picker": "^2.4.8",
     "@react-native-twitter-signin/twitter-signin": "^1.2.0",
     "@react-navigation/bottom-tabs": "^6.3.2",
@@ -84,6 +85,7 @@
     "react-native-haptic-feedback": "^1.14.0",
     "react-native-image-cache-wrapper": "https://github.com/flowency/react-native-image-cache-wrapper#parallel-fetch",
     "react-native-image-picker": "^5.1.0",
+    "react-native-ios-context-menu": "^1.15.3",
     "react-native-level-fs": "^3.0.1",
     "react-native-linear-gradient": "^2.6.2",
     "react-native-logs": "^5.0.1",
@@ -120,7 +122,8 @@
     "victory-native": "^36.6.8",
     "vm-browserify": "^1.1.2",
     "web3": "^1.7.5",
-    "yup": "^0.32.11"
+    "yup": "^0.32.11",
+    "zeego": "^1.4.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.2",
