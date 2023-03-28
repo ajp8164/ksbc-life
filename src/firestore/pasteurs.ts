@@ -1,6 +1,7 @@
 import {
   QueryOrderBy,
   QueryResult,
+  QueryWhere,
   collectionChangeListener,
   documentChangeListener,
   getDocument,
@@ -99,17 +100,20 @@ export const pasteursCollectionChangeListener = (
     lastDocument?: FirebaseFirestoreTypes.DocumentData;
     limit?: number;
     orderBy?: QueryOrderBy;
+    where?: QueryWhere;
   },
 ): (() => void) => {
   const {
     lastDocument,
     limit,
     orderBy = { fieldPath: 'firstName', directionStr: 'asc' },
+    where,
   } = opts || {};
   return collectionChangeListener('Pasteurs', handler, {
     lastDocument,
     limit,
     orderBy,
+    where,
   });
 };
 

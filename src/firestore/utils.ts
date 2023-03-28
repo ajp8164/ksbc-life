@@ -14,6 +14,13 @@ export type QueryOrderBy = {
   directionStr?: 'asc' | 'desc' | undefined;
 };
 
+export type QueryWhere = {
+  fieldPath: string | number | FirebaseFirestoreTypes.FieldPath;
+  opStr: FirebaseFirestoreTypes.WhereFilterOp;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value: any;
+};
+
 export const getDocument = <T>(
   collectionPath: string,
   id: string,
@@ -116,15 +123,24 @@ export const collectionChangeListener = (
     lastDocument?: FirebaseFirestoreTypes.DocumentData;
     limit?: number;
     orderBy?: QueryOrderBy;
+    where?: QueryWhere;
   },
 ): (() => void) => {
-  const { lastDocument, limit, orderBy } = opts;
+  const { lastDocument, limit, orderBy, where } = opts;
 
   let query = firestore().collection(collectionPath);
   if (orderBy) {
     query = query.orderBy(
       orderBy.fieldPath,
       orderBy.directionStr,
+    ) as FirebaseFirestoreTypes.CollectionReference<FirebaseFirestoreTypes.DocumentData>;
+  }
+
+  if (where) {
+    query = query.where(
+      where.fieldPath,
+      where.opStr,
+      where.value,
     ) as FirebaseFirestoreTypes.CollectionReference<FirebaseFirestoreTypes.DocumentData>;
   }
 
