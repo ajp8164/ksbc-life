@@ -1,5 +1,3 @@
-import { TextStyle, ViewStyle } from 'react-native';
-
 import { ISODateString } from 'types/common';
 
 export type PageContentItemKind = 'Card';
@@ -35,19 +33,19 @@ export type PageContentItem = {
 
 export type ScreenCardContentItem = {
   body: string;
-  bodyStyle?: TextStyle | TextStyle[];
+  bodyStyle?: string;
   buttons?: {
     label?: string;
     icon?: string;
     iconType?: string;
   }[];
-  cardStyle?: ViewStyle | ViewStyle[];
+  cardStyle?: string;
   footer: string;
-  footerStyle?: TextStyle | TextStyle[];
+  footerStyle?: string;
   header: string;
-  headerStyle?: TextStyle | TextStyle[];
+  headerStyle?: string;
   imageUrl: string;
   imageSize: PageContentItemImageSize;
   title: string;
-  titleStyle?: TextStyle | TextStyle[];
+  titleStyle?: string;
 };

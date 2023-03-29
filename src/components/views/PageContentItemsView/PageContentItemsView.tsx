@@ -1,4 +1,3 @@
-import { AppTheme, useTheme } from 'theme';
 import {
   PageContentItemsViewMethods,
   PageContentItemsViewProps,
@@ -8,7 +7,8 @@ import React, { useImperativeHandle } from 'react';
 import Card from 'components/molecules/Card';
 import { DateTime } from 'luxon';
 import { PageContentItem } from 'types/pageContentItem';
-import { makeStyles } from '@rneui/themed';
+import { Styles } from 'theme/types/Styles';
+import { useTheme } from 'theme';
 
 type PageContentItemsView = PageContentItemsViewMethods;
 
@@ -19,13 +19,12 @@ const PageContentItemsView = React.forwardRef<
   const { items } = props;
 
   const theme = useTheme();
-  const s = useStyles(theme);
 
   useImperativeHandle(ref, () => ({
     //  These functions exposed to the parent component through the ref.
   }));
 
-  const showCard = (item: PageContentItem) => {
+  const itemVisible = (item: PageContentItem) => {
     const today = DateTime.now();
     const startDate = DateTime.fromISO(item.schedule.startDate);
     const endDate =
@@ -40,8 +39,8 @@ const PageContentItemsView = React.forwardRef<
 
   return (
     <>
-      {items.map((i, index) => {
-        if (!showCard(i)) return null;
+      {items.map((i: PageContentItem, index) => {
+        if (!itemVisible(i)) return null;
         return (
           <Card
             key={index}
@@ -55,30 +54,17 @@ const PageContentItemsView = React.forwardRef<
                 : undefined
             }
             imageHeight={Number(i.content.imageSize)}
-            cardStyle={theme.styles.pageContentCardStyle}
+            cardStyle={theme.styles[i.content.cardStyle as keyof Styles]}
             titleStyle={theme.styles.pageContentCardTitleStyle}
+            headerStyle={theme.styles.pageContentCardHeaderStyle}
+            footerStyle={theme.styles.pageContentCardFooterStyle}
+            bodyStyle={theme.styles.pageContentCardBodyStyle}
           />
         );
       })}
     </>
   );
 });
-
-const useStyles = makeStyles((_theme, theme: AppTheme) => ({
-  cardRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    ...theme.styles.viewHorizontalInset,
-  },
-  transparentCard: {
-    backgroundColor: theme.colors.transparent,
-    ...theme.styles.viewHorizontalInset,
-  },
-  lightCard: {
-    backgroundColor: theme.colors.stickyWhite,
-    ...theme.styles.viewHorizontalInset,
-  },
-}));
 
 export default PageContentItemsView;
 

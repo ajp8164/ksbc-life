@@ -3,7 +3,7 @@ import { Styles } from 'theme/types/Styles';
 import { makeStyles } from '@rneui/themed';
 
 export const useStyles = makeStyles(
-  (_theme): Styles => ({
+  (theme): Styles => ({
     // Constants
     iosLargeHeader: {
       ...Platform.select({
@@ -18,15 +18,26 @@ export const useStyles = makeStyles(
     modalHeader: {
       height: 81,
     },
-    // Styles
+
+    // Content Styles
+    // NOTE -- These style *names* are stored in firestore. Changing the names will break rendered layout.
     pageContentCardStyle: {
       marginBottom: 25,
       paddingVertical: 0,
       overflow: 'hidden',
     },
+    pageContentCardTransparentStyle: {
+      marginBottom: 25,
+      backgroundColor: theme.colors.transparent,
+    },
     pageContentCardTitleStyle: {
       textAlign: 'left',
     },
+    pageContentCardHeaderStyle: {},
+    pageContentCardFooterStyle: {},
+    pageContentCardBodyStyle: {},
+
+    // Styles
     // Aligns items in viewport.width without using view padding (which clips shadows).
     viewHorizontalInset: {
       paddingHorizontal: 15,

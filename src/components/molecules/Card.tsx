@@ -10,11 +10,12 @@ import React, { ReactNode } from 'react';
 
 import { ImageSource } from 'react-native-vector-icons/Icon';
 import { Card as RNULCard } from 'react-native-ui-lib';
+import { Styles } from 'theme/types/Styles';
 import { makeStyles } from '@rneui/themed';
 
 interface CardInterface {
   body?: string;
-  bodyStyle?: TextStyle | TextStyle[];
+  bodyStyle?: string | TextStyle | TextStyle[];
   BodyComponent?: ReactNode;
   buttons?: {
     label?: string;
@@ -22,17 +23,17 @@ interface CardInterface {
     iconType?: string;
     onPress: ((event: GestureResponderEvent) => void) | undefined;
   }[];
-  cardStyle?: ViewStyle | ViewStyle[];
+  cardStyle?: string | ViewStyle | ViewStyle[];
   flexBasis?: number | string;
   footer?: string;
-  footerStyle?: TextStyle | TextStyle[];
+  footerStyle?: string | TextStyle | TextStyle[];
   header?: string;
-  headerStyle?: TextStyle | TextStyle[];
+  headerStyle?: string | TextStyle | TextStyle[];
   imageHeight?: number;
   imageSource?: ImageSource;
   imageWidth?: number | string;
   title?: string;
-  titleStyle?: TextStyle | TextStyle[];
+  titleStyle?: string | TextStyle | TextStyle[];
 }
 
 const Card = ({
@@ -60,6 +61,31 @@ const Card = ({
   title = title && title.length > 0 ? title : undefined;
   body = body && body.length > 0 ? body : undefined;
   footer = footer && footer.length > 0 ? footer : undefined;
+
+  cardStyle =
+    typeof cardStyle === 'string'
+      ? theme.styles[cardStyle as keyof Styles]
+      : cardStyle;
+
+  headerStyle =
+    typeof headerStyle === 'string'
+      ? theme.styles[headerStyle as keyof Styles]
+      : headerStyle;
+
+  titleStyle =
+    typeof titleStyle === 'string'
+      ? theme.styles[titleStyle as keyof Styles]
+      : titleStyle;
+
+  bodyStyle =
+    typeof bodyStyle === 'string'
+      ? theme.styles[bodyStyle as keyof Styles]
+      : bodyStyle;
+
+  footerStyle =
+    typeof footerStyle === 'string'
+      ? theme.styles[footerStyle as keyof Styles]
+      : footerStyle;
 
   return (
     <RNULCard

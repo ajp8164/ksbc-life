@@ -18,6 +18,7 @@ import DateTimePicker, {
 import {
   Divider,
   ListItem,
+  ListItemCheckbox,
   ListItemInput,
   ListItemSwitch,
   PickerItem,
@@ -62,6 +63,7 @@ const initialPageContentItem: PageContentItem = {
   assignment: PageContentItemAssignment.Ministries,
   ordinal: -1,
   content: {
+    cardStyle: 'pageContentCardStyle',
     body: '',
     footer: '',
     header: '',
@@ -280,9 +282,19 @@ const PageContentItemEditorView = React.forwardRef<
     formikRef.current?.setFieldValue('content.imageSize', size);
   };
 
+  const toggleTransparentBackground = () => {
+    formikRef.current?.setFieldValue(
+      'content.cardStyle',
+      formikRef.current?.values.content.cardStyle === 'pageContentCardStyle'
+        ? 'pageContentCardTransparentStyle'
+        : 'pageContentCardStyle',
+    );
+  };
+
   const validationSchema = Yup.object().shape({
     assignment: Yup.string(),
     body: Yup.string(),
+    cardStyle: Yup.string(),
     footer: Yup.string(),
     header: Yup.string(),
     name: Yup.string().required('Content name is required'),
@@ -321,8 +333,11 @@ const PageContentItemEditorView = React.forwardRef<
                   : undefined
               }
               imageHeight={Number(content.imageSize)}
-              cardStyle={theme.styles.pageContentCardStyle}
+              cardStyle={content.cardStyle || undefined}
               titleStyle={theme.styles.pageContentCardTitleStyle}
+              headerStyle={theme.styles.pageContentCardHeaderStyle}
+              footerStyle={theme.styles.pageContentCardFooterStyle}
+              bodyStyle={theme.styles.pageContentCardBodyStyle}
               // buttons={[
               //   {
               //     label: 'Share',
@@ -378,7 +393,7 @@ const PageContentItemEditorView = React.forwardRef<
       <>
         <BottomSheetScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ marginTop: 15, paddingBottom: 50 }}>
+          contentContainerStyle={{ marginTop: 15, paddingBottom: 100 }}>
           <View style={[theme.styles.viewAlt, { flex: 1 }]}>
             <Divider
               type={'note'}
@@ -454,7 +469,7 @@ const PageContentItemEditorView = React.forwardRef<
               onChangeText={formik.handleChange('content.footer')}
               onFocus={() => setEditorState({ focusedField: Fields.footer })}
             />
-            <Divider text={'BODY'} />
+            <Divider />
             <ListItem
               title={
                 formik.values.content.body.length > 0
@@ -466,8 +481,32 @@ const PageContentItemEditorView = React.forwardRef<
                   ? theme.styles.textNormal
                   : theme.styles.textPlaceholder
               }
-              containerStyle={{ borderBottomWidth: 0 }}
+              containerStyle={{
+                backgroundColor: theme.colors.listItemBackgroundAlt,
+              }}
+              position={['first']}
               onPress={() => bodyTextModalRef.current?.present()}
+            />
+            <ListItemCheckbox
+              title={'Transparent Background'}
+              subtitle={'The card will be displayed without a background color'}
+              checkedIcon={'check'}
+              checkIconType={'material-community'}
+              uncheckedIcon={'checkbox-blank-outline'}
+              checkedColor={theme.colors.brandSecondary}
+              checked={
+                formik.values.content.cardStyle ===
+                'pageContentCardTransparentStyle'
+              }
+              containerStyle={{
+                backgroundColor: theme.colors.listItemBackgroundAlt,
+                borderWidth: 0,
+              }}
+              wrapperStyle={{
+                backgroundColor: theme.colors.listItemBackgroundAlt,
+              }}
+              position={['last']}
+              onPress={toggleTransparentBackground}
             />
             {formik.values.content.imageUrl?.length ? (
               <>

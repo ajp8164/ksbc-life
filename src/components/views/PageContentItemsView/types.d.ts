@@ -1,4 +1,4 @@
-import { PageContentItem } from 'types';
+import { PageContentItem } from 'types/pageContentItem';
 import React from 'react';
 
 export declare type PageContentItemsView = PageContentItemsViewMethods;
