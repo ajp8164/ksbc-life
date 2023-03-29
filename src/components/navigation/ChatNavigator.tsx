@@ -1,5 +1,6 @@
 import { ChatNavigatorParamList } from 'types/navigation';
-import ChatScreen from 'components/ChatScreen';
+import ChatThreadListScreen from 'components/ChatThreadListScreen';
+import ChatThreadScreen from 'components/ChatThreadScreen';
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from 'theme';
@@ -11,12 +12,8 @@ const ChatNavigator = () => {
 
   return (
     <ChatStack.Navigator
-      initialRouteName="Chat"
+      initialRouteName="ChatThreadList"
       screenOptions={{
-        headerLargeTitleShadowVisible: theme.mode === 'light',
-        headerLargeStyle: {
-          backgroundColor: theme.colors.screenHeaderBackground,
-        },
         headerStyle: {
           backgroundColor: theme.colors.screenHeaderBackground,
         },
@@ -26,12 +23,19 @@ const ChatNavigator = () => {
         headerTintColor: theme.colors.screenHeaderBackButton,
       }}>
       <ChatStack.Screen
-        name="Chat"
-        component={ChatScreen}
+        name="ChatThreadList"
+        component={ChatThreadListScreen}
         options={{
           title: 'Chat',
           headerLeft: () => null,
           headerLargeTitle: true,
+        }}
+      />
+      <ChatStack.Screen
+        name="ChatThread"
+        component={ChatThreadScreen}
+        options={{
+          title: 'Chat',
         }}
       />
     </ChatStack.Navigator>

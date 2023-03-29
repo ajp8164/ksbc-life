@@ -1,4 +1,4 @@
-import { Platform, StatusBar, Text } from 'react-native';
+import { Platform, StatusBar } from 'react-native';
 import React, { useEffect } from 'react';
 
 import ChatNavigator from './ChatNavigator';
@@ -86,6 +86,7 @@ const TabNavigator = () => {
         component={ChatNavigator}
         options={{
           tabBarLabel: 'Chat',
+          tabBarHideOnKeyboard: false,
           // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({ color }) => (
             <Icon

@@ -10,7 +10,10 @@ export enum StartupScreen {
 }
 
 export type ChatNavigatorParamList = {
-  Chat: undefined;
+  ChatThread: {
+    threadId: string;
+  };
+  ChatThreadList: undefined;
 };
 
 export type GivingNavigatorParamList = {
