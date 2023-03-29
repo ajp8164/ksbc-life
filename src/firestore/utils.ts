@@ -2,7 +2,6 @@ import { log } from '@react-native-ajp-elements/core';
 import firestore, {
   FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';
-import { YouTubeVideoId } from 'types/youTube';
 
 export type QueryResult<T> = {
   allLoaded: boolean;
@@ -49,9 +48,7 @@ export const getDocument = <T>(
   );
 };
 
-export const getDocuments = <
-  T extends { id?: string | YouTubeVideoId | undefined },
->(
+export const getDocuments = <T extends { id?: string | undefined }>(
   collectionPath: string,
   opts?: {
     orderBy?: QueryOrderBy;
