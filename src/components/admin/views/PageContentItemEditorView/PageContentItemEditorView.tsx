@@ -313,9 +313,7 @@ const PageContentItemEditorView = React.forwardRef<
                   ? { uri: content.imageUrl }
                   : undefined
               }
-              imageHeight={Number(
-                content.imageSize || PageContentItemImageSize.Short,
-              )}
+              imageHeight={Number(content.imageSize)}
               cardStyle={theme.styles.pageContentCardStyle}
               titleStyle={theme.styles.pageContentCardTitleStyle}
               // buttons={[

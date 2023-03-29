@@ -14,10 +14,9 @@ import ScrollableTabView, {
 } from 'react-native-scrollable-tab-view';
 
 import { AuthContext } from 'lib/auth';
-import Card from 'components/molecules/Card';
 import { CompositeScreenProps } from '@react-navigation/core';
-import { DateTime } from 'luxon';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import PageContentItemsView from 'components/views/PageContentItemsView';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
 import { TabView } from 'components/atoms/TabView';
@@ -116,94 +115,13 @@ const HomeScreen = ({ navigation }: Props) => {
     }
   };
 
-  const showCard = (item: PageContentItem) => {
-    const today = DateTime.now();
-    const startDate = DateTime.fromISO(item.schedule.startDate);
-    const endDate =
-      item.schedule.endDate.length > 0 &&
-      DateTime.fromISO(item.schedule.endDate);
-    return (
-      item.schedule.enabled &&
-      startDate.startOf('day') <= today.startOf('day') &&
-      (endDate ? endDate.startOf('day') >= today.startOf('day') : true)
-    );
-  };
-
   const renderPageContent = () => {
     return (
       <ScrollView
         contentContainerStyle={{ marginTop: 15, paddingBottom: 15 }}
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior={'automatic'}>
-        {pageContentItems.map((i, index) => {
-          if (!showCard(i)) return null;
-          return (
-            <Card
-              key={index}
-              title={i.content.title}
-              body={i.content.body}
-              header={i.content.header}
-              footer={i.content.footer}
-              imageSource={{ uri: i.content.imageUrl }}
-              imageHeight={Number(i.content.imageSize)}
-              cardStyle={theme.styles.pageContentCardStyle}
-              titleStyle={theme.styles.pageContentCardTitleStyle}
-            />
-          );
-        })}
-        {/* 
-        <Card
-          title={'Welcome'}
-          body={'Worship 11:00 am\nLife Groups 9:30 am'}
-          imageSource={require('img/ksbc-front.jpg')}
-          imageHeight={300}
-          cardStyle={theme.styles.viewHorizontalInset}
-        />
-        <Card
-          title={'Daily Devotion'}
-          body={
-            'For God loved the world in this way: He gave his one and only Son, so that everyone who believes in him will not perish but have eternal life.'
-          }
-          footer={'John 3:16 CSB'}
-          buttons={[
-            {
-              label: 'Share',
-              icon: 'share-variant',
-              onPress: () => {
-                openShareSheet({
-                  title: 'John 3:16 CSB',
-                  message:
-                    'For God loved the world in this way: He gave his one and only Son, so that everyone who believes in him will not perish but have eternal life.',
-                });
-              },
-            },
-            {
-              label: 'Read',
-              icon: 'book-open-variant',
-              onPress: () => {
-                openURL('https://www.bible.com/bible/1713/JHN.3.CSB');
-              },
-            },
-          ]}
-          cardStyle={s.transparentCard}
-          titleStyle={{ textAlign: 'left' }}
-        />
-        <View style={s.cardRow}>
-          <Card
-            imageSource={require('img/life-kids.jpg')}
-            flexBasis={viewport.width / 2 - 23}
-            cardStyle={s.lightCard}
-          />
-          <Card
-            imageSource={require('img/life-kids.jpg')}
-            flexBasis={viewport.width / 2 - 23}
-            cardStyle={s.lightCard}
-          />
-        </View>
-        <Card
-          imageSource={require('img/life-kids.jpg')}
-          cardStyle={s.lightCard}
-        /> */}
+        <PageContentItemsView items={pageContentItems} />
       </ScrollView>
     );
   };
@@ -238,25 +156,12 @@ const HomeScreen = ({ navigation }: Props) => {
   );
 };
 
-const useStyles = makeStyles((_theme, theme: AppTheme) => ({
+const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
   avatar: {
     width: 30,
     height: 30,
     borderRadius: 30,
     top: -5,
-  },
-  cardRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    ...theme.styles.viewHorizontalInset,
-  },
-  transparentCard: {
-    backgroundColor: theme.colors.transparent,
-    ...theme.styles.viewHorizontalInset,
-  },
-  lightCard: {
-    backgroundColor: theme.colors.stickyWhite,
-    ...theme.styles.viewHorizontalInset,
   },
 }));
 

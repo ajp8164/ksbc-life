@@ -56,6 +56,11 @@ const Card = ({
   const s = useStyles(theme);
   const hasText = title || header || body || footer;
 
+  header = header && header.length > 0 ? header : undefined;
+  title = title && title.length > 0 ? title : undefined;
+  body = body && body.length > 0 ? body : undefined;
+  footer = footer && footer.length > 0 ? footer : undefined;
+
   return (
     <RNULCard
       style={[

@@ -20,7 +20,9 @@ export const useStyles = makeStyles(
     },
     // Styles
     pageContentCardStyle: {
+      marginBottom: 25,
       paddingVertical: 0,
+      overflow: 'hidden',
     },
     pageContentCardTitleStyle: {
       textAlign: 'left',
