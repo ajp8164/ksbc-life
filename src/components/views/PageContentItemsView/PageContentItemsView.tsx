@@ -8,7 +8,6 @@ import React, { useImperativeHandle } from 'react';
 import Card from 'components/molecules/Card';
 import { DateTime } from 'luxon';
 import { PageContentItem } from 'types/pageContentItem';
-import { View } from 'react-native';
 import { makeStyles } from '@rneui/themed';
 
 type PageContentItemsView = PageContentItemsViewMethods;

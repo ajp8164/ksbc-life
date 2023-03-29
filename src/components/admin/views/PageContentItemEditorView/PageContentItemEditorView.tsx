@@ -3,6 +3,7 @@ import * as Yup from 'yup';
 
 import {
   Alert,
+  Appearance,
   Keyboard,
   NativeSyntheticEvent,
   TextInput,
@@ -11,6 +12,9 @@ import {
 } from 'react-native';
 import { AppTheme, useTheme } from 'theme';
 import { Button, Icon, Image } from '@rneui/base';
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from '@react-native-community/datetimepicker';
 import {
   Divider,
   ListItem,
@@ -39,8 +43,8 @@ import { ellipsis, useSetState } from '@react-native-ajp-elements/core';
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import Card from 'components/molecules/Card';
-import { DatePickerModal } from 'components/modals/DatePickerModal';
 import { DateTime } from 'luxon';
+import { ExpandableSection } from 'react-native-ui-lib';
 import FormikEffect from 'components/atoms/FormikEffect';
 import ImageEditMenu from 'components/atoms/ImageEditMenu';
 import InfoMessage from 'components/atoms/InfoMessage';
@@ -99,8 +103,9 @@ const PageContentItemEditorView = React.forwardRef<
 
   const bodyTextModalRef = useRef<TextModal>(null);
   const itemAssignmentPickerModalRef = useRef<ItemPickerModal>(null);
-  const startDatePickerModalRef = useRef<DatePickerModal>(null);
-  const endDatePickerModalRef = useRef<DatePickerModal>(null);
+
+  const [expandedStartDate, setExpandedStartDate] = useState(false);
+  const [expandedEndDate, setExpandedEndDate] = useState(false);
 
   const formikRef = useRef<FormikProps<FormValues>>(null);
   const refName = useRef<TextInput>(null);
@@ -251,18 +256,20 @@ const PageContentItemEditorView = React.forwardRef<
     formikRef.current?.setFieldValue('schedule.enabled', value);
   };
 
-  const onStartDateChange = (date: Date) => {
-    formikRef.current?.setFieldValue(
-      'schedule.startDate',
-      DateTime.fromJSDate(date).toISO(),
-    );
+  const onStartDateChange = (_event: DateTimePickerEvent, date?: Date) => {
+    date &&
+      formikRef.current?.setFieldValue(
+        'schedule.startDate',
+        DateTime.fromJSDate(date).toISO(),
+      );
   };
 
-  const onEndDateChange = (date: Date) => {
-    formikRef.current?.setFieldValue(
-      'schedule.endDate',
-      DateTime.fromJSDate(date).toISO(),
-    );
+  const onEndDateChange = (_event: DateTimePickerEvent, date?: Date) => {
+    date &&
+      formikRef.current?.setFieldValue(
+        'schedule.endDate',
+        DateTime.fromJSDate(date).toISO(),
+      );
   };
 
   const onAssignmentChange = (assignment: string): void => {
@@ -552,8 +559,27 @@ const PageContentItemEditorView = React.forwardRef<
                   )
                 : 'Today'
             }
-            onPress={() => startDatePickerModalRef.current?.present()}
+            onPress={() => setExpandedStartDate(!expandedStartDate)}
           />
+          <ExpandableSection expanded={expandedStartDate}>
+            <DateTimePicker
+              mode={'date'}
+              minimumDate={new Date()}
+              style={
+                Appearance.getColorScheme() !== 'light' ||
+                theme.mode !== 'light'
+                  ? {
+                      backgroundColor: `${theme.colors.brandSecondary}60`,
+                    }
+                  : { backgroundColor: theme.colors.hintGray }
+              }
+              accentColor={theme.colors.brandSecondary}
+              value={DateTime.fromISO(
+                formik.values.schedule.startDate,
+              ).toJSDate()}
+              onChange={onStartDateChange}
+            />
+          </ExpandableSection>
           <ListItem
             title={'To'}
             containerStyle={{
@@ -567,8 +593,29 @@ const PageContentItemEditorView = React.forwardRef<
                 : 'Indefinite'
             }
             position={['last']}
-            onPress={() => endDatePickerModalRef.current?.present()}
+            onPress={() => setExpandedEndDate(!expandedEndDate)}
           />
+          <ExpandableSection expanded={expandedEndDate}>
+            <DateTimePicker
+              mode={'date'}
+              minimumDate={new Date()}
+              style={
+                Appearance.getColorScheme() !== 'light' ||
+                theme.mode !== 'light'
+                  ? {
+                      backgroundColor: `${theme.colors.brandSecondary}60`,
+                    }
+                  : { backgroundColor: theme.colors.hintGray }
+              }
+              accentColor={theme.colors.brandSecondary}
+              value={
+                formik.values.schedule.endDate.length > 0
+                  ? DateTime.fromISO(formik.values.schedule.endDate).toJSDate()
+                  : new Date()
+              }
+              onChange={onEndDateChange}
+            />
+          </ExpandableSection>
         </View>
       </BottomSheetScrollView>
     );
@@ -635,28 +682,6 @@ const PageContentItemEditorView = React.forwardRef<
         items={assignmentItems}
         value={formikRef.current?.values.assignment}
         onValueChange={onAssignmentChange}
-      />
-      <DatePickerModal
-        ref={startDatePickerModalRef}
-        value={
-          formikRef.current?.values.schedule.startDate
-            ? DateTime.fromISO(
-                formikRef.current.values.schedule.startDate,
-              ).toJSDate()
-            : new Date()
-        }
-        onValueChange={onStartDateChange}
-      />
-      <DatePickerModal
-        ref={endDatePickerModalRef}
-        value={
-          formikRef.current?.values.schedule.endDate
-            ? DateTime.fromISO(
-                formikRef.current.values.schedule.endDate,
-              ).toJSDate()
-            : new Date()
-        }
-        onValueChange={onEndDateChange}
       />
     </>
   );
