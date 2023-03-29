@@ -16,6 +16,7 @@ import ScrollableTabView, {
 import { AuthContext } from 'lib/auth';
 import Card from 'components/molecules/Card';
 import { CompositeScreenProps } from '@react-navigation/core';
+import { DateTime } from 'luxon';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
@@ -115,6 +116,19 @@ const HomeScreen = ({ navigation }: Props) => {
     }
   };
 
+  const showCard = (item: PageContentItem) => {
+    const today = DateTime.now();
+    const startDate = DateTime.fromISO(item.schedule.startDate);
+    const endDate =
+      item.schedule.endDate.length > 0 &&
+      DateTime.fromISO(item.schedule.endDate);
+    return (
+      item.schedule.enabled &&
+      startDate.startOf('day') <= today.startOf('day') &&
+      (endDate ? endDate.startOf('day') >= today.startOf('day') : true)
+    );
+  };
+
   const renderPageContent = () => {
     return (
       <ScrollView
@@ -122,6 +136,7 @@ const HomeScreen = ({ navigation }: Props) => {
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior={'automatic'}>
         {pageContentItems.map((i, index) => {
+          if (!showCard(i)) return null;
           return (
             <Card
               key={index}

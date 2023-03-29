@@ -181,9 +181,10 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
     const startDate = DateTime.fromISO(item.schedule.startDate).toFormat(
       'MMM d, yyyy',
     );
-    const endDate = DateTime.fromISO(item.schedule.endDate).toFormat(
-      'MMM d, yyyy',
-    );
+    const endDate =
+      item.schedule.endDate.length > 0
+        ? DateTime.fromISO(item.schedule.endDate).toFormat('MMM d, yyyy')
+        : undefined;
     return (
       <ShadowDecorator opacity={0.1} radius={10}>
         <ListItem
