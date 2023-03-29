@@ -206,7 +206,7 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
           rightImage={
             sortEnabled ? (
               <Icon
-                name="drag-horizontal-variant"
+                name="menu"
                 type={'material-community'}
                 color={theme.colors.midGray}
                 size={24}
