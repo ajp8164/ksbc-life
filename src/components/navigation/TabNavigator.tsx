@@ -1,6 +1,7 @@
 import { Platform, StatusBar, Text } from 'react-native';
 import React, { useEffect } from 'react';
 
+import ChatNavigator from './ChatNavigator';
 import GivingNavigator from './GivingNavigator';
 import HomeNavigator from './HomeNavigator';
 import { Icon } from '@rneui/base';
@@ -37,22 +38,10 @@ const TabNavigator = () => {
       initialRouteName="HomeTab"
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: theme.colors.brandPrimary,
+        tabBarActiveTintColor: theme.colors.brandSecondary,
         tabBarInactiveTintColor: theme.colors.lightGray,
         tabBarActiveBackgroundColor: theme.colors.activeTabBackground,
         tabBarInactiveBackgroundColor: theme.colors.inactiveTabBackground,
-        // eslint-disable-next-line react/no-unstable-nested-components
-        tabBarLabel: ({ focused }) => (
-          <Text
-            style={[
-              theme.styles.textTiny,
-              focused
-                ? { color: theme.colors.brandPrimary }
-                : { color: theme.colors.lightGray },
-            ]}>
-            {''}
-          </Text>
-        ),
         tabBarStyle: {
           backgroundColor: theme.colors.inactiveTabBackground,
           borderTopColor: theme.colors.tabBarBorder,
@@ -85,6 +74,22 @@ const TabNavigator = () => {
           tabBarIcon: ({ color }) => (
             <Icon
               name={'television-play'}
+              type={'material-community'}
+              color={color}
+              size={28}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="ChatTab"
+        component={ChatNavigator}
+        options={{
+          tabBarLabel: 'Chat',
+          // eslint-disable-next-line react/no-unstable-nested-components
+          tabBarIcon: ({ color }) => (
+            <Icon
+              name={'chat'}
               type={'material-community'}
               color={color}
               size={28}

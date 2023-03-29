@@ -9,6 +9,10 @@ export enum StartupScreen {
   Welcome = 'Welcome',
 }
 
+export type ChatNavigatorParamList = {
+  Chat: undefined;
+};
+
 export type GivingNavigatorParamList = {
   Giving: undefined;
   GivingBrowser: undefined;
@@ -58,6 +62,7 @@ export type StartupNavigatorParamList = {
 };
 
 export type TabNavigatorParamList = {
+  ChatTab: undefined;
   GivingTab: undefined;
   HomeTab: undefined;
   MoreTab: undefined;
