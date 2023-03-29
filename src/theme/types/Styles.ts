@@ -3,7 +3,7 @@ import { TextStyle, ViewStyle } from 'react-native';
 export type Styles = {
   iosLargeHeader: ViewStyle;
   modalHeader: ViewStyle;
-  pageContentCardStyle: ViewStyle;
+  pageContentCardDefaultStyle: ViewStyle;
   pageContentCardTransparentStyle: ViewStyle;
   pageContentCardTitleStyle: TextStyle;
   pageContentCardHeaderStyle: TextStyle;

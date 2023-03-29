@@ -21,7 +21,7 @@ export const useStyles = makeStyles(
 
     // Content Styles
     // NOTE -- These style *names* are stored in firestore. Changing the names will break rendered layout.
-    pageContentCardStyle: {
+    pageContentCardDefaultStyle: {
       marginBottom: 25,
       paddingVertical: 0,
       overflow: 'hidden',

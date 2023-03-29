@@ -63,7 +63,7 @@ const initialPageContentItem: PageContentItem = {
   assignment: PageContentItemAssignment.Ministries,
   ordinal: -1,
   content: {
-    cardStyle: 'pageContentCardStyle',
+    cardStyle: 'pageContentCardDefaultStyle',
     body: '',
     footer: '',
     header: '',
@@ -285,9 +285,10 @@ const PageContentItemEditorView = React.forwardRef<
   const toggleTransparentBackground = () => {
     formikRef.current?.setFieldValue(
       'content.cardStyle',
-      formikRef.current?.values.content.cardStyle === 'pageContentCardStyle'
+      formikRef.current?.values.content.cardStyle ===
+        'pageContentCardDefaultStyle'
         ? 'pageContentCardTransparentStyle'
-        : 'pageContentCardStyle',
+        : 'pageContentCardDefaultStyle',
     );
   };
 
