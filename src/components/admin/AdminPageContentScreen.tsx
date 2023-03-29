@@ -19,6 +19,7 @@ import { ActionSheet } from 'react-native-ui-lib';
 import { DateTime } from 'luxon';
 import { EditPageContentItemModal } from 'components/admin/modals/EditPageContentItemModal';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+import InfoMessage from 'components/atoms/InfoMessage';
 import { MoreNavigatorParamList } from 'types/navigation';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { PageContentItem } from 'types/pageContentItem';
@@ -283,10 +284,15 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
     return (
       <>
         {sortEnabled && (
-          <Divider
-            text={'Drag items to reorder content.'}
-            subHeaderStyle={{ marginTop: 10 }}
-          />
+          <>
+            <Divider
+              text={'Drag items to reorder.'}
+              subHeaderStyle={{ marginTop: 10 }}
+            />
+            <InfoMessage
+              text={`Changes to card order are immediatley visible to users.`}
+            />
+          </>
         )}
         {isLoading && (
           <View style={s.activityIndicator}>
