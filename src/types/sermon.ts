@@ -17,4 +17,4 @@ export type Sermon = {
   video?: SermonVideo;
 };
 
-export type SermonVideo = GoogleApiYouTubeSearchResource;
+export type SermonVideo = GoogleApiYouTubeSearchResource & { id?: string };
