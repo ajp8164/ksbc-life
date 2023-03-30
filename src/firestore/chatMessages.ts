@@ -54,11 +54,6 @@ export const addChatMessage = (
     firestore()
       .collection('ChatMessages')
       .doc(threadId)
-      // .update({
-      //   messages: {
-      //     [key]: outgoingMessage,
-      //   },
-      // })
       .update({
         [`messages.${key}`]: outgoingMessage,
       })
