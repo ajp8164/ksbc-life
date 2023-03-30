@@ -3,5 +3,5 @@ import { IChatMessage } from 'react-native-gifted-chat';
 
 export type ChatMessage = IChatMessage & {
   id?: string;
-  createdAt: IChatMessage['createdAt'] & FirebaseFirestoreTypes.Timestamp;
+  createdAt: IChatMessage['createdAt'] | FirebaseFirestoreTypes.Timestamp;
 };

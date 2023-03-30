@@ -1,10 +1,8 @@
 import {
   QueryOrderBy,
-  QueryResult,
   QueryWhere,
   collectionChangeListener,
   documentChangeListener,
-  getDocuments,
 } from 'firestore/utils';
 import firestore, {
   FirebaseFirestoreTypes,
@@ -13,19 +11,6 @@ import firestore, {
 import { ChatMessage } from 'types/chatMessage';
 import { log } from '@react-native-ajp-elements/core';
 import { uuidv4 } from 'lib/uuid';
-
-export const getChatMessages = (opts?: {
-  lastDocument?: FirebaseFirestoreTypes.DocumentData;
-  limit?: number;
-  orderBy?: QueryOrderBy;
-}): Promise<QueryResult<ChatMessage>> => {
-  const {
-    lastDocument,
-    limit = 10,
-    orderBy = { fieldPath: 'createdAt', directionStr: 'desc' },
-  } = opts || {};
-  return getDocuments('ChatMessages', { orderBy, limit, lastDocument });
-};
 
 export const initChatThread = (
   message: ChatMessage,
@@ -40,7 +25,11 @@ export const initChatThread = (
     firestore()
       .collection('ChatMessages')
       .doc(threadId)
-      .set({ [key]: outgoingMessage })
+      .set({
+        messages: {
+          [key]: outgoingMessage,
+        },
+      })
       .then(() => {
         return message;
       })
@@ -65,7 +54,14 @@ export const addChatMessage = (
     firestore()
       .collection('ChatMessages')
       .doc(threadId)
-      .update({ [key]: outgoingMessage })
+      // .update({
+      //   messages: {
+      //     [key]: outgoingMessage,
+      //   },
+      // })
+      .update({
+        [`messages.${key}`]: outgoingMessage,
+      })
       .then(() => {
         return message;
       })
@@ -73,6 +69,36 @@ export const addChatMessage = (
       .catch((e: any) => {
         if (e.message.includes('firestore/not-found')) {
           return initChatThread(message, threadId);
+        }
+        log.error(`Failed to add chat message: ${e.message}`);
+        throw e;
+      })
+  );
+};
+
+export const sendTypingState = (
+  isTyping: boolean,
+  userId: string,
+  threadId: string,
+): Promise<void> => {
+  console.log(isTyping, userId, threadId);
+  return (
+    firestore()
+      .collection('ChatMessages')
+      .doc(threadId)
+      .update({
+        isTyping: isTyping
+          ? firestore.FieldValue.arrayUnion(userId)
+          : firestore.FieldValue.arrayRemove(userId),
+      })
+      .then(() => {
+        return;
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch((e: any) => {
+        if (e.message.includes('firestore/not-found')) {
+          // If chat thread not initialized just ignore request to set isTyping.
+          return;
         }
         log.error(`Failed to add chat message: ${e.message}`);
         throw e;
