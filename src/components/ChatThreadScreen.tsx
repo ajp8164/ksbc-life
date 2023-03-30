@@ -33,6 +33,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
   const userProfile = useSelector(selectUserProfile);
   const threadId = useRef<string>();
   const [isLoading, setIsLoading] = useState(false);
+  const isInitializing = useRef(true);
   const [isTyping, setIsTyping] = useState(false);
   const iAmTyping = useRef(false);
 
@@ -108,6 +109,15 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
     threadId.current && addChatMessage(messages[0], threadId.current);
   }, []);
 
+  const onInputTextChanged = (text: string) => {
+    setTypingState(text);
+
+    // The first time text is entered we declare that initial message loading is complete.
+    if (text.length > 0) {
+      isInitializing.current = false;
+    }
+  };
+
   const setTypingState = (text: string) => {
     if (userProfile?.id && threadId.current) {
       // This logic ensures we send typing updates on state transitions, not on every keystroke.
@@ -126,7 +136,13 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
       {userProfile?.id ? (
         <GiftedChat
           messages={chatMessages}
-          renderMessage={props => <ChatMessageAnimated {...props} />}
+          renderMessage={props => {
+            return (
+              <ChatMessageAnimated
+                {...{ ...props, isInitializing: isInitializing.current }}
+              />
+            );
+          }}
           onSend={onSend}
           user={{
             _id: userProfile?.id,
@@ -135,7 +151,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
           }}
           bottomOffset={78}
           isTyping={isTyping}
-          onInputTextChanged={setTypingState}
+          onInputTextChanged={onInputTextChanged}
         />
       ) : (
         <InfoMessage text={'User id not found'} />
