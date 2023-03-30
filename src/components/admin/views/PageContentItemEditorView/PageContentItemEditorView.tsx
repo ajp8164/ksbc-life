@@ -151,7 +151,6 @@ const PageContentItemEditorView = React.forwardRef<
         value: key,
       });
     });
-    console.log(Object.keys(PageContentItemAssignment), items);
     setAssignmentItems(items);
   }, []);
 
