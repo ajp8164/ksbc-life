@@ -1,8 +1,8 @@
 import { AppTheme, useTheme } from 'theme';
+import { Avatar, Icon } from '@rneui/base';
 import { FlatList, ListRenderItem, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 
-import { Avatar } from '@rneui/base';
 import { ChatNavigatorParamList } from 'types/navigation';
 import { ListItem } from '@react-native-ajp-elements/ui';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -33,18 +33,28 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
   }, []);
 
   const renderUser: ListRenderItem<UserProfile> = ({ item, index }) => {
-    if (!users || !item.id) return null;
-    const threadId = item.id;
+    const recipient = item;
+    if (!users || !recipient.id) return null;
     return (
       <ListItem
-        title={item.name}
+        title={recipient.name || recipient.email}
         titleStyle={{ marginLeft: 10 }}
         leftImage={
-          <Avatar
-            source={{ uri: item.photoUrl }}
-            imageProps={{ resizeMode: 'contain' }}
-            avatarStyle={{ borderRadius: 30, paddingRight: 5 }}
-          />
+          recipient.photoUrl ? (
+            <Avatar
+              source={{ uri: recipient.photoUrl }}
+              imageProps={{ resizeMode: 'contain' }}
+              avatarStyle={{ borderRadius: 30, paddingRight: 5 }}
+            />
+          ) : (
+            <Icon
+              name={'account-circle-outline'}
+              type={'material-community'}
+              color={theme.colors.icon}
+              size={40}
+              style={{ marginLeft: -5, width: 44 }}
+            />
+          )
         }
         position={[
           index === 0 ? 'first' : undefined,
@@ -52,7 +62,7 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
         ]}
         onPress={() =>
           navigation.navigate('ChatThread', {
-            threadId,
+            recipient,
           })
         }
       />

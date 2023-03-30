@@ -1,10 +1,11 @@
 import { AppTheme, useTheme } from 'theme';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   addChatMessage,
   chatMessagesDocumentChangeListener,
 } from 'firestore/chatMessages';
 
+import ChatHeader from 'components/molecules/ChatHeader';
 import { ChatMessage } from 'types/chatMessage';
 import { ChatNavigatorParamList } from 'types/navigation';
 import { GiftedChat } from 'react-native-gifted-chat';
@@ -20,18 +21,28 @@ export type Props = NativeStackScreenProps<
   'ChatThread'
 >;
 
-const ChatThreadScreen = ({ navigation: _navigation, route }: Props) => {
+const ChatThreadScreen = ({ navigation, route }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
+  const recipient = route.params.recipient;
   const userProfile = useSelector(selectUserProfile);
-  const threadId = `${userProfile?.id}-${route.params.threadId}`;
+  const threadId = useRef<string>();
 
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
   useEffect(() => {
+    if (userProfile?.id && recipient.id) {
+      threadId.current =
+        userProfile?.id < recipient.id
+          ? `${userProfile?.id}-${recipient.id}`
+          : `${recipient.id}-${userProfile?.id}`;
+    }
+
+    if (!threadId.current) return;
+
     const subscription = chatMessagesDocumentChangeListener(
-      threadId,
+      threadId.current,
       snapshot => {
         const data = snapshot.data();
         if (!snapshot.metadata.hasPendingWrites && data) {
@@ -52,14 +63,24 @@ const ChatThreadScreen = ({ navigation: _navigation, route }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onSend = useCallback((messages = [] as ChatMessage[]) => {
-    addChatMessage(messages[0], threadId);
+  useEffect(() => {
+    navigation.setOptions({
+      header: renderHeader,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const renderHeader = () => {
+    return <ChatHeader userProfile={recipient} />;
+  };
+
+  const onSend = useCallback((messages = [] as ChatMessage[]) => {
+    threadId.current && addChatMessage(messages[0], threadId.current);
   }, []);
 
   console.log('chatMessages', chatMessages);
   return (
-    <View style={{ flex: 1, marginBottom: 0 }}>
+    <View style={{ flex: 1 }}>
       {userProfile?.id ? (
         <GiftedChat
           messages={chatMessages}

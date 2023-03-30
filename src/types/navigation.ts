@@ -2,6 +2,7 @@ import { ContentView } from 'types/content';
 import { NavigatorScreenParams } from '@react-navigation/core';
 import { PageContentItemAssignment } from 'types/pageContentItem';
 import { Sermon } from 'types/sermon';
+import { UserProfile } from 'types/user';
 
 export enum StartupScreen {
   None = 'None',
@@ -11,7 +12,7 @@ export enum StartupScreen {
 
 export type ChatNavigatorParamList = {
   ChatThread: {
-    threadId: string;
+    recipient: UserProfile;
   };
   ChatThreadList: undefined;
 };
