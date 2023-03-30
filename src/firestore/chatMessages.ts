@@ -81,7 +81,6 @@ export const sendTypingState = (
   userId: string,
   threadId: string,
 ): Promise<void> => {
-  console.log(isTyping, userId, threadId);
   return (
     firestore()
       .collection('ChatMessages')
