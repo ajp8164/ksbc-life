@@ -58,7 +58,6 @@ const HomeScreen = ({ navigation }: Props) => {
         snapshot.docs.forEach(d => {
           items.push({ ...d.data(), id: d.id } as PageContentItem);
         });
-        console.log(items);
         setPageContentItems(sortContentItems(items));
       },
       {
