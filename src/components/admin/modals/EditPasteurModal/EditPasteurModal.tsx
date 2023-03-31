@@ -1,12 +1,11 @@
 import { EditPasteurModalMethods, EditPasteurModalProps } from './types';
+import { Modal, ModalHeader } from '@react-native-ajp-elements/ui';
 import PasteurEditorView, {
   EditorState,
 } from 'components/admin/views/PasteurEditorView';
 import React, { useImperativeHandle, useRef, useState } from 'react';
 
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import { Modal } from '@react-native-ajp-elements/ui';
-import ModalHeader from 'components/molecules/ModalHeader';
 import { Pasteur } from 'types/pasteur';
 
 type EditPasteurModal = EditPasteurModalMethods;

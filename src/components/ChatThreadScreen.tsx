@@ -1,5 +1,13 @@
-import { AppTheme, useTheme } from 'theme';
-import { LayoutAnimation, View } from 'react-native';
+import {
+  ChatMessageAnimated,
+  renderActions,
+  renderAvatar,
+  renderBubble,
+  renderComposer,
+  renderHeader,
+  renderMessageText,
+  renderSend,
+} from 'components/molecules/chat';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   addChatMessage,
@@ -7,16 +15,14 @@ import {
   sendTypingState,
 } from 'firestore/chatMessages';
 
-import ChatHeader from 'components/molecules/ChatHeader';
 import { ChatMessage } from 'types/chatMessage';
-import { ChatMessageAnimated } from 'components/molecules/ChatMessageAnimated';
 import { ChatNavigatorParamList } from 'types/navigation';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { GiftedChat } from 'react-native-gifted-chat';
 import InfoMessage from 'components/atoms/InfoMessage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { View } from 'react-native';
 import lodash from 'lodash';
-import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { useSelector } from 'react-redux';
 
@@ -26,13 +32,9 @@ export type Props = NativeStackScreenProps<
 >;
 
 const ChatThreadScreen = ({ navigation, route }: Props) => {
-  const theme = useTheme();
-  const s = useStyles(theme);
-
   const recipient = route.params.recipient;
   const userProfile = useSelector(selectUserProfile);
   const threadId = useRef<string>();
-  const [isLoading, setIsLoading] = useState(false);
   const isInitializing = useRef(true);
   const [isTyping, setIsTyping] = useState(false);
   const iAmTyping = useRef(false);
@@ -66,11 +68,22 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
               rawMessages[key].createdAt =
                 (rawMessages[key].createdAt as FirebaseFirestoreTypes.Timestamp)
                   .seconds * 1000;
+
+              rawMessages[key].received = false; // Reset all message received status.
+              rawMessages[key].sent = false; // Reset all message sent status.
               return rawMessages[key] as ChatMessage;
             })
             .sort((a, b) => {
               return (b.createdAt as number) - (a.createdAt as number);
             });
+
+          // Use the last message in the list to set status.
+          // This status is used to create a status message and space at the end of the list.
+          if (messages[0].user._id === userProfile?.id) {
+            messages[0].sent = true;
+          } else {
+            messages[0].received = true;
+          }
 
           setChatMessages(messages);
 
@@ -95,17 +108,12 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
 
   useEffect(() => {
     navigation.setOptions({
-      header: renderHeader,
+      header: () => renderHeader(recipient),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const renderHeader = () => {
-    return <ChatHeader userProfile={recipient} />;
-  };
-
   const onSend = useCallback((messages = [] as ChatMessage[]) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     threadId.current && addChatMessage(messages[0], threadId.current);
   }, []);
 
@@ -136,6 +144,21 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
       {userProfile?.id ? (
         <GiftedChat
           messages={chatMessages}
+          onInputTextChanged={onInputTextChanged}
+          onSend={onSend}
+          user={{
+            _id: userProfile.id,
+            name: userProfile.name || '',
+            avatar: userProfile.photoUrl || '',
+          }}
+          isTyping={isTyping}
+          bottomOffset={78}
+          renderActions={renderActions}
+          renderAvatar={renderAvatar}
+          renderBubble={renderBubble}
+          renderComposer={renderComposer}
+          renderMessageText={renderMessageText}
+          renderSend={renderSend}
           renderMessage={props => {
             return (
               <ChatMessageAnimated
@@ -143,15 +166,6 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
               />
             );
           }}
-          onSend={onSend}
-          user={{
-            _id: userProfile?.id,
-            name: userProfile.name,
-            avatar: userProfile.photoUrl,
-          }}
-          bottomOffset={78}
-          isTyping={isTyping}
-          onInputTextChanged={onInputTextChanged}
         />
       ) : (
         <InfoMessage text={'User id not found'} />
@@ -159,7 +173,5 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
     </View>
   );
 };
-
-const useStyles = makeStyles((_theme, __theme: AppTheme) => ({}));
 
 export default ChatThreadScreen;

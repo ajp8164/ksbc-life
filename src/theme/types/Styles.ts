@@ -9,5 +9,6 @@ export type Styles = {
   pageContentCardHeaderStyle: TextStyle;
   pageContentCardFooterStyle: TextStyle;
   pageContentCardBodyStyle: TextStyle;
+  textMicro: TextStyle;
   viewHorizontalInset: ViewStyle;
 };

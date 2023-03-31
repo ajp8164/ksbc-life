@@ -1,11 +1,10 @@
 import { LayoutChangeEvent, Platform, StatusBar } from 'react-native';
-import { Modal, viewport } from '@react-native-ajp-elements/ui';
+import { Modal, ModalHeader, viewport } from '@react-native-ajp-elements/ui';
 import React, { useImperativeHandle, useRef, useState } from 'react';
 import { TextModalMethods, TextModalProps } from './types';
 import TextView, { TextViewMethods } from 'components/views/TextView';
 
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import ModalHeader from 'components/molecules/ModalHeader';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type TextModal = TextModalMethods;

@@ -2,12 +2,11 @@ import { EditLocationModalMethods, EditLocationModalProps } from './types';
 import LocationEditorView, {
   EditorState,
 } from 'components/admin/views/LocationEditorView';
+import { Modal, ModalHeader } from '@react-native-ajp-elements/ui';
 import React, { useImperativeHandle, useRef, useState } from 'react';
 
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { Location } from 'types/location';
-import { Modal } from '@react-native-ajp-elements/ui';
-import ModalHeader from 'components/molecules/ModalHeader';
 
 type EditLocationModal = EditLocationModalMethods;
 

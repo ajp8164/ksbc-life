@@ -1,3 +1,4 @@
+import { Modal, ModalHeader } from '@react-native-ajp-elements/ui';
 import React, { useImperativeHandle, useRef } from 'react';
 import {
   SermonVideoPickerModalMethods,
@@ -5,8 +6,6 @@ import {
 } from './types';
 
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import { Modal } from '@react-native-ajp-elements/ui';
-import ModalHeader from 'components/molecules/ModalHeader';
 import { SermonVideo } from 'types/sermon';
 import SermonVideoPickerView from './SermonVideoPickerView';
 

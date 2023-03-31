@@ -1,12 +1,11 @@
 import { EditUserModalMethods, EditUserModalProps } from './types';
+import { Modal, ModalHeader } from '@react-native-ajp-elements/ui';
 import React, { useImperativeHandle, useRef, useState } from 'react';
 import UserEditorView, {
   EditorState,
 } from 'components/admin/views/UserEditorView';
 
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import { Modal } from '@react-native-ajp-elements/ui';
-import ModalHeader from 'components/molecules/ModalHeader';
 import { UserProfile } from 'types/user';
 
 type EditUserModal = EditUserModalMethods;

@@ -1,3 +1,4 @@
+import { Modal, ModalHeader } from '@react-native-ajp-elements/ui';
 import React, { useImperativeHandle, useRef, useState } from 'react';
 import {
   UserStatusPickerModalMethods,
@@ -5,8 +6,6 @@ import {
 } from './types';
 
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import { Modal } from '@react-native-ajp-elements/ui';
-import ModalHeader from 'components/molecules/ModalHeader';
 import { UserStatus } from 'types/user';
 import UserStatusPickerView from './UserStatusPickerView';
 

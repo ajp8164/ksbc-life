@@ -11,6 +11,10 @@ interface ChatHeaderInterface {
   userProfile?: UserProfile;
 }
 
+export const renderHeader = (recipient: UserProfile) => {
+  return <ChatHeader userProfile={recipient} />;
+};
+
 const ChatHeader = ({ userProfile }: ChatHeaderInterface) => {
   const theme = useTheme();
   const s = useStyles(theme);
@@ -74,5 +78,3 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
     top: 5,
   },
 }));
-
-export default ChatHeader;

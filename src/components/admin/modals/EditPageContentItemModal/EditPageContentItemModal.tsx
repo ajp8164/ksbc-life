@@ -2,14 +2,13 @@ import {
   EditPageContentItemModalMethods,
   EditPageContentItemModalProps,
 } from './types';
+import { Modal, ModalHeader } from '@react-native-ajp-elements/ui';
 import PageContentItemEditorView, {
   EditorState,
 } from 'components/admin/views/PageContentItemEditorView';
 import React, { useImperativeHandle, useRef, useState } from 'react';
 
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import { Modal } from '@react-native-ajp-elements/ui';
-import ModalHeader from 'components/molecules/ModalHeader';
 import { PageContentItem } from 'types/pageContentItem';
 
 type EditPageContentItemModal = EditPageContentItemModalMethods;
