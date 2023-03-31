@@ -209,14 +209,6 @@ const PageContentItemEditorView = React.forwardRef<
         pageContentImageAsset.current = imageAsset;
         formikRef.current?.setFieldValue('content.imageUrl', imageAsset.uri);
       },
-      onError: () => {
-        Alert.alert(
-          'Image Not Selected',
-          'This image could not be selected. Please try again.',
-          [{ text: 'OK' }],
-          { cancelable: false },
-        );
-      },
     });
   };
 

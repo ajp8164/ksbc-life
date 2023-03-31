@@ -156,14 +156,6 @@ const LocationEditorView = React.forwardRef<
         locationImageAsset.current = imageAsset;
         formikRef.current?.setFieldValue('photoUrl', imageAsset.uri);
       },
-      onError: () => {
-        Alert.alert(
-          'Image Not Selected',
-          'This image could not be selected. Please try again.',
-          [{ text: 'OK' }],
-          { cancelable: false },
-        );
-      },
     });
   };
 
