@@ -147,7 +147,7 @@ const ChurchEditorView = React.forwardRef<
       onError: () => {
         Alert.alert(
           'Image Not Selected',
-          'This image could not be selected. Please try again,',
+          'This image could not be selected. Please try again.',
           [{ text: 'OK' }],
           { cancelable: false },
         );
@@ -179,7 +179,7 @@ const ChurchEditorView = React.forwardRef<
         .catch(() => {
           Alert.alert(
             'Image Not Deleted',
-            'This image could not be deleted. Please try again,',
+            'This image could not be deleted. Please try again.',
             [{ text: 'OK' }],
             { cancelable: false },
           );
