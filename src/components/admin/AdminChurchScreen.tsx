@@ -24,15 +24,12 @@ import { Location } from 'types/location';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { churchCollectionChangeListener } from 'firestore/churches';
 import { makeStyles } from '@rneui/themed';
-import { useHeaderHeight } from '@react-navigation/elements';
 
 const AdminChurchScreen = () => {
   const theme = useTheme();
   const s = useStyles(theme);
 
-  const headerHeight = useHeaderHeight();
-  const iosLargeTitleHeight = theme.styles.iosLargeHeader.height as number;
-  const contentTop = headerHeight + iosLargeTitleHeight;
+  const contentTop = theme.styles.headerBarLarge.height as number;
 
   const editChurchModalRef = useRef<EditChurchModal>(null);
   const editLocationModalRef = useRef<EditLocationModal>(null);

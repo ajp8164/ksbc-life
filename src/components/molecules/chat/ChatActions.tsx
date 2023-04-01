@@ -2,6 +2,7 @@ import { ActionsProps, Actions as GCActions } from 'react-native-gifted-chat';
 import { CameraModal, MediaCapture } from '@react-native-ajp-elements/ui';
 import React, { useRef } from 'react';
 
+import { Asset } from 'react-native-image-picker';
 import { Icon } from '@rneui/base';
 import { Keyboard } from 'react-native';
 import { useTheme } from 'theme';
@@ -15,8 +16,12 @@ export const Actions = (props: ActionsProps) => {
 
   const cameraModalRef = useRef<CameraModal>(null);
 
-  const onPreviewAction = (capture: MediaCapture) => {
+  const onCapture = (capture: MediaCapture) => {
     console.log('send this file', capture.media.path);
+  };
+
+  const onSelect = (assets: Asset[]) => {
+    console.log('send these files', assets.length, assets[0].uri);
   };
 
   const renderCameraIcon = () => {
@@ -51,8 +56,9 @@ export const Actions = (props: ActionsProps) => {
       />
       <CameraModal
         ref={cameraModalRef}
-        onPreviewAction={onPreviewAction}
         preview={true}
+        onCapture={onCapture}
+        onSelect={onSelect}
       />
     </>
   );

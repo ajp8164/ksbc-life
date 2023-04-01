@@ -22,6 +22,7 @@ import {
   ListItemInput,
   ListItemSwitch,
   PickerItem,
+  selectImage,
   viewport,
 } from '@react-native-ajp-elements/ui';
 import {
@@ -38,7 +39,7 @@ import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import ScrollableTabView, {
   DefaultTabBar,
 } from 'react-native-scrollable-tab-view';
-import { deleteImage, saveImage, selectImage } from 'lib/imageSelect';
+import { deleteImage, saveImage } from 'lib/imageSelect';
 import { ellipsis, useSetState } from '@react-native-ajp-elements/core';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
@@ -205,9 +206,12 @@ const PageContentItemEditorView = React.forwardRef<
 
   const selectPageContentImage = () => {
     selectImage({
-      onSuccess: imageAsset => {
-        pageContentImageAsset.current = imageAsset;
-        formikRef.current?.setFieldValue('content.imageUrl', imageAsset.uri);
+      onSuccess: imageAssets => {
+        pageContentImageAsset.current = imageAssets[0];
+        formikRef.current?.setFieldValue(
+          'content.imageUrl',
+          imageAssets[0].uri,
+        );
       },
     });
   };

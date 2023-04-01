@@ -21,11 +21,12 @@ import {
   Divider,
   ListItem,
   ListItemInput,
+  selectImage,
   viewport,
 } from '@react-native-ajp-elements/ui';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import React, { useEffect, useImperativeHandle, useRef } from 'react';
-import { deleteImage, saveImage, selectImage } from 'lib/imageSelect';
+import { deleteImage, saveImage } from 'lib/imageSelect';
 import { ellipsis, useSetState } from '@react-native-ajp-elements/core';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
@@ -140,9 +141,9 @@ const ChurchEditorView = React.forwardRef<
 
   const selectChurchImage = () => {
     selectImage({
-      onSuccess: imageAsset => {
-        churchImageAsset.current = imageAsset;
-        formikRef.current?.setFieldValue('photoUrl', imageAsset.uri);
+      onSuccess: imageAssets => {
+        churchImageAsset.current = imageAssets[0];
+        formikRef.current?.setFieldValue('photoUrl', imageAssets[0].uri);
       },
     });
   };

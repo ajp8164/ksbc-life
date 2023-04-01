@@ -16,6 +16,7 @@ import {
   Divider,
   ListItem,
   ListItemInput,
+  selectImage,
   viewport,
 } from '@react-native-ajp-elements/ui';
 import {
@@ -25,7 +26,7 @@ import {
 } from './types';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import React, { useEffect, useImperativeHandle, useRef } from 'react';
-import { deleteImage, saveImage, selectImage } from 'lib/imageSelect';
+import { deleteImage, saveImage } from 'lib/imageSelect';
 import { ellipsis, useSetState } from '@react-native-ajp-elements/core';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
@@ -151,9 +152,9 @@ const PasteurEditorView = React.forwardRef<
 
   const selectPasteurImage = () => {
     selectImage({
-      onSuccess: imageAsset => {
-        pasteurImageAsset.current = imageAsset;
-        formikRef.current?.setFieldValue('photoUrl', imageAsset.uri);
+      onSuccess: imageAssets => {
+        pasteurImageAsset.current = imageAssets[0];
+        formikRef.current?.setFieldValue('photoUrl', imageAssets[0].uri);
       },
     });
   };

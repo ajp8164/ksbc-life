@@ -11,7 +11,6 @@ import helpContent from 'lib/content/helpContent';
 import legalContent from 'lib/content/legalContent';
 import { makeStyles } from '@rneui/themed';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useHeaderHeight } from '@react-navigation/elements';
 
 export type Props = NativeStackScreenProps<MoreNavigatorParamList, 'About'>;
 
@@ -19,11 +18,10 @@ const AboutScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
-  const headerHeight = useHeaderHeight();
   const tabBarHeight = useBottomTabBarHeight();
-  const iosLargeTitleHeight = theme.styles.iosLargeHeader.height as number;
+  const headerBarLargeHeight = theme.styles.headerBarLarge.height as number;
   const visibleViewHeight =
-    viewport.height - headerHeight - tabBarHeight - iosLargeTitleHeight;
+    viewport.height - tabBarHeight - headerBarLargeHeight;
 
   return (
     <SafeAreaView edges={['left', 'right']} style={theme.styles.view}>

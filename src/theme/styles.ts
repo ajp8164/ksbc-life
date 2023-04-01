@@ -3,7 +3,6 @@ import {
   fontFamily,
 } from '@react-native-ajp-elements/ui';
 
-import { Platform } from 'react-native';
 import { Styles } from 'theme/types/Styles';
 import { makeStyles } from '@rneui/themed';
 
@@ -14,24 +13,6 @@ export const fontSizes = {
 
 export const useStyles = makeStyles(
   (theme): Styles => ({
-    /**
-     * Constants
-     */
-
-    iosLargeHeader: {
-      ...Platform.select({
-        android: {
-          height: 0,
-        },
-        ios: {
-          height: 52,
-        },
-      }),
-    },
-    modalHeader: {
-      height: 81,
-    },
-
     /**
      * Content Styles
      * NOTE -- These style *names* are stored in firestore. Changing the names will break rendered layout.

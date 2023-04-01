@@ -26,7 +26,6 @@ import { PageContentItem } from 'types/pageContentItem';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import lodash from 'lodash';
 import { makeStyles } from '@rneui/themed';
-import { useHeaderHeight } from '@react-navigation/elements';
 
 type ContentItemFilter = 'active-only' | 'archive-only' | 'all';
 
@@ -41,9 +40,7 @@ const AdminPageContentScreen = ({ navigation, route }: Props) => {
 
   const pageName = route.params.pageName;
 
-  const headerHeight = useHeaderHeight();
-  const iosLargeTitleHeight = theme.styles.iosLargeHeader.height as number;
-  const contentTop = headerHeight + iosLargeTitleHeight;
+  const contentTop = theme.styles.headerBarLarge.height as number;
 
   const [cardFilterActionSheetVisible, setCardFilterActionSheetVisible] =
     useState(false);

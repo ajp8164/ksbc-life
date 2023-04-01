@@ -1049,7 +1049,7 @@ PODS:
     - FBSDKGamingServicesKit (~> 15.0.0)
     - FBSDKShareKit (~> 15.0.0)
     - React-Core
-  - react-native-image-picker (5.1.0):
+  - react-native-image-picker (5.3.1):
     - React-Core
   - react-native-ios-context-menu (1.15.3):
     - React-Core
@@ -1251,8 +1251,6 @@ PODS:
     - Sentry/HybridSDK (= 7.31.5)
   - RNShare (8.2.0):
     - React-Core
-  - RNStaticSafeAreaInsets (2.2.0):
-    - React-Core
   - RNSVG (13.8.0):
     - React-Core
   - RNVectorIcons (9.2.0):
@@ -1345,7 +1343,6 @@ DEPENDENCIES:
   - RNScreens (from `../node_modules/react-native-screens`)
   - "RNSentry (from `../node_modules/@sentry/react-native`)"
   - RNShare (from `../node_modules/react-native-share`)
-  - RNStaticSafeAreaInsets (from `../node_modules/react-native-static-safe-area-insets`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - VisionCamera (from `../node_modules/react-native-vision-camera`)
@@ -1539,8 +1536,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@sentry/react-native"
   RNShare:
     :path: "../node_modules/react-native-share"
-  RNStaticSafeAreaInsets:
-    :path: "../node_modules/react-native-static-safe-area-insets"
   RNSVG:
     :path: "../node_modules/react-native-svg"
   RNVectorIcons:
@@ -1608,7 +1603,7 @@ SPEC CHECKSUMS:
   react-native-cameraroll: f3050460fe1708378698c16686bfaa5f34099be2
   react-native-config: 5330c8258265c1e5fdb8c009d2cabd6badd96727
   react-native-fbsdk-next: c78dede90e3c50ab6936a7d56c43e1a9eb37e25a
-  react-native-image-picker: c33d4e79f0a14a2b66e5065e14946ae63749660b
+  react-native-image-picker: ec9b713e248760bfa0f879f0715391de4651a7cb
   react-native-ios-context-menu: e529171ba760a1af7f2ef0729f5a7f4d226171c5
   react-native-menu: 9d7d6f819cc7fa14a15cf86888c53f3240d86f1b
   react-native-netinfo: 2517ad504b3d303e90d7a431b0fcaef76d207983
@@ -1657,7 +1652,6 @@ SPEC CHECKSUMS:
   RNScreens: 218801c16a2782546d30bd2026bb625c0302d70f
   RNSentry: 50f8b7147d1d0973a56635e524b192ec80e53195
   RNShare: b089c33619bbfb0a32bc4069c858b9274e694187
-  RNStaticSafeAreaInsets: 055ddbf5e476321720457cdaeec0ff2ba40ec1b8
   RNSVG: c1e76b81c76cdcd34b4e1188852892dc280eb902
   RNVectorIcons: fcc2f6cb32f5735b586e66d14103a74ce6ad61f8
   Sentry: 4c9babff9034785067c896fd580b1f7de44da020
