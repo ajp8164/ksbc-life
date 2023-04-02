@@ -17,7 +17,7 @@ export const useAuthorizeUser = () => {
     result?: {
       onAuthorized?: () => void;
       onUnauthorized?: (alertUser?: boolean) => void;
-      onError?: () => void;
+      onError?: (msg: string) => void;
     },
   ) => {
     if (credentials) {
@@ -46,7 +46,7 @@ export const useAuthorizeUser = () => {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               .catch((e: any) => {
                 log.error(`Failed to add user to firestore: ${e.message}`);
-                result?.onError && result.onError();
+                result?.onError && result.onError(e.message);
               });
           } else {
             // User exists. Update user in firestore (if needed) and set user.
@@ -77,7 +77,7 @@ export const useAuthorizeUser = () => {
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   .catch((e: any) => {
                     log.error(`Failed to add user to firestore: ${e.message}`);
-                    result?.onError && result.onError();
+                    result?.onError && result.onError(e.message);
                   });
               } else {
                 const user = setUser(credentials, profile);
@@ -100,7 +100,7 @@ export const useAuthorizeUser = () => {
           log.error(
             `Failed to query User collection from firestore: ${e.message}`,
           );
-          result?.onError && result.onError();
+          result?.onError && result.onError(e.message);
         });
     } else {
       signOut().then(() => {

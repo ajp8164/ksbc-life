@@ -66,13 +66,22 @@ export const useAuthContext = (
     signInModalRef.current?.present(msg);
   };
 
-  const onAuthError = () => {
-    Alert.alert(
-      'Sign In Failed',
-      'There was a problem signing in. Please try again.',
-      [{ text: 'OK' }],
-      { cancelable: false },
-    );
+  const onAuthError = (msg: string) => {
+    if (msg.includes('firestore/unavailable')) {
+      Alert.alert(
+        'Service Unavailable',
+        "We can't connect to the server. Please check your network connection and try again.",
+        [{ text: 'OK' }],
+        { cancelable: false },
+      );
+    } else {
+      Alert.alert(
+        'Sign In Failed',
+        'There was a problem signing in. Please try again.',
+        [{ text: 'OK' }],
+        { cancelable: false },
+      );
+    }
   };
 
   const onNotAuthorized = (alertUser?: boolean) => {
