@@ -20,6 +20,7 @@ export const useAuthorizeUser = () => {
       onError?: (msg: string) => void;
     },
   ) => {
+    console.log(credentials);
     if (credentials) {
       // Check if user already exists in firstore. If not then add the user to firestore.
       firestore()
@@ -116,7 +117,7 @@ const createProfile = (credentials: FirebaseAuthTypes.User): UserProfile => {
     name: credentials.displayName,
     email: credentials.email,
     photoUrl: credentials.photoURL,
-    role: UserRole.User, // All users created with default role.
+    role: credentials.isAnonymous ? UserRole.Anonymous : UserRole.User,
     status: UserStatus.Active,
   } as UserProfile;
 };

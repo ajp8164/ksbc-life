@@ -11,6 +11,7 @@ import { signOut, useUnauthorizeUser } from 'lib/auth';
 
 import { CompositeScreenProps } from '@react-navigation/core';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { UserRole } from 'types/user';
 import { biometricAuthentication } from 'lib/biometricAuthentication';
 import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
@@ -64,7 +65,7 @@ const UserProfileScreen = ({ navigation }: Props) => {
       navigation.goBack();
     });
   };
-
+  console.log(userProfile);
   return (
     <View>
       <ScrollView
@@ -85,11 +86,15 @@ const UserProfileScreen = ({ navigation }: Props) => {
             style={{ marginTop: 15 }}
           />
         )}
-        {userProfile?.name && (
-          <Text style={s.profileName}>{userProfile.name}</Text>
-        )}
-        {userProfile?.email && (
-          <Text style={s.profileEmail}>{userProfile.email}</Text>
+        {userProfile?.role === UserRole.Anonymous ? (
+          <Text style={s.profileName}>{'Anonymous'}</Text>
+        ) : (
+          userProfile?.name && (
+            <Text style={s.profileName}>{userProfile.name}</Text>
+          ) &&
+          userProfile?.email && (
+            <Text style={s.profileEmail}>{userProfile.email}</Text>
+          )
         )}
         <Divider />
         <ListItem

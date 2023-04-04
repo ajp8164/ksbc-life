@@ -1,6 +1,6 @@
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { createContext, useEffect, useRef } from 'react';
-import { useAuthorizeUser, useUnauthorizeUser } from '.';
+import { signInAnonymously, useAuthorizeUser, useUnauthorizeUser } from '.';
 
 import { Alert } from 'react-native';
 import { DateTime } from 'luxon';
@@ -84,9 +84,9 @@ export const useAuthContext = (
     }
   };
 
-  const onNotAuthorized = (alertUser?: boolean) => {
+  const onNotAuthorized = (accountNotActive?: boolean) => {
     dismiss();
-    if (alertUser) {
+    if (accountNotActive) {
       Alert.alert(
         'Account Disabled',
         'Contact your administrator for more information.',
@@ -94,6 +94,10 @@ export const useAuthContext = (
         { cancelable: false },
       );
     }
+
+    // Not authorized via sign-on credentials. Provide anonymous authentication.
+    // Anonymous sign in allows restricted use of firebase services.
+    signInAnonymously();
   };
 
   return {
