@@ -51,6 +51,20 @@ export const updateUser = (user: UserProfile): Promise<UserProfile> => {
   );
 };
 
+export const deleteUser = (id: string): Promise<void> => {
+  return (
+    firestore()
+      .collection('Users')
+      .doc(id)
+      .delete()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch((e: any) => {
+        log.error(`Failed to delete user document: ${e.message}`);
+        throw e;
+      })
+  );
+};
+
 export const usersCollectionChangeListener = (
   handler: (
     snapshot: FirebaseFirestoreTypes.QuerySnapshot<FirebaseFirestoreTypes.DocumentData>,

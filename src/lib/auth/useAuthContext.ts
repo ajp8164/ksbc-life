@@ -5,7 +5,9 @@ import { signInAnonymously, useAuthorizeUser, useUnauthorizeUser } from '.';
 import { Alert } from 'react-native';
 import { DateTime } from 'luxon';
 import { SignInModalMethods } from 'components/modals/SignInModal';
+import { UserRole } from 'types/user';
 import { appConfig } from 'config';
+import { deleteUser } from 'firestore/users';
 import lodash from 'lodash';
 import { selectUser } from 'store/selectors/userSelectors';
 import { useSelector } from 'react-redux';
@@ -39,6 +41,15 @@ export const useAuthContext = (
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(credentials => {
+      // Delete the anonymous user profile.
+      if (
+        credentials &&
+        user.profile?.role === UserRole.Anonymous &&
+        user.profile.id
+      ) {
+        deleteUser(user.profile.id);
+      }
+
       // This handler is called multiple times. Avoid more than one authoization.
       // See https://stackoverflow.com/a/40436769
       if (isReAuthenticationRequired(user.credentials)) {
