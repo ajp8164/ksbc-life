@@ -9,9 +9,7 @@ import {
   PageContentItemAssignment,
 } from 'types/pageContentItem';
 import React, { useContext, useEffect, useState } from 'react';
-import ScrollableTabView, {
-  DefaultTabBar,
-} from 'react-native-scrollable-tab-view';
+import { TabBar, TabView } from 'react-native-tab-view';
 
 import { AuthContext } from 'lib/auth';
 import { CompositeScreenProps } from '@react-navigation/core';
@@ -19,11 +17,12 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import PageContentItemsView from 'components/views/PageContentItemsView';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
-import { TabView } from 'components/atoms/TabView';
+import { Text } from 'react-native';
 import { makeStyles } from '@rneui/themed';
 import { pageContentItemCollectionChangeListener } from 'firestore/pageContentItems';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { useSelector } from 'react-redux';
+import { viewport } from '@react-native-ajp-elements/ui';
 
 type Props = CompositeScreenProps<
   NativeStackScreenProps<HomeNavigatorParamList, 'Home'>,
@@ -40,6 +39,27 @@ const HomeScreen = ({ navigation }: Props) => {
   const [pageContentItems, setPageContentItems] = useState<PageContentItem[]>(
     [],
   );
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const renderScene = ({ route }: any) => {
+    switch (route.key) {
+      case 'ministries':
+        return renderMinistriesContent();
+      case 'events':
+        return null; //renderEventsContent();
+      case 'my-feed':
+        return null; //renderMyFeedContent();
+      default:
+        return null;
+    }
+  };
+
+  const [tabIndex, setTabIndex] = React.useState(0);
+  const [routes] = React.useState([
+    { key: 'ministries', title: 'Ministries' },
+    { key: 'events', title: 'Events' },
+    { key: 'my-feed', title: 'My Feed' },
+  ]);
 
   useEffect(() => {
     setAvatar();
@@ -114,10 +134,13 @@ const HomeScreen = ({ navigation }: Props) => {
     }
   };
 
-  const renderPageContent = () => {
+  const renderMinistriesContent = () => {
     return (
       <ScrollView
-        contentContainerStyle={{ marginTop: 15, paddingBottom: 15 }}
+        contentContainerStyle={[
+          theme.styles.view,
+          { marginTop: 15, paddingBottom: 15 },
+        ]}
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior={'automatic'}>
         <PageContentItemsView items={pageContentItems} />
@@ -125,32 +148,34 @@ const HomeScreen = ({ navigation }: Props) => {
     );
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const renderTabBar = (props: any) => {
+    return (
+      <TabBar
+        {...props}
+        renderLabel={({ route }) => (
+          <Text style={theme.styles.textNormal}>{route.title}</Text>
+        )}
+        indicatorStyle={{
+          backgroundColor: theme.colors.brandSecondary,
+          height: 5,
+        }}
+        style={{ backgroundColor: theme.colors.white }}
+      />
+    );
+  };
+
   return (
-    <SafeAreaView edges={['left', 'right']} style={theme.styles.view}>
-      <ScrollableTabView
-        initialPage={0}
-        renderTabBar={() => (
-          <DefaultTabBar
-            // @ts-ignore property is incorrectly typed
-            tabBarUnderlineStyle={{
-              backgroundColor: theme.colors.brandSecondary,
-            }}
-            tabStyle={{ paddingBottom: 0 }}
-            textStyle={theme.styles.textNormal}
-            inactiveTextColor={theme.colors.textDim}
-            style={{ borderBottomColor: theme.colors.subtleGray }}
-          />
-        )}>
-        <TabView tabLabel={'Ministries'} style={{ flex: 1 }}>
-          {renderPageContent()}
-        </TabView>
-        <TabView tabLabel={'Events'} style={{ flex: 1 }}>
-          {/* {renderContentEditor(formik)} */}
-        </TabView>
-        <TabView tabLabel={'My Feed'} style={{ flex: 1 }}>
-          {/* {renderScheduleEditor(formik)} */}
-        </TabView>
-      </ScrollableTabView>
+    <SafeAreaView
+      edges={['left', 'right']}
+      style={[theme.styles.view, { paddingHorizontal: 0 }]}>
+      <TabView
+        navigationState={{ index: tabIndex, routes }}
+        renderScene={renderScene}
+        onIndexChange={setTabIndex}
+        initialLayout={{ width: viewport.width }}
+        renderTabBar={renderTabBar}
+      />
     </SafeAreaView>
   );
 };

@@ -6,6 +6,7 @@ import {
   Appearance,
   Keyboard,
   NativeSyntheticEvent,
+  Text,
   TextInput,
   TextInputFocusEventData,
   View,
@@ -36,9 +37,7 @@ import {
   PageContentItemImageSize,
 } from 'types/pageContentItem';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
-import ScrollableTabView, {
-  DefaultTabBar,
-} from 'react-native-scrollable-tab-view';
+import { TabBar, TabView } from 'react-native-tab-view';
 import { deleteImage, saveImage } from 'lib/imageSelect';
 import { ellipsis, useSetState } from '@react-native-ajp-elements/core';
 
@@ -52,7 +51,6 @@ import ImageEditMenu from 'components/atoms/ImageEditMenu';
 import InfoMessage from 'components/atoms/InfoMessage';
 import { ItemPickerModal } from 'components/modals/ItemPickerModal';
 import { PageContentItemAssignment } from 'types/pageContentItem';
-import { TabView } from 'components/atoms/TabView';
 import { TextModal } from 'components/modals/TextModal';
 import { appConfig } from 'config';
 import { savePageContentItem as commitPageContentItem } from 'firestore/pageContentItems';
@@ -111,6 +109,7 @@ const PageContentItemEditorView = React.forwardRef<
   const [expandedEndDate, setExpandedEndDate] = useState(false);
 
   const formikRef = useRef<FormikProps<FormValues>>(null);
+  const tabsFormikRef = useRef<FormikProps<PageContentItem>>();
   const refName = useRef<TextInput>(null);
   const refFooter = useRef<TextInput>(null);
   const refHeader = useRef<TextInput>(null);
@@ -133,6 +132,28 @@ const PageContentItemEditorView = React.forwardRef<
     isSubmitting: false,
     changed: false,
   });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const renderScene = ({ route }: any) => {
+    if (!tabsFormikRef.current) return;
+    switch (route.key) {
+      case 'preview':
+        return renderCardPreview(tabsFormikRef.current);
+      case 'edit':
+        return renderContentEditor(tabsFormikRef.current);
+      case 'schedule':
+        return renderScheduleEditor(tabsFormikRef.current);
+      default:
+        return null;
+    }
+  };
+
+  const [tabIndex, setTabIndex] = React.useState(0);
+  const [routes] = React.useState([
+    { key: 'preview', title: 'Preview' },
+    { key: 'edit', title: 'Edit' },
+    { key: 'schedule', title: 'Schedule' },
+  ]);
 
   useImperativeHandle(ref, () => ({
     //  These functions exposed to the parent component through the ref.
@@ -656,6 +677,23 @@ const PageContentItemEditorView = React.forwardRef<
     );
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const renderTabBar = (props: any) => {
+    return (
+      <TabBar
+        {...props}
+        renderLabel={({ route }) => (
+          <Text style={theme.styles.textNormal}>{route.title}</Text>
+        )}
+        indicatorStyle={{
+          backgroundColor: theme.colors.brandSecondary,
+          height: 5,
+        }}
+        style={{ backgroundColor: theme.colors.white }}
+      />
+    );
+  };
+
   return (
     <>
       <AvoidSoftInputView
@@ -668,47 +706,33 @@ const PageContentItemEditorView = React.forwardRef<
           validateOnBlur={true}
           validationSchema={validationSchema}
           onSubmit={save}>
-          {formik => (
-            <>
-              <FormikEffect
-                formik={formik}
-                onChange={(currentState, previousState) => {
-                  if (
-                    currentState.dirty !== previousState?.dirty ||
-                    currentState.isValid !== previousState?.isValid
-                  ) {
-                    setEditorState({
-                      changed: currentState.dirty && currentState.isValid,
-                    });
-                  }
-                }}
-              />
-              <ScrollableTabView
-                initialPage={0}
-                renderTabBar={() => (
-                  <DefaultTabBar
-                    // @ts-ignore property is incorrectly typed
-                    tabBarUnderlineStyle={{
-                      backgroundColor: theme.colors.brandSecondary,
-                    }}
-                    tabStyle={{ paddingBottom: 0 }}
-                    textStyle={theme.styles.textNormal}
-                    inactiveTextColor={theme.colors.textDim}
-                    style={{ borderBottomColor: theme.colors.subtleGray }}
-                  />
-                )}>
-                <TabView tabLabel={'Preview'} style={{ flex: 1 }}>
-                  {renderCardPreview(formik)}
-                </TabView>
-                <TabView tabLabel={'Edit'} style={{ flex: 1 }}>
-                  {renderContentEditor(formik)}
-                </TabView>
-                <TabView tabLabel={'Schedule'} style={{ flex: 1 }}>
-                  {renderScheduleEditor(formik)}
-                </TabView>
-              </ScrollableTabView>
-            </>
-          )}
+          {formik => {
+            tabsFormikRef.current = formik;
+            return (
+              <>
+                <FormikEffect
+                  formik={formik}
+                  onChange={(currentState, previousState) => {
+                    if (
+                      currentState.dirty !== previousState?.dirty ||
+                      currentState.isValid !== previousState?.isValid
+                    ) {
+                      setEditorState({
+                        changed: currentState.dirty && currentState.isValid,
+                      });
+                    }
+                  }}
+                />
+                <TabView
+                  navigationState={{ index: tabIndex, routes }}
+                  renderScene={renderScene}
+                  onIndexChange={setTabIndex}
+                  initialLayout={{ width: viewport.width }}
+                  renderTabBar={renderTabBar}
+                />
+              </>
+            );
+          }}
         </Formik>
       </AvoidSoftInputView>
       <ItemPickerModal
