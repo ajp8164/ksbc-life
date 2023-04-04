@@ -5,7 +5,6 @@ import {
   TabNavigatorParamList,
 } from 'types/navigation';
 import React, { useContext, useEffect } from 'react';
-import { ScrollView, View } from 'react-native';
 import { UserProfile, UserRole } from 'types/user';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -13,6 +12,7 @@ import { AuthContext } from 'lib/auth';
 import { CompositeScreenProps } from '@react-navigation/core';
 import { Image } from '@rneui/base';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { ScrollView } from 'react-native';
 import { appConfig } from 'config';
 import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
@@ -60,68 +60,66 @@ const MoreScreen = ({ navigation, route }: Props) => {
   }, [route.params?.subNav]);
 
   return (
-    <View>
-      <ScrollView
-        style={theme.styles.view}
-        showsVerticalScrollIndicator={false}
-        contentInsetAdjustmentBehavior={'automatic'}>
-        <Divider />
-        {userProfile && userProfile.role !== UserRole.Anonymous ? (
-          <ListItem
-            title={userProfile.name || userProfile.email || 'My Profile'}
-            leftImage={
-              userProfile.photoUrl ? (
-                <Image
-                  source={{ uri: userProfile.photoUrl }}
-                  containerStyle={s.avatar}
-                />
-              ) : (
-                'account-circle-outline'
-              )
-            }
-            leftImageType={'material-community'}
-            position={['first', 'last']}
-            onPress={() => navigation.navigate('UserProfile')}
-          />
-        ) : (
-          <ListItem
-            title={'Sign In or Sign Up'}
-            leftImage={'account-circle-outline'}
-            leftImageType={'material-community'}
-            position={['first', 'last']}
-            onPress={() => auth.presentSignInModal()}
-          />
-        )}
-        <Divider />
+    <ScrollView
+      style={theme.styles.view}
+      showsVerticalScrollIndicator={false}
+      contentInsetAdjustmentBehavior={'automatic'}>
+      <Divider />
+      {userProfile && userProfile.role !== UserRole.Anonymous ? (
         <ListItem
-          title={'App Settings'}
-          position={['first']}
-          leftImage={'cog-outline'}
+          title={userProfile.name || userProfile.email || 'My Profile'}
+          leftImage={
+            userProfile.photoUrl ? (
+              <Image
+                source={{ uri: userProfile.photoUrl }}
+                containerStyle={s.avatar}
+              />
+            ) : (
+              'account-circle-outline'
+            )
+          }
           leftImageType={'material-community'}
-          onPress={() => navigation.navigate('AppSettings')}
+          position={['first', 'last']}
+          onPress={() => navigation.navigate('UserProfile')}
         />
+      ) : (
         <ListItem
-          title={`About ${appConfig.appName}`}
-          position={['last']}
-          leftImage={'information-outline'}
+          title={'Sign In or Sign Up'}
+          leftImage={'account-circle-outline'}
           leftImageType={'material-community'}
-          onPress={() => navigation.navigate('About')}
+          position={['first', 'last']}
+          onPress={() => auth.presentSignInModal()}
         />
-        <Divider />
-        {(userProfile?.role === UserRole.Owner ||
-          userProfile?.role === UserRole.Admin) && (
-          <ListItem
-            title={'Administration'}
-            position={['first', 'last']}
-            leftImage={'database-outline'}
-            leftImageType={'material-community'}
-            onPress={() => {
-              navigation.navigate('AdminHome');
-            }}
-          />
-        )}
-      </ScrollView>
-    </View>
+      )}
+      <Divider />
+      <ListItem
+        title={'App Settings'}
+        position={['first']}
+        leftImage={'cog-outline'}
+        leftImageType={'material-community'}
+        onPress={() => navigation.navigate('AppSettings')}
+      />
+      <ListItem
+        title={`About ${appConfig.appName}`}
+        position={['last']}
+        leftImage={'information-outline'}
+        leftImageType={'material-community'}
+        onPress={() => navigation.navigate('About')}
+      />
+      <Divider />
+      {(userProfile?.role === UserRole.Owner ||
+        userProfile?.role === UserRole.Admin) && (
+        <ListItem
+          title={'Administration'}
+          position={['first', 'last']}
+          leftImage={'database-outline'}
+          leftImageType={'material-community'}
+          onPress={() => {
+            navigation.navigate('AdminHome');
+          }}
+        />
+      )}
+    </ScrollView>
   );
 };
 

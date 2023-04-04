@@ -1,16 +1,21 @@
 import { AppTheme, useTheme } from 'theme';
 import { Avatar, Icon } from '@rneui/base';
-import { FlatList, ListRenderItem, View } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import { Divider, ListItem } from '@react-native-ajp-elements/ui';
+import { FlatList, ListRenderItem, ScrollView, View } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
 
+import { AuthContext } from 'lib/auth';
 import { ChatNavigatorParamList } from 'types/navigation';
-import { ListItem } from '@react-native-ajp-elements/ui';
+import InfoMessage from 'components/atoms/InfoMessage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import NoItems from 'components/atoms/NoItems';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { UserProfile } from 'types/user';
+import { UserRole } from 'types/user';
 import { getUsers } from 'firestore/users';
 import { makeStyles } from '@rneui/themed';
+import { selectUserProfile } from 'store/selectors/userSelectors';
+import { useSelector } from 'react-redux';
 
 export type Props = NativeStackScreenProps<
   ChatNavigatorParamList,
@@ -20,6 +25,9 @@ export type Props = NativeStackScreenProps<
 const ChatThreadListScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
+
+  const auth = useContext(AuthContext);
+  const userProfile = useSelector(selectUserProfile);
 
   const [isLoading, setIsLoading] = useState(false);
   const [users, setUsers] = useState<UserProfile[]>();
@@ -82,17 +90,34 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
     <SafeAreaView
       edges={['left', 'right']}
       style={[theme.styles.view, { paddingHorizontal: 0 }]}>
-      <FlatList
-        data={users}
-        renderItem={renderUser}
-        ListEmptyComponent={renderListEmptyComponent}
-        keyExtractor={item => `${item.id}`}
-        contentContainerStyle={{
-          paddingVertical: 15,
-          ...theme.styles.viewHorizontalInset,
-        }}
-        contentInsetAdjustmentBehavior={'automatic'}
-      />
+      {userProfile?.role !== UserRole.Anonymous ? (
+        <FlatList
+          data={users}
+          renderItem={renderUser}
+          ListEmptyComponent={renderListEmptyComponent}
+          keyExtractor={item => `${item.id}`}
+          contentContainerStyle={{
+            paddingVertical: 15,
+            ...theme.styles.viewHorizontalInset,
+          }}
+          contentInsetAdjustmentBehavior={'automatic'}
+        />
+      ) : (
+        <ScrollView
+          style={theme.styles.view}
+          showsVerticalScrollIndicator={false}
+          contentInsetAdjustmentBehavior={'automatic'}>
+          <InfoMessage text={'Please sign in to use chat.'} />
+          <Divider />
+          <ListItem
+            title={'Sign In or Sign Up'}
+            leftImage={'account-circle-outline'}
+            leftImageType={'material-community'}
+            position={['first', 'last']}
+            onPress={() => auth.presentSignInModal()}
+          />
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 };
