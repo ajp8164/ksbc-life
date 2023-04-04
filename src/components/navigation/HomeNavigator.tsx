@@ -1,9 +1,9 @@
-import { getSvg } from '@react-native-ajp-elements/ui';
-import { SvgXml } from 'react-native-svg';
 import { HomeNavigatorParamList } from 'types/navigation';
 import HomeScreen from 'components/HomeScreen';
 import React from 'react';
+import { SvgXml } from 'react-native-svg';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { getSvg } from '@react-native-ajp-elements/ui';
 import { useTheme } from 'theme';
 
 const POSStack = createNativeStackNavigator<HomeNavigatorParamList>();
@@ -27,6 +27,7 @@ const HomeNavigator = () => {
         name="Home"
         component={HomeScreen}
         options={{
+          headerShadowVisible: false,
           // eslint-disable-next-line react/no-unstable-nested-components
           headerTitle: () => (
             <SvgXml
