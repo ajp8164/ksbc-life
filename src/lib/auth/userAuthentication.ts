@@ -9,18 +9,15 @@ import { log } from '@react-native-ajp-elements/core';
 const { RNTwitterSignIn } = NativeModules;
 
 export const signInAnonymously = async () => {
-  console.log('signInAnonymously');
-  auth()
-    .signInAnonymously()
-    .then(() => {
-      console.log('User signed in anonymously');
-    })
-    .catch(error => {
-      if (error.code === 'auth/operation-not-allowed') {
-        console.log('Enable anonymous in your firebase console.');
-      }
-      console.error(error);
-    });
+  try {
+    return await auth().signInAnonymously();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
+    log.error(`Anonymous sign in error: ${e.message}`);
+    throw new Error(
+      'An internal error occurred while trying to sign in. Please try again.',
+    );
+  }
 };
 
 export const signInWithApple = async () => {

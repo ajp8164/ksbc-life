@@ -20,7 +20,6 @@ export const useAuthorizeUser = () => {
       onError?: (msg: string) => void;
     },
   ) => {
-    console.log(credentials);
     if (credentials) {
       // Check if user already exists in firstore. If not then add the user to firestore.
       firestore()

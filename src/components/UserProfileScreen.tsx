@@ -65,7 +65,7 @@ const UserProfileScreen = ({ navigation }: Props) => {
       navigation.goBack();
     });
   };
-  console.log(userProfile);
+
   return (
     <View>
       <ScrollView
