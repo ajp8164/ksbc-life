@@ -368,6 +368,9 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
                 ...defaultTheme.list.container,
                 backgroundColor: theme.colors.white,
               },
+              contentContainer: {
+                backgroundColor: theme.colors.white,
+              },
             },
           }}
           // renderBubble={renderBubble}
