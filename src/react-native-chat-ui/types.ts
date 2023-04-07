@@ -4,6 +4,7 @@ import { ColorValue, ImageURISource, TextStyle, ViewStyle } from 'react-native';
 
 import { PreviewData } from '@flyerhq/react-native-link-preview';
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace MessageType {
   export type Any = Custom | File | Image | Text | Unsupported;
 
@@ -25,6 +26,7 @@ export namespace MessageType {
     author: User;
     createdAt?: number;
     id: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     metadata?: Record<string, any>;
     roomId?: string;
     status?: 'delivered' | 'error' | 'seen' | 'sending' | 'sent';
@@ -61,6 +63,7 @@ export namespace MessageType {
   }
 
   export interface PartialCustom extends Base {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     metadata?: Record<string, any>;
     type: 'custom';
   }
@@ -70,6 +73,7 @@ export namespace MessageType {
   }
 
   export interface PartialFile {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     metadata?: Record<string, any>;
     mimeType?: string;
     name: string;
@@ -84,6 +88,7 @@ export namespace MessageType {
 
   export interface PartialImage {
     height?: number;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     metadata?: Record<string, any>;
     name: string;
     size: number;
@@ -97,6 +102,7 @@ export namespace MessageType {
   }
 
   export interface PartialText {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     metadata?: Record<string, any>;
     previewData?: PreviewData;
     text: string;
@@ -199,6 +205,7 @@ export interface User {
   imageUrl?: ImageURISource['uri'];
   lastName?: string;
   lastSeen?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   metadata?: Record<string, any>;
   role?: 'admin' | 'agent' | 'moderator' | 'user';
   updatedAt?: number;

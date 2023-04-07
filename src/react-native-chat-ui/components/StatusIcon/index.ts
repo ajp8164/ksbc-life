@@ -1,1 +1,1 @@
-export * from './StatusIcon'
+export * from './StatusIcon';

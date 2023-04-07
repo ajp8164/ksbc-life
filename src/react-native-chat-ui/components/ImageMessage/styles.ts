@@ -1,6 +1,6 @@
-import { StyleSheet } from 'react-native'
+import { MessageType, Theme, User } from '../../types';
 
-import { MessageType, Theme, User } from '../../types'
+import { StyleSheet } from 'react-native';
 
 const styles = ({
   aspectRatio,
@@ -9,11 +9,11 @@ const styles = ({
   theme,
   user,
 }: {
-  aspectRatio: number
-  message: MessageType.Image
-  messageWidth: number
-  theme: Theme
-  user?: User
+  aspectRatio: number;
+  message: MessageType.Image;
+  messageWidth: number;
+  theme: Theme;
+  user?: User;
 }) =>
   StyleSheet.create({
     horizontalImage: {
@@ -57,6 +57,6 @@ const styles = ({
       minWidth: 170,
       width: messageWidth * aspectRatio,
     },
-  })
+  });
 
-export default styles
+export default styles;

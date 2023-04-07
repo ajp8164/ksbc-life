@@ -153,9 +153,9 @@ export const defaultTheme: Theme = {
       color: NEUTRAL_7,
       fontSize: 16,
       fontWeight: '500',
-      lineHeight: 20,
+      lineHeight: 22,
       borderRadius: 20,
-      backgroundColor: NEUTRAL_0,
+      backgroundColor: SECONDARY_DARK,
     },
   },
 };

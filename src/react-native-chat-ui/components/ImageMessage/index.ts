@@ -1,1 +1,1 @@
-export * from './ImageMessage'
+export * from './ImageMessage';

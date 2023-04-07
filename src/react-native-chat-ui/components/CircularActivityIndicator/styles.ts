@@ -1,4 +1,4 @@
-import { ColorValue, StyleSheet } from 'react-native'
+import { ColorValue, StyleSheet } from 'react-native';
 
 const styles = ({ color, size }: { color: ColorValue; size: number }) =>
   StyleSheet.create({
@@ -13,6 +13,6 @@ const styles = ({ color, size }: { color: ColorValue; size: number }) =>
       height: size,
       width: size,
     },
-  })
+  });
 
-export default styles
+export default styles;

@@ -1,16 +1,16 @@
-import { StyleSheet } from 'react-native'
+import { MessageType, Theme, User } from '../../types';
 
-import { MessageType, Theme, User } from '../../types'
-import { getUserAvatarNameColor } from '../../utils'
+import { StyleSheet } from 'react-native';
+import { getUserAvatarNameColor } from '../../utils';
 
 const styles = ({
   message,
   theme,
   user,
 }: {
-  message: MessageType.Text
-  theme: Theme
-  user?: User
+  message: MessageType.Text;
+  theme: Theme;
+  user?: User;
 }) =>
   StyleSheet.create({
     descriptionText: {
@@ -23,7 +23,7 @@ const styles = ({
       ...theme.fonts.userNameTextStyle,
       color: getUserAvatarNameColor(
         message.author,
-        theme.colors.userAvatarNameColors
+        theme.colors.userAvatarNameColors,
       ),
       marginBottom: 6,
     },
@@ -39,6 +39,6 @@ const styles = ({
       marginHorizontal: theme.bubble.messageInsetsHorizontal,
       marginVertical: theme.bubble.messageInsetsVertical,
     },
-  })
+  });
 
-export default styles
+export default styles;

@@ -1,20 +1,21 @@
+import * as React from 'react';
+
 import {
   LinkPreview,
   PreviewData,
   REGEX_LINK,
-} from '@flyerhq/react-native-link-preview'
-import * as React from 'react'
-import { Linking, Text, View } from 'react-native'
-import ParsedText from 'react-native-parsed-text'
-
-import { MessageType } from '../../types'
+} from '@flyerhq/react-native-link-preview';
+import { Linking, Text, View } from 'react-native';
 import {
-  excludeDerivedMessageProps,
-  getUserName,
   ThemeContext,
   UserContext,
-} from '../../utils'
-import styles from './styles'
+  excludeDerivedMessageProps,
+  getUserName,
+} from '../../utils';
+
+import { MessageType } from '../../types';
+import ParsedText from 'react-native-parsed-text';
+import styles from './styles';
 
 export interface TextMessageTopLevelProps {
   /** @see {@link LinkPreviewProps.onPreviewDataFetched} */
@@ -22,18 +23,18 @@ export interface TextMessageTopLevelProps {
     message,
     previewData,
   }: {
-    message: MessageType.Text
-    previewData: PreviewData
-  }) => void
+    message: MessageType.Text;
+    previewData: PreviewData;
+  }) => void;
   /** Enables link (URL) preview */
-  usePreviewData?: boolean
+  usePreviewData?: boolean;
 }
 
 export interface TextMessageProps extends TextMessageTopLevelProps {
-  enableAnimation?: boolean
-  message: MessageType.DerivedText
-  messageWidth: number
-  showName: boolean
+  enableAnimation?: boolean;
+  message: MessageType.DerivedText;
+  messageWidth: number;
+  showName: boolean;
 }
 
 export const TextMessage = ({
@@ -44,58 +45,56 @@ export const TextMessage = ({
   showName,
   usePreviewData,
 }: TextMessageProps) => {
-  const theme = React.useContext(ThemeContext)
-  const user = React.useContext(UserContext)
-  const [previewData, setPreviewData] = React.useState(message.previewData)
+  const theme = React.useContext(ThemeContext);
+  const user = React.useContext(UserContext);
+  const [previewData, setPreviewData] = React.useState(message.previewData);
   const { descriptionText, headerText, titleText, text, textContainer } =
     styles({
       message,
       theme,
       user,
-    })
+    });
 
   const handleEmailPress = (email: string) => {
-    try {
-      Linking.openURL(`mailto:${email}`)
-    } catch {}
-  }
+    Linking.openURL(`mailto:${email}`);
+  };
 
   const handlePreviewDataFetched = (data: PreviewData) => {
-    setPreviewData(data)
+    setPreviewData(data);
     onPreviewDataFetched?.({
       // It's okay to cast here since we know it is a text message
       // type-coverage:ignore-next-line
       message: excludeDerivedMessageProps(message) as MessageType.Text,
       previewData: data,
-    })
-  }
+    });
+  };
 
   const handleUrlPress = (url: string) => {
-    const uri = url.toLowerCase().startsWith('http') ? url : `https://${url}`
+    const uri = url.toLowerCase().startsWith('http') ? url : `https://${url}`;
 
-    Linking.openURL(uri)
-  }
+    Linking.openURL(uri);
+  };
 
   const renderPreviewDescription = (description: string) => {
     return (
       <Text numberOfLines={3} style={descriptionText}>
         {description}
       </Text>
-    )
-  }
+    );
+  };
 
   const renderPreviewHeader = (header: string) => {
     return (
       <Text numberOfLines={1} style={headerText}>
         {header}
       </Text>
-    )
-  }
+    );
+  };
 
   const renderPreviewText = (previewText: string) => {
     return (
       <ParsedText
-        accessibilityRole='link'
+        accessibilityRole="link"
         parse={[
           {
             onPress: handleEmailPress,
@@ -108,20 +107,19 @@ export const TextMessage = ({
             style: [text, { textDecorationLine: 'underline' }],
           },
         ]}
-        style={text}
-      >
+        style={text}>
         {previewText}
       </ParsedText>
-    )
-  }
+    );
+  };
 
   const renderPreviewTitle = (title: string) => {
     return (
       <Text numberOfLines={2} style={titleText}>
         {title}
       </Text>
-    )
-  }
+    );
+  };
 
   return usePreviewData &&
     !!onPreviewDataFetched &&
@@ -154,5 +152,5 @@ export const TextMessage = ({
       }
       <Text style={text}>{message.text}</Text>
     </View>
-  )
-}
+  );
+};

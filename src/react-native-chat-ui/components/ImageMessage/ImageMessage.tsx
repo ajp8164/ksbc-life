@@ -1,14 +1,15 @@
-import * as React from 'react'
-import { Image, ImageBackground, Text, View } from 'react-native'
+import * as React from 'react';
 
-import { MessageType, Size } from '../../types'
-import { formatBytes, ThemeContext, UserContext } from '../../utils'
-import styles from './styles'
+import { Image, ImageBackground, Text, View } from 'react-native';
+import { MessageType, Size } from '../../types';
+import { ThemeContext, UserContext, formatBytes } from '../../utils';
+
+import styles from './styles';
 
 export interface ImageMessageProps {
-  message: MessageType.DerivedImage
+  message: MessageType.DerivedImage;
   /** Maximum message width */
-  messageWidth: number
+  messageWidth: number;
 }
 
 /** Image message component. Supports different
@@ -16,16 +17,16 @@ export interface ImageMessageProps {
  * if the image is narrow, renders image in form of a file if aspect
  * ratio is very small or very big. */
 export const ImageMessage = ({ message, messageWidth }: ImageMessageProps) => {
-  const theme = React.useContext(ThemeContext)
-  const user = React.useContext(UserContext)
-  const defaultHeight = message.height ?? 0
-  const defaultWidth = message.width ?? 0
+  const theme = React.useContext(ThemeContext);
+  const user = React.useContext(UserContext);
+  const defaultHeight = message.height ?? 0;
+  const defaultWidth = message.width ?? 0;
   const [size, setSize] = React.useState<Size>({
     height: defaultHeight,
     width: defaultWidth,
-  })
-  const aspectRatio = size.width / (size.height || 1)
-  const isMinimized = aspectRatio < 0.1 || aspectRatio > 10
+  });
+  const aspectRatio = size.width / (size.height || 1);
+  const isMinimized = aspectRatio < 0.1 || aspectRatio > 10;
   const {
     horizontalImage,
     minimizedImage,
@@ -40,21 +41,21 @@ export const ImageMessage = ({ message, messageWidth }: ImageMessageProps) => {
     messageWidth,
     theme,
     user,
-  })
+  });
 
   React.useEffect(() => {
     if (defaultHeight <= 0 || defaultWidth <= 0)
       Image.getSize(
         message.uri,
         (width, height) => setSize({ height, width }),
-        () => setSize({ height: 0, width: 0 })
-      )
-  }, [defaultHeight, defaultWidth, message.uri])
+        () => setSize({ height: 0, width: 0 }),
+      );
+  }, [defaultHeight, defaultWidth, message.uri]);
 
   const renderImage = () => {
     return (
       <Image
-        accessibilityRole='image'
+        accessibilityRole="image"
         resizeMode={isMinimized ? 'cover' : 'contain'}
         source={{ uri: message.uri }}
         style={
@@ -65,8 +66,8 @@ export const ImageMessage = ({ message, messageWidth }: ImageMessageProps) => {
             : horizontalImage
         }
       />
-    )
-  }
+    );
+  };
 
   return isMinimized ? (
     <View style={minimizedImageContainer}>
@@ -80,5 +81,5 @@ export const ImageMessage = ({ message, messageWidth }: ImageMessageProps) => {
     <ImageBackground blurRadius={26} source={{ uri: message.uri }} style={{}}>
       {renderImage()}
     </ImageBackground>
-  )
-}
+  );
+};

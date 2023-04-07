@@ -1,15 +1,15 @@
-import { StyleSheet } from 'react-native'
+import { MessageType, Theme, User } from '../../types';
 
-import { MessageType, Theme, User } from '../../types'
+import { StyleSheet } from 'react-native';
 
 const styles = ({
   message,
   theme,
   user,
 }: {
-  message: MessageType.DerivedFile
-  theme: Theme
-  user?: User
+  message: MessageType.DerivedFile;
+  theme: Theme;
+  user?: User;
 }) =>
   StyleSheet.create({
     container: {
@@ -49,6 +49,6 @@ const styles = ({
       flexShrink: 1,
       marginLeft: 16,
     },
-  })
+  });
 
-export default styles
+export default styles;

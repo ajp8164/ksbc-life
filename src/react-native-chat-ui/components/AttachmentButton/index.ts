@@ -1,1 +1,1 @@
-export * from './AttachmentButton'
+export * from './AttachmentButton';

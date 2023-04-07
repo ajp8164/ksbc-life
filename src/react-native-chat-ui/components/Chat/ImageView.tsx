@@ -1,15 +1,16 @@
-import * as React from 'react'
-import { ImageRequireSource, ImageURISource, View } from 'react-native'
+import * as React from 'react';
+
+import { ImageRequireSource, ImageURISource, View } from 'react-native';
 
 interface Props {
-  imageIndex: number
-  images: Array<ImageURISource | ImageRequireSource>
-  onRequestClose: () => void
-  visible: boolean
+  imageIndex: number;
+  images: Array<ImageURISource | ImageRequireSource>;
+  onRequestClose: () => void;
+  visible: boolean;
 }
 
 const ImageView = (_: Props) => {
-  return <View />
-}
+  return <View />;
+};
 
-export default ImageView
+export default ImageView;

@@ -1,6 +1,6 @@
-import { StyleSheet } from 'react-native'
+import { MessageType, Theme } from '../../types';
 
-import { MessageType, Theme } from '../../types'
+import { StyleSheet } from 'react-native';
 
 const styles = ({
   currentUserIsAuthor,
@@ -9,11 +9,11 @@ const styles = ({
   roundBorder,
   theme,
 }: {
-  currentUserIsAuthor: boolean
-  message: MessageType.DerivedAny
-  messageWidth: number
-  roundBorder: boolean
-  theme: Theme
+  currentUserIsAuthor: boolean;
+  message: MessageType.DerivedAny;
+  messageWidth: number;
+  roundBorder: boolean;
+  theme: Theme;
 }) =>
   StyleSheet.create({
     container: {
@@ -52,6 +52,6 @@ const styles = ({
     pressable: {
       maxWidth: messageWidth,
     },
-  })
+  });
 
-export default styles
+export default styles;

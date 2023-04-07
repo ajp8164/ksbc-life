@@ -1,1 +1,1 @@
-export * from './FileMessage'
+export * from './FileMessage';

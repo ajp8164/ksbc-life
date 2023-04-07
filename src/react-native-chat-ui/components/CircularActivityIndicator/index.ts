@@ -1,1 +1,1 @@
-export * from './CircularActivityIndicator'
+export * from './CircularActivityIndicator';

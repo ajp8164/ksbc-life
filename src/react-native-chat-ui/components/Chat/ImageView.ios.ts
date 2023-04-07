@@ -1,3 +1,3 @@
-import ImageView from 'react-native-image-viewing'
+import ImageView from 'react-native-image-viewing';
 
-export default ImageView
+export default ImageView;
