@@ -135,7 +135,7 @@ export const defaultTheme: Theme = {
     messageInsetsVertical: 16,
   },
   composer: {
-    spaceBetweenKeyboardAndAccessoryView: 0,
+    contentOffsetKeyboardOpened: 0,
     tabBarHeight: 0,
     container: {
       position: 'absolute',
