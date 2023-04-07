@@ -356,6 +356,12 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
                 borderRadius: 5,
               },
             },
+            date: {
+              text: {
+                ...theme.styles.textTiny,
+                ...theme.styles.textBold,
+              },
+            },
             list: {
               ...defaultTheme.list,
               container: {
