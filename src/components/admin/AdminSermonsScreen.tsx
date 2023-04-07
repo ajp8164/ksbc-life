@@ -39,10 +39,10 @@ const AdminSermonsScreen = ({ navigation }: Props) => {
   const editSermonModalRef = useRef<EditSermonModal>(null);
 
   const [havePasteurs, setHavePasteurs] = useState(false);
-  const [allLoaded, setAllLoaded] = useState(false);
+  const allLoaded = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [lastDocument, setLastDocument] =
-    useState<FirebaseFirestoreTypes.DocumentData>();
+  const lastDocument = useRef<FirebaseFirestoreTypes.DocumentData>();
+  useState<FirebaseFirestoreTypes.DocumentData>();
   const [sermons, setSermons] = useState<Sermon[]>([]);
 
   useEffect(() => {
@@ -54,22 +54,21 @@ const AdminSermonsScreen = ({ navigation }: Props) => {
           updated.push({ ...d.data(), id: d.id } as Sermon);
         });
         setSermons(updated);
-        setLastDocument(snapshot.docs[snapshot.docs.length - 1]);
-        setAllLoaded(false);
+        lastDocument.current = snapshot.docs[snapshot.docs.length - 1];
+        allLoaded.current = false;
       },
-      { lastDocument },
+      { lastDocument: lastDocument.current },
     );
     return subscription;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getMoreSermons = async () => {
-    if (!allLoaded) {
+    if (!allLoaded.current) {
       setIsLoading(true);
-      const s = await getSermons({ lastDocument });
-      setLastDocument(s.lastDocument);
+      const s = await getSermons({ lastDocument: lastDocument.current });
+      lastDocument.current = s.lastDocument;
       setSermons(sermons.concat(s.result));
-      setAllLoaded(s.allLoaded);
+      allLoaded.current = s.allLoaded;
       setIsLoading(false);
     }
   };

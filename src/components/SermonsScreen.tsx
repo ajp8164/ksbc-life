@@ -1,6 +1,6 @@
 import { AppTheme, useTheme } from 'theme';
 import { FlatList, ListRenderItem, View } from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { getSermons, sermonsCollectionChangeListener } from 'firestore/sermons';
 
 import { AuthContext } from 'lib/auth';
@@ -26,10 +26,9 @@ const SermonsScreen = ({ navigation }: Props) => {
 
   const auth = useContext(AuthContext);
 
-  const [allLoaded, setAllLoaded] = useState(false);
+  const allLoaded = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [lastDocument, setLastDocument] =
-    useState<FirebaseFirestoreTypes.DocumentData>();
+  const lastDocument = useRef<FirebaseFirestoreTypes.DocumentData>();
   const [sermons, setSermons] = useState<Sermon[]>([]);
   const [showVideo, setShowVideo] = useState<string | undefined>(undefined);
   const [paused, setPaused] = useState(false);
@@ -42,22 +41,21 @@ const SermonsScreen = ({ navigation }: Props) => {
           updated.push({ ...d.data(), id: d.id } as Sermon);
         });
         setSermons(updated);
-        setLastDocument(snapshot.docs[snapshot.docs.length - 1]);
-        setAllLoaded(false);
+        lastDocument.current = snapshot.docs[snapshot.docs.length - 1];
+        allLoaded.current = false;
       },
-      { lastDocument },
+      { lastDocument: lastDocument.current },
     );
     return subscription;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getMoreSermons = async () => {
-    if (!allLoaded) {
+    if (!allLoaded.current) {
       setIsLoading(true);
-      const s = await getSermons({ lastDocument });
-      setLastDocument(s.lastDocument);
+      const s = await getSermons({ lastDocument: lastDocument.current });
+      lastDocument.current = s.lastDocument;
       setSermons(sermons.concat(s.result));
-      setAllLoaded(s.allLoaded);
+      allLoaded.current = s.allLoaded;
       setIsLoading(false);
     }
   };

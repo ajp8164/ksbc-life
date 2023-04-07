@@ -20,10 +20,10 @@ const AdminUsersScreen = () => {
   const s = useStyles(theme);
 
   const editUserModalRef = useRef<EditUserModal>(null);
-  const [allLoaded, setAllLoaded] = useState(false);
+  const allLoaded = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [lastDocument, setLastDocument] =
-    useState<FirebaseFirestoreTypes.DocumentData>();
+  const lastDocument = useRef<FirebaseFirestoreTypes.DocumentData>();
+  useState<FirebaseFirestoreTypes.DocumentData>();
   const [users, setUsers] = useState<UserProfile[]>([]);
 
   useEffect(() => {
@@ -34,14 +34,24 @@ const AdminUsersScreen = () => {
           updated.push({ ...d.data(), id: d.id } as UserProfile);
         });
         setUsers(updated);
-        setLastDocument(snapshot.docs[snapshot.docs.length - 1]);
-        setAllLoaded(false);
+        lastDocument.current = snapshot.docs[snapshot.docs.length - 1];
+        allLoaded.current = false;
       },
-      { lastDocument },
+      { lastDocument: lastDocument.current },
     );
     return subscription;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const getMoreUsers = async () => {
+    if (!allLoaded.current) {
+      setIsLoading(true);
+      const s = await getUsers({ lastDocument: lastDocument.current });
+      lastDocument.current = s.lastDocument;
+      setUsers(users.concat(s.result));
+      allLoaded.current = s.allLoaded;
+      setIsLoading(false);
+    }
+  };
 
   const renderUser: ListRenderItem<UserProfile> = ({ item, index }) => {
     return (
@@ -58,17 +68,6 @@ const AdminUsersScreen = () => {
         onPress={() => editUserModalRef.current?.present('Edit User', item)}
       />
     );
-  };
-
-  const getMoreUsers = async () => {
-    if (!allLoaded) {
-      setIsLoading(true);
-      const s = await getUsers({ lastDocument });
-      setLastDocument(s.lastDocument);
-      setUsers(users.concat(s.result));
-      setAllLoaded(s.allLoaded);
-      setIsLoading(false);
-    }
   };
 
   const renderListEmptyComponent = () => {

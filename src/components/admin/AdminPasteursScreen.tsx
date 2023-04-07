@@ -28,10 +28,9 @@ const AdminPasteursScreen = ({ navigation }: Props) => {
   const s = useStyles(theme);
 
   const editPasteurModalRef = useRef<EditPasteurModal>(null);
-  const [allLoaded, setAllLoaded] = useState(false);
+  const allLoaded = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [lastDocument, setLastDocument] =
-    useState<FirebaseFirestoreTypes.DocumentData>();
+  const lastDocument = useRef<FirebaseFirestoreTypes.DocumentData>();
   const [pasteurs, setPasteurs] = useState<Pasteur[]>([]);
 
   useEffect(() => {
@@ -42,22 +41,21 @@ const AdminPasteursScreen = ({ navigation }: Props) => {
           updated.push({ ...d.data(), id: d.id } as Pasteur);
         });
         setPasteurs(updated);
-        setLastDocument(snapshot.docs[snapshot.docs.length - 1]);
-        setAllLoaded(false);
+        lastDocument.current = snapshot.docs[snapshot.docs.length - 1];
+        allLoaded.current = false;
       },
-      { lastDocument },
+      { lastDocument: lastDocument.current },
     );
     return subscription;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getMorePasteurs = async () => {
-    if (!allLoaded) {
+    if (!allLoaded.current) {
       setIsLoading(true);
-      const s = await getPasteurs({ lastDocument });
-      setLastDocument(s.lastDocument);
+      const s = await getPasteurs({ lastDocument: lastDocument.current });
+      lastDocument.current = s.lastDocument;
       setPasteurs(pasteurs.concat(s.result));
-      setAllLoaded(s.allLoaded);
+      allLoaded.current = s.allLoaded;
       setIsLoading(false);
     }
   };

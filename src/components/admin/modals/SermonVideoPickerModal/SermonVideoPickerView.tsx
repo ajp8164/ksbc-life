@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import { AppTheme, useTheme } from 'theme';
 import { Divider, ListItemCheckbox } from '@react-native-ajp-elements/ui';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   getSermonVideos,
   sermonVideosCollectionChangeListener,
@@ -30,10 +30,9 @@ const SermonVideoPickerView = ({
   const theme = useTheme();
   const s = useStyles(theme);
 
-  const [allLoaded, setAllLoaded] = useState(false);
+  const allLoaded = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [lastDocument, setLastDocument] =
-    useState<FirebaseFirestoreTypes.DocumentData>();
+  const lastDocument = useRef<FirebaseFirestoreTypes.DocumentData>();
 
   const [sermonVideos, setSermonVideos] = useState<SermonVideo[]>([]);
   const [selected, setSelected] = useState<SermonVideo | undefined>(value);
@@ -46,22 +45,21 @@ const SermonVideoPickerView = ({
           updated.push(d.data() as SermonVideo);
         });
         setSermonVideos(updated);
-        setLastDocument(snapshot.docs[snapshot.docs.length - 1]);
-        setAllLoaded(false);
+        lastDocument.current = snapshot.docs[snapshot.docs.length - 1];
+        allLoaded.current = false;
       },
-      { lastDocument },
+      { lastDocument: lastDocument.current },
     );
     return subscription;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getMoreSermonVideos = async () => {
-    if (!allLoaded) {
+    if (!allLoaded.current) {
       setIsLoading(true);
-      const v = await getSermonVideos({ lastDocument });
-      setLastDocument(v.lastDocument);
+      const v = await getSermonVideos({ lastDocument: lastDocument.current });
+      lastDocument.current = v.lastDocument;
       setSermonVideos(sermonVideos.concat(v.result));
-      setAllLoaded(v.allLoaded);
+      allLoaded.current = v.allLoaded;
       setIsLoading(false);
     }
   };

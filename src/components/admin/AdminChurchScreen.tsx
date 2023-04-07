@@ -35,10 +35,9 @@ const AdminChurchScreen = () => {
   const editLocationModalRef = useRef<EditLocationModal>(null);
 
   const [church, setChurch] = useState<Church>();
-  const [allLoaded, setAllLoaded] = useState(false);
+  const allLoaded = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [lastDocument, setLastDocument] =
-    useState<FirebaseFirestoreTypes.DocumentData>();
+  const lastDocument = useRef<FirebaseFirestoreTypes.DocumentData>();
   const [locations, setLocations] = useState<Location[]>([]);
 
   useEffect(() => {
@@ -49,13 +48,12 @@ const AdminChurchScreen = () => {
           updated.push({ ...d.data(), id: d.id } as Church);
         });
         setChurch(updated[0]); // Single church at the moment
-        setLastDocument(snapshot.docs[snapshot.docs.length - 1]);
-        setAllLoaded(false);
+        lastDocument.current = snapshot.docs[snapshot.docs.length - 1];
+        allLoaded.current = false;
       },
-      { lastDocument },
+      { lastDocument: lastDocument.current },
     );
     return subscription;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -66,22 +64,21 @@ const AdminChurchScreen = () => {
           updated.push({ ...d.data(), id: d.id } as Location);
         });
         setLocations(updated);
-        setLastDocument(snapshot.docs[snapshot.docs.length - 1]);
-        setAllLoaded(false);
+        lastDocument.current = snapshot.docs[snapshot.docs.length - 1];
+        allLoaded.current = false;
       },
-      { lastDocument },
+      { lastDocument: lastDocument.current },
     );
     return subscription;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getMoreLocations = async () => {
-    if (!allLoaded) {
+    if (!allLoaded.current) {
       setIsLoading(true);
-      const s = await getLocations({ lastDocument });
-      setLastDocument(s.lastDocument);
+      const s = await getLocations({ lastDocument: lastDocument.current });
+      lastDocument.current = s.lastDocument;
       setLocations(locations.concat(s.result));
-      setAllLoaded(s.allLoaded);
+      allLoaded.current = s.allLoaded;
       setIsLoading(false);
     }
   };
