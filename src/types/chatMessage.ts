@@ -1,7 +1,11 @@
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
-import { IChatMessage } from 'react-native-gifted-chat';
+import { MessageType } from '@flyerhq/react-native-chat-ui';
 
-export type ChatMessage = IChatMessage & {
-  id?: string;
-  createdAt: IChatMessage['createdAt'] | FirebaseFirestoreTypes.Timestamp;
-};
+export type ChatMessage =
+  | (MessageType.Any | MessageType.Text | MessageType.Image) & {
+      createdAt?:
+        | MessageType.Any['createdAt']
+        | MessageType.Text['createdAt']
+        | MessageType.Image['createdAt']
+        | FirebaseFirestoreTypes.Timestamp;
+    };

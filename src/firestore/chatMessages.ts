@@ -45,7 +45,6 @@ export const addChatMessage = (
   message: ChatMessage,
   threadId: string,
 ): Promise<ChatMessage> => {
-  const key = uuidv4();
   const outgoingMessage = {
     ...message,
     createdAt: firestore.FieldValue.serverTimestamp(),
@@ -55,7 +54,7 @@ export const addChatMessage = (
       .collection('ChatMessages')
       .doc(threadId)
       .update({
-        [`messages.${key}`]: outgoingMessage,
+        [`messages.${outgoingMessage.id}`]: outgoingMessage,
       })
       .then(() => {
         return message;
