@@ -14,8 +14,12 @@ const styles = ({
   messageWidth: number;
   roundBorder: boolean;
   theme: Theme;
-}) =>
-  StyleSheet.create({
+}) => {
+  const restContentContainer = currentUserIsAuthor
+    ? theme.bubble.contentRightContainer
+    : theme.bubble.contentLeftContainer;
+
+  return StyleSheet.create({
     container: {
       alignItems: 'flex-end',
       alignSelf: currentUserIsAuthor ? 'flex-end' : 'flex-start',
@@ -26,22 +30,21 @@ const styles = ({
       marginLeft: 20,
     },
     contentContainer: {
-      backgroundColor:
-        !currentUserIsAuthor || message.type === 'image'
-          ? theme.colors.secondary
-          : theme.colors.primary,
+      overflow: 'hidden',
       borderBottomLeftRadius:
         currentUserIsAuthor || roundBorder
-          ? theme.bubble.messageBorderRadius
+          ? theme.bubble.contentRightContainer.borderBottomLeftRadius
           : 0,
       borderBottomRightRadius: currentUserIsAuthor
         ? roundBorder
-          ? theme.bubble.messageBorderRadius
+          ? theme.bubble.contentRightContainer.borderBottomRightRadius
           : 0
-        : theme.bubble.messageBorderRadius,
+        : theme.bubble.contentLeftContainer.borderBottomLeftRadius,
       borderColor: 'transparent',
-      borderRadius: theme.bubble.messageBorderRadius,
-      overflow: 'hidden',
+      borderRadius: currentUserIsAuthor
+        ? theme.bubble.contentRightContainer.borderRadius
+        : theme.bubble.contentLeftContainer.borderRadius,
+      ...restContentContainer,
     },
     dateHeader: {
       alignItems: 'center',
@@ -52,6 +55,11 @@ const styles = ({
     pressable: {
       maxWidth: messageWidth,
     },
+    username: {
+      // Avatar - marginLeft + width + marginRight + some additional padding
+      marginLeft: 20 + 32 + 8 + 10,
+    },
   });
+};
 
 export default styles;

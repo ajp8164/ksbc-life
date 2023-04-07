@@ -4,8 +4,8 @@ import { Theme } from '../../types';
 export default ({ theme }: { theme: Theme }) =>
   StyleSheet.create({
     container: {
-      backgroundColor: theme.colors.background,
       flex: 1,
+      ...theme.list.container,
     },
     emptyComponentContainer: {
       alignItems: 'center',
@@ -13,15 +13,15 @@ export default ({ theme }: { theme: Theme }) =>
       transform: [{ rotateX: '180deg' }],
     },
     emptyComponentTitle: {
-      ...theme.fonts.emptyChatPlaceholderTextStyle,
-      textAlign: 'center',
+      ...theme.list.emptyChatPlaceholderText,
     },
     flatList: {
-      backgroundColor: theme.colors.background,
       flex: 1,
+      ...theme.list.container,
     },
     flatListContentContainer: {
       flexGrow: 1,
+      ...theme.list.contentContainer,
     },
     footer: {
       height: 16,

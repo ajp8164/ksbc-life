@@ -38,7 +38,6 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
   useEffect(() => {
     const subscription = usersCollectionChangeListener(
       snapshot => {
-        console.log('***');
         const updated: UserProfile[] = [];
         snapshot.docs.forEach(d => {
           updated.push({ ...d.data(), id: d.id } as UserProfile);

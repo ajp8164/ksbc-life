@@ -38,7 +38,7 @@ export namespace MessageType {
     nextMessageInGroup: boolean;
     // TODO: Check name?
     offset: number;
-    showName: boolean;
+    showName: UsernameLocation;
     showStatus: boolean;
   }
 
@@ -134,46 +134,56 @@ export interface Size {
   width: number;
 }
 
+export type UsernameLocation = 'none' | 'inside' | 'outside';
+
 /** Base chat theme containing all required properties to make a theme.
  * Implement this interface if you want to create a custom theme. */
 export interface Theme {
+  avatar: ThemeAvatar;
   bubble: ThemeBubble;
   colors: ThemeColors;
   composer: ThemeComposer;
-  fonts: ThemeFonts;
+  date: ThemeDate;
   icons?: ThemeIcons;
+  list: ThemeList;
+}
+
+export interface ThemeAvatar {
+  colors: ColorValue[];
+  imageBackgroundColor: ColorValue;
+  text: TextStyle;
 }
 
 export interface ThemeBubble {
-  messageBorderRadius: number;
-  messageInsetsHorizontal: number;
-  messageInsetsVertical: number;
+  bodyTextLeft: TextStyle;
+  bodyTextRight: TextStyle;
+  captionTextLeft: TextStyle;
+  captionTextRight: TextStyle;
+  contentLeftContainer: ViewStyle;
+  contentRightContainer: ViewStyle;
+  documentIconLeftColor: ColorValue;
+  documentIconRightColor: ColorValue;
+  fileLeftContainer: TextStyle;
+  fileRightContainer: TextStyle;
+  headerText: TextStyle;
+  linkDescriptionTextLeft: TextStyle;
+  linkDescriptionTextRight: TextStyle;
+  linkTitleTextLeft: TextStyle;
+  linkTitleTextRight: TextStyle;
+  messageTextLeft: TextStyle;
+  messageTextRight: TextStyle;
+  textLeftContainer: TextStyle;
+  textRightContainer: TextStyle;
 }
 
 export interface ThemeColors {
-  background: ColorValue;
   error: ColorValue;
   primary: ColorValue;
   secondary: ColorValue;
-  receivedMessageDocumentIcon: ColorValue;
-  sentMessageDocumentIcon: ColorValue;
-  userAvatarImageBackground: ColorValue;
-  userAvatarNameColors: ColorValue[];
 }
 
-export interface ThemeFonts {
-  dateDividerTextStyle: TextStyle;
-  emptyChatPlaceholderTextStyle: TextStyle;
-  receivedMessageBodyTextStyle: TextStyle;
-  receivedMessageCaptionTextStyle: TextStyle;
-  receivedMessageLinkDescriptionTextStyle: TextStyle;
-  receivedMessageLinkTitleTextStyle: TextStyle;
-  sentMessageBodyTextStyle: TextStyle;
-  sentMessageCaptionTextStyle: TextStyle;
-  sentMessageLinkDescriptionTextStyle: TextStyle;
-  sentMessageLinkTitleTextStyle: TextStyle;
-  userAvatarTextStyle: TextStyle;
-  userNameTextStyle: TextStyle;
+export interface ThemeDate {
+  text: TextStyle;
 }
 
 export interface ThemeIcons {
@@ -196,6 +206,12 @@ export interface ThemeComposer {
   container: ViewStyle | ViewStyle[];
   inputStyle: TextStyle;
   tabBarHeight: number;
+}
+
+export interface ThemeList {
+  container: ViewStyle | ViewStyle[];
+  contentContainer: ViewStyle | ViewStyle[];
+  emptyChatPlaceholderText: TextStyle;
 }
 
 export interface User {

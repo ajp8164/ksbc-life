@@ -14,8 +14,13 @@ const styles = ({
   messageWidth: number;
   theme: Theme;
   user?: User;
-}) =>
-  StyleSheet.create({
+}) => {
+  const restTextContainer =
+    user?.id === message.author.id
+      ? theme.bubble.textRightContainer
+      : theme.bubble.textLeftContainer;
+
+  return StyleSheet.create({
     horizontalImage: {
       height: messageWidth / aspectRatio,
       maxHeight: messageWidth,
@@ -24,9 +29,9 @@ const styles = ({
     minimizedImage: {
       borderRadius: 15,
       height: 64,
-      marginLeft: theme.bubble.messageInsetsVertical,
+      marginLeft: restTextContainer.marginLeft,
       marginRight: 16,
-      marginVertical: theme.bubble.messageInsetsVertical,
+      marginVertical: restTextContainer.marginVertical,
       width: 64,
     },
     minimizedImageContainer: {
@@ -39,18 +44,16 @@ const styles = ({
     },
     nameText:
       user?.id === message.author.id
-        ? theme.fonts.sentMessageBodyTextStyle
-        : theme.fonts.receivedMessageBodyTextStyle,
+        ? theme.bubble.bodyTextRight
+        : theme.bubble.bodyTextLeft,
     sizeText: {
       ...(user?.id === message.author.id
-        ? theme.fonts.sentMessageCaptionTextStyle
-        : theme.fonts.receivedMessageCaptionTextStyle),
-      marginTop: 4,
+        ? theme.bubble.captionTextRight
+        : theme.bubble.captionTextLeft),
     },
     textContainer: {
       flexShrink: 1,
-      marginRight: theme.bubble.messageInsetsHorizontal,
-      marginVertical: theme.bubble.messageInsetsVertical,
+      ...restTextContainer,
     },
     verticalImage: {
       height: messageWidth,
@@ -58,5 +61,5 @@ const styles = ({
       width: messageWidth * aspectRatio,
     },
   });
-
+};
 export default styles;

@@ -13,32 +13,26 @@ const styles = ({
   user?: User;
 }) =>
   StyleSheet.create({
-    descriptionText: {
-      ...(user?.id === message.author.id
-        ? theme.fonts.sentMessageLinkDescriptionTextStyle
-        : theme.fonts.receivedMessageLinkDescriptionTextStyle),
-      marginTop: 4,
-    },
+    descriptionText:
+      user?.id === message.author.id
+        ? theme.bubble.linkDescriptionTextRight
+        : theme.bubble.linkDescriptionTextLeft,
     headerText: {
-      ...theme.fonts.userNameTextStyle,
-      color: getUserAvatarNameColor(
-        message.author,
-        theme.colors.userAvatarNameColors,
-      ),
-      marginBottom: 6,
+      ...theme.bubble.headerText,
+      color: getUserAvatarNameColor(message.author, theme.avatar.colors),
     },
     titleText:
       user?.id === message.author.id
-        ? theme.fonts.sentMessageLinkTitleTextStyle
-        : theme.fonts.receivedMessageLinkTitleTextStyle,
+        ? theme.bubble.linkTitleTextRight
+        : theme.bubble.linkTitleTextLeft,
     text:
       user?.id === message.author.id
-        ? theme.fonts.sentMessageBodyTextStyle
-        : theme.fonts.receivedMessageBodyTextStyle,
-    textContainer: {
-      marginHorizontal: theme.bubble.messageInsetsHorizontal,
-      marginVertical: theme.bubble.messageInsetsVertical,
-    },
+        ? theme.bubble.messageTextRight
+        : theme.bubble.messageTextLeft,
+    textContainer:
+      user?.id === message.author.id
+        ? theme.bubble.textRightContainer
+        : theme.bubble.textLeftContainer,
   });
 
 export default styles;

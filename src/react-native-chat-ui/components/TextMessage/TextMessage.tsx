@@ -6,6 +6,7 @@ import {
   REGEX_LINK,
 } from '@flyerhq/react-native-link-preview';
 import { Linking, Text, View } from 'react-native';
+import { MessageType, UsernameLocation } from '../../types';
 import {
   ThemeContext,
   UserContext,
@@ -13,7 +14,6 @@ import {
   getUserName,
 } from '../../utils';
 
-import { MessageType } from '../../types';
 import ParsedText from 'react-native-parsed-text';
 import styles from './styles';
 
@@ -34,7 +34,7 @@ export interface TextMessageProps extends TextMessageTopLevelProps {
   enableAnimation?: boolean;
   message: MessageType.DerivedText;
   messageWidth: number;
-  showName: boolean;
+  showName: UsernameLocation;
 }
 
 export const TextMessage = ({
@@ -91,6 +91,14 @@ export const TextMessage = ({
     );
   };
 
+  const renderUsername = (username: string) => {
+    return (
+      <Text numberOfLines={1} style={headerText}>
+        {username}
+      </Text>
+    );
+  };
+
   const renderPreviewText = (previewText: string) => {
     return (
       <ParsedText
@@ -127,7 +135,7 @@ export const TextMessage = ({
     <LinkPreview
       containerStyle={{ width: previewData?.image ? messageWidth : undefined }}
       enableAnimation={enableAnimation}
-      header={showName ? getUserName(message.author) : undefined}
+      header={showName === 'inside' ? getUserName(message.author) : undefined}
       onPreviewDataFetched={handlePreviewDataFetched}
       previewData={previewData}
       renderDescription={renderPreviewDescription}
@@ -145,9 +153,9 @@ export const TextMessage = ({
   ) : (
     <View style={textContainer}>
       {
-        // Tested inside the link preview
-        /* istanbul ignore next */ showName
-          ? renderPreviewHeader(getUserName(message.author))
+        /* istanbul ignore next */
+        showName === 'inside'
+          ? renderUsername(getUserName(message.author))
           : null
       }
       <Text style={text}>{message.text}</Text>

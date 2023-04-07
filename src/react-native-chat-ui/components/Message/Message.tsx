@@ -6,6 +6,7 @@ import {
   ThemeContext,
   UserContext,
   excludeDerivedMessageProps,
+  getUserName,
 } from '../../utils';
 
 import { Avatar } from '../Avatar';
@@ -13,6 +14,7 @@ import { FileMessage } from '../FileMessage';
 import { ImageMessage } from '../ImageMessage';
 import { MessageType } from '../../types';
 import { StatusIcon } from '../StatusIcon';
+import { UsernameLocation } from '../../types';
 import { oneOf } from '@flyerhq/react-native-link-preview';
 import styles from './styles';
 
@@ -50,7 +52,7 @@ export interface MessageTopLevelProps extends TextMessageTopLevelProps {
   renderTextMessage?: (
     message: MessageType.Text,
     messageWidth: number,
-    showName: boolean,
+    showName: UsernameLocation,
   ) => React.ReactNode;
   /** Show user avatars for received messages. Useful for a group chat. */
   showUserAvatars?: boolean;
@@ -64,7 +66,7 @@ export interface MessageProps extends MessageTopLevelProps {
   messageWidth: number;
   roundBorder: boolean;
   showAvatar: boolean;
-  showName: boolean;
+  showName: UsernameLocation;
   showStatus: boolean;
 }
 
@@ -98,25 +100,25 @@ export const Message = React.memo(
     const currentUserIsAuthor =
       message.type !== 'dateHeader' && user?.id === message.author.id;
 
-    const { container, contentContainer, dateHeader, pressable } = styles({
-      currentUserIsAuthor,
-      message,
-      messageWidth,
-      roundBorder,
-      theme,
-    });
+    const { container, contentContainer, dateHeader, pressable, username } =
+      styles({
+        currentUserIsAuthor,
+        message,
+        messageWidth,
+        roundBorder,
+        theme,
+      });
 
     if (message.type === 'dateHeader') {
       return (
         <View style={dateHeader}>
-          <Text style={theme.fonts.dateDividerTextStyle}>{message.text}</Text>
+          <Text style={theme.date.text}>{message.text}</Text>
         </View>
       );
     }
 
     const renderBubbleContainer = () => {
       const child = renderMessage();
-
       return oneOf(
         renderBubble,
         <View style={contentContainer} testID="ContentContainer">
@@ -184,34 +186,50 @@ export const Message = React.memo(
       }
     };
 
+    const renderUsername = () => {
+      return (
+        <Text numberOfLines={1} style={theme.bubble.headerText}>
+          {getUserName(message.author)}
+        </Text>
+      );
+    };
+
     return (
-      <View style={container} onLayout={onLayout}>
-        <Avatar
-          {...{
-            author: message.author,
-            currentUserIsAuthor,
-            showAvatar,
-            showUserAvatars,
-            theme,
-          }}
-        />
-        <Pressable
-          onLongPress={() =>
-            onMessageLongPress?.(excludeDerivedMessageProps(message))
-          }
-          onPress={() => onMessagePress?.(excludeDerivedMessageProps(message))}
-          style={pressable}>
-          {renderBubbleContainer()}
-        </Pressable>
-        <StatusIcon
-          {...{
-            currentUserIsAuthor,
-            showStatus,
-            status: message.status,
-            theme,
-          }}
-        />
-      </View>
+      <>
+        <View style={container} onLayout={onLayout}>
+          <Avatar
+            {...{
+              author: message.author,
+              currentUserIsAuthor,
+              showAvatar,
+              showUserAvatars,
+              theme,
+            }}
+          />
+          {/* {showName === 'outside' ? renderUsername() : null} */}
+          <Pressable
+            onLongPress={() =>
+              onMessageLongPress?.(excludeDerivedMessageProps(message))
+            }
+            onPress={() =>
+              onMessagePress?.(excludeDerivedMessageProps(message))
+            }
+            style={pressable}>
+            {renderBubbleContainer()}
+          </Pressable>
+          <StatusIcon
+            {...{
+              currentUserIsAuthor,
+              showStatus,
+              status: message.status,
+              theme,
+            }}
+          />
+        </View>
+        <View style={username}>
+          {showName === 'outside' ? renderUsername() : null}
+        </View>
+      </>
     );
   },
 );

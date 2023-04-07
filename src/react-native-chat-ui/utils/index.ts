@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import * as React from 'react';
 
-import { MessageType, PreviewImage, Theme, User } from '../types';
+import {
+  MessageType,
+  PreviewImage,
+  Theme,
+  User,
+  UsernameLocation,
+} from '../types';
 
 import Blob from 'react-native/Libraries/Blob/Blob';
 import { ColorValue } from 'react-native';
@@ -124,7 +130,7 @@ export const calculateChatMessages = (
   }: {
     customDateHeaderText?: (dateTime: number) => string;
     dateFormat?: string;
-    showUserNames: boolean;
+    showUserNames: UsernameLocation;
     timeFormat?: string;
   },
 ) => {
@@ -146,9 +152,9 @@ export const calculateChatMessages = (
     let nextMessageDateThreshold = false;
     let nextMessageDifferentDay = false;
     let nextMessageInGroup = false;
-    let showName = false;
+    let showName = 'none';
 
-    if (showUserNames) {
+    if (showUserNames !== 'none') {
       const previousMessage = isFirst ? undefined : messages[i + 1];
 
       const isFirstInGroup =
@@ -161,14 +167,14 @@ export const calculateChatMessages = (
       if (isFirstInGroup) {
         shouldShowName = false;
         if (message.type === 'text') {
-          showName = true;
+          showName = showUserNames;
         } else {
           shouldShowName = true;
         }
       }
 
       if (message.type === 'text' && shouldShowName) {
-        showName = true;
+        showName = showUserNames;
         shouldShowName = false;
       }
     }
@@ -206,8 +212,10 @@ export const calculateChatMessages = (
         showName:
           notMyMessage &&
           showUserNames &&
-          showName &&
-          !!getUserName(message.author),
+          showName !== 'none' &&
+          !!getUserName(message.author)
+            ? showUserNames
+            : 'none',
         showStatus: true,
       },
       ...chatMessages,

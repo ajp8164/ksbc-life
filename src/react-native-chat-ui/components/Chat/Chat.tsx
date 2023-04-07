@@ -25,7 +25,7 @@ import {
   unwrap,
 } from '../../utils';
 import { Message, MessageTopLevelProps } from '../Message';
-import { MessageType, Theme, User } from '../../types';
+import { MessageType, Theme, User, UsernameLocation } from '../../types';
 
 import { CircularActivityIndicator } from '../CircularActivityIndicator';
 import ImageView from './ImageView';
@@ -66,7 +66,7 @@ export interface ChatProps extends ChatTopLevelProps {
   /** Disable automatic image preview on tap. */
   disableImageGallery?: boolean;
   /** Allows you to change what the user sees when there are no messages.
-   * `emptyChatPlaceholder` and `emptyChatPlaceholderTextStyle` are ignored
+   * `emptyChatPlaceholder` and `emptyChatPlaceholderText` are ignored
    * in this case. */
   emptyState?: () => React.ReactNode;
   /** Use this to enable `LayoutAnimation`. Experimental on Android (same as React Native). */
@@ -89,7 +89,7 @@ export interface ChatProps extends ChatTopLevelProps {
   onEndReached?: () => Promise<void>;
   /** Show user names for received messages. Useful for a group chat. Will be
    * shown only on text messages. */
-  showUserNames?: boolean;
+  showUserNames?: UsernameLocation;
   /** Chat theme. Implement {@link Theme} to create your own theme or use
    * existing one, like the {@link defaultTheme}. */
   theme?: Theme;
@@ -130,7 +130,7 @@ export const Chat = ({
   renderTextMessage,
   sendButtonVisibilityMode = 'editing',
   showUserAvatars = false,
-  showUserNames = false,
+  showUserNames = 'inside',
   theme = defaultTheme,
   timeFormat,
   usePreviewData = true,
@@ -283,7 +283,8 @@ export const Chat = ({
         message.type !== 'dateHeader' && message.nextMessageInGroup;
       const showAvatar =
         message.type !== 'dateHeader' && !message.nextMessageInGroup;
-      const showName = message.type !== 'dateHeader' && message.showName;
+      const showName =
+        message.type !== 'dateHeader' ? message.showName : 'none';
       const showStatus = message.type !== 'dateHeader' && message.showStatus;
 
       return (

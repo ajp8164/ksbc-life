@@ -272,10 +272,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
       }
     }
   };
-  const [messages, setMessages] = useState([] as MessageType.Any[]);
-  const addMessage = (message: MessageType.Any) => {
-    setMessages([message, ...messages]);
-  };
+
   return (
     <SafeAreaView edges={['left', 'right']} style={{ flex: 1 }}>
       {userProfile?.id ? (
@@ -292,18 +289,53 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
           // onAttachmentPress={handleFileSelection}
           // onMessagePress={handleMessagePress}
           showUserAvatars={true}
-          showUserNames={true}
+          showUserNames={'outside'}
           theme={{
             ...defaultTheme,
+            avatar: {
+              ...defaultTheme.avatar,
+              text: {
+                ...theme.styles.textSmall,
+                ...theme.styles.textBold,
+                color: theme.colors.textInv,
+              },
+            },
             bubble: {
               ...defaultTheme.bubble,
-              messageBorderRadius: 12,
-              messageInsetsHorizontal: 20,
-              messageInsetsVertical: 10,
+              contentLeftContainer: {
+                ...defaultTheme.bubble.contentLeftContainer,
+                backgroundColor: theme.colors.brandSecondary,
+                borderRadius: 20,
+              },
+              contentRightContainer: {
+                ...defaultTheme.bubble.contentRightContainer,
+                backgroundColor: theme.colors.brandPrimary,
+                borderRadius: 20,
+              },
+              messageTextLeft: {
+                ...theme.styles.textNormal,
+              },
+              messageTextRight: {
+                ...theme.styles.textNormal,
+                color: theme.colors.textInv,
+              },
+              headerText: {
+                ...defaultTheme.bubble.headerText,
+                ...theme.styles.textTiny,
+              },
+              textLeftContainer: {
+                ...defaultTheme.bubble.textLeftContainer,
+                marginHorizontal: 15,
+                marginVertical: 8,
+              },
+              textRightContainer: {
+                ...defaultTheme.bubble.textRightContainer,
+                marginHorizontal: 15,
+                marginVertical: 8,
+              },
             },
             colors: {
               ...defaultTheme.colors,
-              userAvatarNameColors: ['green'],
             },
             composer: {
               ...defaultTheme.composer,
@@ -311,17 +343,24 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
               tabBarHeight,
               container: {
                 ...defaultTheme.composer.container,
-                // backgroundColor: theme.colors.subtleGray,
-                // borderTopLeftRadius: 0,
-                // borderTopRightRadius: 0,
-                // paddingVertical: 10,
+                backgroundColor: theme.colors.subtleGray,
+                borderTopLeftRadius: 0,
+                borderTopRightRadius: 0,
+                paddingVertical: 10,
               },
               inputStyle: {
                 ...defaultTheme.composer.inputStyle,
-                // backgroundColor: theme.colors.white,
-                // color: theme.colors.text,
-                // borderRadius: 5,
-                // paddingHorizontal: 10,
+                ...theme.styles.textNormal,
+                backgroundColor: theme.colors.white,
+                color: theme.colors.text,
+                borderRadius: 5,
+              },
+            },
+            list: {
+              ...defaultTheme.list,
+              container: {
+                ...defaultTheme.list.container,
+                backgroundColor: theme.colors.white,
               },
             },
           }}
