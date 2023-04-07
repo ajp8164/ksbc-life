@@ -17,11 +17,12 @@ export default ({ theme }: { theme: Theme }) =>
       textAlign: 'center',
     },
     flatList: {
-      backgroundColor: theme.colors.background,
-      // borderWidth: 2,
-      // borderColor: 'red',
+      // backgroundColor: theme.colors.background,
+      borderWidth: 2,
+      borderColor: 'red',
+      // backgroundColor: 'red',
       flex: 1,
-      marginBottom: 5,
+      // marginBottom: 5,
     },
     flatListContentContainer: {
       flexGrow: 1,

@@ -36,6 +36,7 @@ import { l10n } from '../../l10n';
 import { oneOf } from '@flyerhq/react-native-link-preview';
 import styles from './styles';
 import { usePrevious } from '../../hooks';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Untestable
 /* istanbul ignore next */
@@ -154,6 +155,8 @@ export const Chat = ({
   const [imageViewIndex, setImageViewIndex] = React.useState(0);
   const [stackEntry, setStackEntry] = React.useState<StatusBarProps>({});
   const [composerHeight, setComposerHeight] = React.useState(0);
+  const [initialComposerHeight, setInitialComposerHeight] = React.useState(0);
+  const insets = useSafeAreaInsets();
 
   const l10nValue = React.useMemo(
     () => ({ ...l10n[locale], ...unwrap(l10nOverride) }),
@@ -407,11 +410,14 @@ export const Chat = ({
               <KeyboardAccessoryView
                 renderScrollable={renderScrollable}
                 contentContainerStyle={{ marginBottom: 0 }}
-                contentOffsetKeyboardClosed={composerHeight - 5}
-                contentOffsetKeyboardOpened={23}
+                contentOffsetKeyboardClosed={initialComposerHeight}
+                contentOffsetKeyboardOpened={
+                  composerHeight -
+                  insets.bottom -
+                  theme.composer.contentOffsetKeyboardOpened
+                }
                 spaceBetweenKeyboardAndAccessoryView={
-                  -theme.composer.spaceBetweenKeyboardAndAccessoryView -
-                  composerHeight
+                  -theme.composer.tabBarHeight
                 }>
                 <Input
                   {...{
@@ -422,7 +428,11 @@ export const Chat = ({
                     renderScrollable,
                     sendButtonVisibilityMode,
                     onLayout: (event: LayoutChangeEvent) => {
-                      console.log('composer', event.nativeEvent.layout);
+                      if (initialComposerHeight === 0) {
+                        setInitialComposerHeight(
+                          event.nativeEvent.layout.height,
+                        );
+                      }
                       setComposerHeight(event.nativeEvent.layout.height);
                     },
                   }}

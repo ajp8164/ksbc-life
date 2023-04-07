@@ -181,7 +181,8 @@ export interface ThemeIcons {
 }
 
 export interface ThemeComposer {
-  spaceBetweenKeyboardAndAccessoryView: number;
+  contentOffsetKeyboardOpened: number;
+  tabBarHeight: number;
   activityIndicator: {
     color: ColorValue;
     size: number;

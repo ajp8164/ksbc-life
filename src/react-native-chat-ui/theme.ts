@@ -136,6 +136,7 @@ export const defaultTheme: Theme = {
   },
   composer: {
     spaceBetweenKeyboardAndAccessoryView: 0,
+    tabBarHeight: 0,
     container: {
       position: 'absolute',
       bottom: 0,

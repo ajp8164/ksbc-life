@@ -1,3 +1,4 @@
+// import { Chat, MessageType, defaultTheme } from '@flyerhq/react-native-chat-ui';
 import { Chat, MessageType, defaultTheme } from '../react-native-chat-ui';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -16,6 +17,7 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import lodash from 'lodash';
 import { renderHeader } from 'components/molecules/chat';
 import { selectUserProfile } from 'store/selectors/userSelectors';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useSelector } from 'react-redux';
 import { useTheme } from 'theme';
 import { uuidv4 } from 'lib/uuid';
@@ -28,6 +30,7 @@ export type Props = NativeStackScreenProps<
 const ChatThreadScreen = ({ navigation, route }: Props) => {
   const theme = useTheme();
 
+  const tabBarHeight = useBottomTabBarHeight();
   const recipient = route.params.recipient;
   const userProfile = useSelector(selectUserProfile);
   const threadId = useRef<string>();
@@ -270,10 +273,31 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
       }
     }
   };
-
+  const [messages, setMessages] = useState([] as MessageType.Any[]);
+  const addMessage = (message: MessageType.Any) => {
+    setMessages([message, ...messages]);
+  };
   return (
     <SafeAreaView edges={['left', 'right']} style={{ flex: 1 }}>
       {userProfile?.id ? (
+        // <Chat
+        //   messages={messages}
+        //   onSendPress={message => {
+        //     const textMessage: MessageType.Text = {
+        //       author: { id: '06c33e8b-e835-4736-80f4-63f44b66666c' },
+        //       createdAt: Date.now(),
+        //       id: uuidv4(),
+        //       text: message.text,
+        //       type: 'text',
+        //     };
+        //     addMessage(textMessage);
+        //   }}
+        //   user={{ id: '06c33e8b-e835-4736-80f4-63f44b66666c' }}
+        //   theme={{
+        //     ...defaultTheme,
+        //     colors: { ...defaultTheme.colors, inputBackground: 'red' },
+        //   }}
+        // />
         <Chat
           messages={chatMessages}
           onSendPress={handleSendPress}
@@ -302,7 +326,8 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
             },
             composer: {
               ...defaultTheme.composer,
-              spaceBetweenKeyboardAndAccessoryView: 11, //29,
+              contentOffsetKeyboardOpened: 11,
+              tabBarHeight,
               container: {
                 ...defaultTheme.composer.container,
                 backgroundColor: theme.colors.subtleGray,

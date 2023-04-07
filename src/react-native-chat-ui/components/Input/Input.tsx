@@ -77,7 +77,7 @@ export const Input = ({
       setText('');
     }
   };
-  console.log(theme.composer.inputStyle);
+
   return (
     <View style={[container, theme.composer.container]} onLayout={onLayout}>
       {user &&
