@@ -12,7 +12,8 @@ export default ({ theme }: { theme: Theme }) =>
     input: {
       flex: 1,
       maxHeight: 100,
-      // height: 20,
+      minHeight: 25,
+      paddingHorizontal: 10,
       ...theme.composer.inputStyle,
 
       // Fixes default paddings for Android
