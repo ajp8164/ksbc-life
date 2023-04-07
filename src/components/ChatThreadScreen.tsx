@@ -1,4 +1,3 @@
-// import { Chat, MessageType, defaultTheme } from '@flyerhq/react-native-chat-ui';
 import { Chat, MessageType, defaultTheme } from '../react-native-chat-ui';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -280,24 +279,6 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
   return (
     <SafeAreaView edges={['left', 'right']} style={{ flex: 1 }}>
       {userProfile?.id ? (
-        // <Chat
-        //   messages={messages}
-        //   onSendPress={message => {
-        //     const textMessage: MessageType.Text = {
-        //       author: { id: '06c33e8b-e835-4736-80f4-63f44b66666c' },
-        //       createdAt: Date.now(),
-        //       id: uuidv4(),
-        //       text: message.text,
-        //       type: 'text',
-        //     };
-        //     addMessage(textMessage);
-        //   }}
-        //   user={{ id: '06c33e8b-e835-4736-80f4-63f44b66666c' }}
-        //   theme={{
-        //     ...defaultTheme,
-        //     colors: { ...defaultTheme.colors, inputBackground: 'red' },
-        //   }}
-        // />
         <Chat
           messages={chatMessages}
           onSendPress={handleSendPress}

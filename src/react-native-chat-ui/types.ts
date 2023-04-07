@@ -182,7 +182,6 @@ export interface ThemeIcons {
 
 export interface ThemeComposer {
   contentOffsetKeyboardOpened: number;
-  tabBarHeight: number;
   activityIndicator: {
     color: ColorValue;
     size: number;
@@ -190,6 +189,7 @@ export interface ThemeComposer {
   };
   container: ViewStyle | ViewStyle[];
   inputStyle: TextStyle;
+  tabBarHeight: number;
 }
 
 export interface User {
