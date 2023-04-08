@@ -1,4 +1,5 @@
 import { UserProfile, UserRole, UserStatus } from 'types/user';
+import { getUserAvatarColor, getUserInitials } from 'lib/user';
 
 import { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -7,10 +8,12 @@ import { log } from '@react-native-ajp-elements/core';
 import { saveUser } from 'store/slices/user';
 import { signOut } from 'lib/auth';
 import { useDispatch } from 'react-redux';
+import { useTheme } from 'theme';
 
 export const useAuthorizeUser = () => {
   const setUser = useSetUser();
   const unauthorizeUser = useUnauthorizeUser();
+  const theme = useTheme();
 
   return (
     credentials: FirebaseAuthTypes.User | null,
@@ -29,7 +32,10 @@ export const useAuthorizeUser = () => {
         .then(documentSnapshot => {
           if (!documentSnapshot.exists) {
             // Add user to firestore and set user.
-            const profile = createProfile(credentials);
+            const profile = createProfile(
+              credentials,
+              theme.colors.avatarColors,
+            );
 
             firestore()
               .collection('Users')
@@ -111,11 +117,23 @@ export const useAuthorizeUser = () => {
   };
 };
 
-const createProfile = (credentials: FirebaseAuthTypes.User): UserProfile => {
+const createProfile = (
+  credentials: FirebaseAuthTypes.User,
+  colors: string[],
+): UserProfile => {
+  const firstName =
+    credentials.displayName?.split(' ')[0] || credentials.email || '';
+  const lastName = credentials.displayName?.split(' ')[1] || '';
   return {
     name: credentials.displayName,
+    firstName,
+    lastName,
     email: credentials.email,
     photoUrl: credentials.photoURL,
+    avatar: {
+      color: getUserAvatarColor(`${firstName}${lastName}`, colors),
+      title: getUserInitials(firstName, lastName),
+    },
     role: credentials.isAnonymous ? UserRole.Anonymous : UserRole.User,
     status: UserStatus.Active,
   } as UserProfile;

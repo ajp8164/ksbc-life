@@ -1,4 +1,3 @@
-import { AppTheme, useTheme } from 'theme';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import {
   MoreNavigatorParamList,
@@ -9,14 +8,14 @@ import { UserProfile, UserRole } from 'types/user';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { AuthContext } from 'lib/auth';
+import { Avatar } from '@rneui/base';
 import { CompositeScreenProps } from '@react-navigation/core';
-import { Image } from '@rneui/base';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ScrollView } from 'react-native';
 import { appConfig } from 'config';
-import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { updateUserProfile } from 'store/slices/user';
+import { useTheme } from 'theme';
 import { usersDocumentChangeListener } from 'firestore/users';
 
 export type Props = CompositeScreenProps<
@@ -26,7 +25,6 @@ export type Props = CompositeScreenProps<
 
 const MoreScreen = ({ navigation, route }: Props) => {
   const theme = useTheme();
-  const s = useStyles(theme);
   const dispatch = useDispatch();
 
   const auth = useContext(AuthContext);
@@ -70,15 +68,22 @@ const MoreScreen = ({ navigation, route }: Props) => {
           title={userProfile.name || userProfile.email || 'My Profile'}
           leftImage={
             userProfile.photoUrl ? (
-              <Image
+              <Avatar
                 source={{ uri: userProfile.photoUrl }}
-                containerStyle={s.avatar}
+                imageProps={{ resizeMode: 'contain' }}
+                containerStyle={theme.styles.avatar}
               />
             ) : (
-              'account-circle-outline'
+              <Avatar
+                title={userProfile?.avatar.title}
+                titleStyle={theme.styles.avatarTitle}
+                containerStyle={{
+                  ...theme.styles.avatar,
+                  backgroundColor: userProfile?.avatar.color,
+                }}
+              />
             )
           }
-          leftImageType={'material-community'}
           position={['first', 'last']}
           onPress={() => navigation.navigate('UserProfile')}
         />
@@ -122,20 +127,5 @@ const MoreScreen = ({ navigation, route }: Props) => {
     </ScrollView>
   );
 };
-
-const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
-  avatar: {
-    width: 30,
-    height: 30,
-    borderRadius: 30,
-    left: -3,
-    top: 1,
-  },
-  adminButtonContainer: {
-    width: '80%',
-    alignSelf: 'center',
-    marginTop: 30,
-  },
-}));
 
 export default MoreScreen;

@@ -8,11 +8,32 @@ import { makeStyles } from '@rneui/themed';
 
 export const fontSizes = {
   ...defaultFontSizes,
+  giant: 64,
   micro: 10,
 };
 
 export const useStyles = makeStyles(
   (theme): Styles => ({
+    avatar: {
+      width: 28,
+      height: 28,
+      borderRadius: 28,
+      overflow: 'hidden',
+    },
+    avatarForListItem: {
+      width: 28,
+      height: 28,
+      borderRadius: 28,
+      left: -3,
+      top: 1,
+    },
+    avatarTitle: {
+      color: theme.colors.stickyWhite,
+      fontSize: fontSizes.normal,
+      fontFamily,
+      fontWeight: 'normal',
+    },
+
     /**
      * Content Styles
      * NOTE -- These style *names* are stored in firestore. Changing the names will break rendered layout.
@@ -38,6 +59,12 @@ export const useStyles = makeStyles(
      * Styles
      */
 
+    textGiant: {
+      color: theme.colors.text,
+      fontSize: fontSizes.giant,
+      fontFamily,
+      fontWeight: 'normal',
+    },
     textMicro: {
       color: theme.colors.text,
       fontSize: fontSizes.micro,

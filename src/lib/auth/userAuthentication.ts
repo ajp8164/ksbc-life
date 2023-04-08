@@ -47,11 +47,12 @@ export const signInWithApple = async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     // com.apple.AuthenticationServices.AuthorizationError is likely due to the user not being
-    // signed into their iOS device via the Settings app.  Don't throw error, just report it.
-    log.error(`Apple sign in error: ${e.message}`);
+    // signed into their iOS device via the Settings app or they auth'd with an incorrect
+    // password.
     if (
       !e.message.includes('com.apple.AuthenticationServices.AuthorizationError')
     ) {
+      log.error(`Apple sign in error: ${e.message}`);
       throw new Error(
         'An internal error occurred while trying to sign in. Please try again.',
       );

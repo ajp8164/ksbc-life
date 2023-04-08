@@ -1,7 +1,6 @@
 import { Alert, ScrollView, Text, View } from 'react-native';
 import { AppTheme, useTheme } from 'theme';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
-import { Icon, Image } from '@rneui/base';
 import {
   MainNavigatorParamList,
   MoreNavigatorParamList,
@@ -9,6 +8,7 @@ import {
 import React, { useEffect } from 'react';
 import { signOut, useUnauthorizeUser } from 'lib/auth';
 
+import { Avatar } from '@rneui/base';
 import { CompositeScreenProps } from '@react-navigation/core';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { biometricAuthentication } from 'lib/biometricAuthentication';
@@ -72,17 +72,19 @@ const UserProfileScreen = ({ navigation }: Props) => {
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior={'automatic'}>
         {userProfile?.photoUrl ? (
-          <Image
+          <Avatar
             source={{ uri: userProfile?.photoUrl }}
+            imageProps={{ resizeMode: 'contain' }}
             containerStyle={s.avatar}
           />
         ) : (
-          <Icon
-            name="account-circle"
-            type={'material-community'}
-            color={theme.colors.brandSecondary}
-            size={100}
-            style={{ marginTop: 15 }}
+          <Avatar
+            title={userProfile?.avatar.title}
+            titleStyle={s.avatarTitle}
+            containerStyle={{
+              ...s.avatar,
+              backgroundColor: userProfile?.avatar.color,
+            }}
           />
         )}
         {userProfile?.name && (
@@ -112,6 +114,11 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
     alignSelf: 'center',
     marginTop: 15,
     marginBottom: 15,
+    overflow: 'hidden',
+  },
+  avatarTitle: {
+    ...theme.styles.textGiant,
+    color: theme.colors.stickyWhite,
   },
   profileName: {
     ...theme.styles.textNormal,

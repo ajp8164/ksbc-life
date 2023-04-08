@@ -6,6 +6,18 @@ import { theme as rneulTheme } from '@react-native-ajp-elements/ui';
 export const theme = createTheme(
   lodash.merge({}, rneulTheme, {
     darkColors: {
+      avatarColors: [
+        '#ff6767',
+        '#66e0da',
+        '#f5a2d9',
+        '#f0c722',
+        '#6a85e5',
+        '#fd9a6f',
+        '#92db6e',
+        '#73b8e5',
+        '#fd7590',
+        '#c78ae5',
+      ],
       brandPrimary: '#194E6A',
       brandSecondary: '#80BFE1',
       calm: '#B260EA',
@@ -30,6 +42,18 @@ export const theme = createTheme(
       }),
     },
     lightColors: {
+      avatarColors: [
+        '#ff6767',
+        '#66e0da',
+        '#f5a2d9',
+        '#f0c722',
+        '#6a85e5',
+        '#fd9a6f',
+        '#92db6e',
+        '#73b8e5',
+        '#fd7590',
+        '#c78ae5',
+      ],
       brandPrimary: '#194E6A',
       brandSecondary: '#80BFE1',
       calm: '#B260EA',

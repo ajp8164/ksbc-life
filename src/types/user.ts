@@ -15,8 +15,14 @@ export enum UserStatus {
 export type UserProfile = {
   id?: string;
   name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   photoUrl: string;
+  avatar: {
+    color: string;
+    title: string;
+  };
   role: UserRole;
   status: UserStatus;
 };
