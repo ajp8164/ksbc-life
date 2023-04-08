@@ -1,11 +1,11 @@
 import { AppTheme, useTheme } from 'theme';
-import { Avatar, Icon } from '@rneui/base';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import { FlatList, ListRenderItem, ScrollView, View } from 'react-native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { getUsers, usersCollectionChangeListener } from 'firestore/users';
 
 import { AuthContext } from 'lib/auth';
+import { Avatar } from '@rneui/base';
 import { ChatNavigatorParamList } from 'types/navigation';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import InfoMessage from 'components/atoms/InfoMessage';
@@ -42,7 +42,7 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
         snapshot.docs.forEach(d => {
           updated.push({ ...d.data(), id: d.id } as UserProfile);
         });
-        setUsers(updated);
+        setUsers(filterUsers(updated));
         lastDocument.current = snapshot.docs[snapshot.docs.length - 1];
         allLoaded.current = false;
       },
@@ -56,33 +56,39 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
       setIsLoading(true);
       const s = await getUsers({ lastDocument: lastDocument.current });
       lastDocument.current = s.lastDocument;
-      setUsers(users.concat(s.result));
+      setUsers(filterUsers(users.concat(s.result)));
       allLoaded.current = s.allLoaded;
       setIsLoading(false);
     }
   };
 
+  const filterUsers = (users: UserProfile[]) => {
+    return users.filter(u => u.role !== UserRole.Anonymous);
+  };
+
   const renderUser: ListRenderItem<UserProfile> = ({ item, index }) => {
     const recipient = item;
-    if (!users || !recipient.id) return null;
+    if (!users || !recipient.id || recipient.role === UserRole.Anonymous) {
+      return null;
+    }
     return (
       <ListItem
         title={recipient.name || recipient.email}
-        titleStyle={{ marginLeft: 10 }}
         leftImage={
           recipient.photoUrl ? (
             <Avatar
               source={{ uri: recipient.photoUrl }}
               imageProps={{ resizeMode: 'contain' }}
-              avatarStyle={{ borderRadius: 30, paddingRight: 5 }}
+              containerStyle={theme.styles.avatar}
             />
           ) : (
-            <Icon
-              name={'account-circle-outline'}
-              type={'material-community'}
-              color={theme.colors.icon}
-              size={40}
-              style={{ marginLeft: -5, width: 44 }}
+            <Avatar
+              title={userProfile?.avatar.title}
+              titleStyle={[theme.styles.avatarTitle]}
+              containerStyle={{
+                ...theme.styles.avatar,
+                backgroundColor: userProfile?.avatar.color,
+              }}
             />
           )
         }
