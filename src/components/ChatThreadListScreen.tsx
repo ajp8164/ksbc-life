@@ -83,11 +83,11 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
             />
           ) : (
             <Avatar
-              title={userProfile?.avatar.title}
+              title={recipient?.avatar.title}
               titleStyle={[theme.styles.avatarTitle]}
               containerStyle={{
                 ...theme.styles.avatar,
-                backgroundColor: userProfile?.avatar.color,
+                backgroundColor: recipient?.avatar.color,
               }}
             />
           )
