@@ -80,7 +80,7 @@ export const defaultTheme: Theme = {
     },
     bodyTextLeft: {
       color: NEUTRAL_0,
-      fontSize: 1600,
+      fontSize: 16,
       fontWeight: '500',
       lineHeight: 24,
     },
@@ -91,7 +91,7 @@ export const defaultTheme: Theme = {
       lineHeight: 24,
     },
     captionTextLeft: {
-      color: NEUTRAL_2,
+      color: PRIMARY,
       fontSize: 12,
       fontWeight: '500',
       lineHeight: 16,

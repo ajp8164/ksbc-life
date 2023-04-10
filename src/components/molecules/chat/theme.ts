@@ -18,6 +18,16 @@ export const chatTheme = (
     },
     bubble: {
       ...defaultTheme.bubble,
+      captionTextLeft: {
+        ...defaultTheme.bubble.captionTextLeft,
+        ...theme.styles.textSmall,
+        color: theme.colors.blackTransparentMid,
+      },
+      captionTextRight: {
+        ...defaultTheme.bubble.captionTextRight,
+        ...theme.styles.textSmall,
+        color: theme.colors.whiteTransparentMid,
+      },
       contentLeftContainer: {
         ...defaultTheme.bubble.contentLeftContainer,
         backgroundColor: theme.colors.brandSecondary,
@@ -28,6 +38,8 @@ export const chatTheme = (
         backgroundColor: theme.colors.brandPrimary,
         borderRadius: 20,
       },
+      documentIconLeftColor: theme.colors.brandPrimary,
+      documentIconRightColor: theme.colors.stickyWhite,
       messageTextLeft: {
         ...theme.styles.textNormal,
       },
