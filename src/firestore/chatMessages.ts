@@ -8,7 +8,7 @@ import firestore, {
   FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';
 
-import { ChatMessage } from 'types/chatMessage';
+import { ChatMessage } from 'types/chat';
 import { log } from '@react-native-ajp-elements/core';
 import { uuidv4 } from 'lib/uuid';
 

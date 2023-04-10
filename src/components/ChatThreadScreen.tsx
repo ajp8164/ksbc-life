@@ -12,7 +12,7 @@ import {
   useSendAttachment,
 } from 'components/molecules/chat';
 
-import { ChatMessage } from 'types/chatMessage';
+import { ChatMessage } from 'types/chat';
 import { ChatNavigatorParamList } from 'types/navigation';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import InfoMessage from 'components/atoms/InfoMessage';
