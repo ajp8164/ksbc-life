@@ -1,25 +1,17 @@
 import * as React from 'react';
 
-import {
-  Animated,
-  ColorValue,
-  Easing,
-  StyleProp,
-  ViewStyle,
-} from 'react-native';
+import { Animated, ColorValue, Easing } from 'react-native';
 
 import styles from './styles';
 
 export interface CircularActivityIndicatorProps {
   color: ColorValue;
   size?: number;
-  style?: StyleProp<ViewStyle>;
 }
 
 export const CircularActivityIndicator = ({
   color,
   size = 24,
-  style,
 }: CircularActivityIndicatorProps) => {
   const spinValue = React.useRef(new Animated.Value(0)).current;
   const { circle } = styles({ color, size });
@@ -50,7 +42,6 @@ export const CircularActivityIndicator = ({
           ],
         },
         circle,
-        style,
       ]}
       testID="CircularActivityIndicator"
     />

@@ -348,12 +348,16 @@ export const Chat = ({
       /* istanbul ignore next */
       isNextPageLoading ? (
         <View style={footerLoadingPage}>
-          <CircularActivityIndicator color={theme.colors.primary} size={16} />
+          <CircularActivityIndicator
+            color={theme.list.activityIndicator.color}
+            size={theme.list.activityIndicator.size}
+          />
         </View>
       ) : (
         <View style={footer} />
       ),
-    [footer, footerLoadingPage, isNextPageLoading, theme.colors.primary],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [footer, footerLoadingPage, isNextPageLoading],
   );
 
   const renderScrollable = React.useCallback(

@@ -1,6 +1,12 @@
 import * as React from 'react';
 
-import { ColorValue, ImageURISource, TextStyle, ViewStyle } from 'react-native';
+import {
+  ColorValue,
+  ImageStyle,
+  ImageURISource,
+  TextStyle,
+  ViewStyle,
+} from 'react-native';
 
 import { PreviewData } from '@flyerhq/react-native-link-preview';
 
@@ -146,6 +152,7 @@ export interface Theme {
   date: ThemeDate;
   icons?: ThemeIcons;
   list: ThemeList;
+  statusIcon: ThemeStatusIcon;
 }
 
 export interface ThemeAvatar {
@@ -159,6 +166,8 @@ export interface ThemeBubble {
   bodyTextRight: TextStyle;
   captionTextLeft: TextStyle;
   captionTextRight: TextStyle;
+  containerLeft: ViewStyle;
+  containerRight: ViewStyle;
   contentLeftContainer: ViewStyle;
   contentRightContainer: ViewStyle;
   documentIconLeftColor: ColorValue;
@@ -197,21 +206,35 @@ export interface ThemeIcons {
 }
 
 export interface ThemeComposer {
-  contentOffsetKeyboardOpened: number;
   activityIndicator: {
     color: ColorValue;
     size: number;
-    style: ViewStyle | ViewStyle[];
   };
+  attachmentIcon: ImageStyle;
   container: ViewStyle | ViewStyle[];
+  contentOffsetKeyboardOpened: number;
   inputStyle: TextStyle;
+  sendIcon: ImageStyle;
   tabBarHeight: number;
 }
 
 export interface ThemeList {
+  activityIndicator: {
+    color: ColorValue;
+    size: number;
+  };
   container: ViewStyle | ViewStyle[];
   contentContainer: ViewStyle | ViewStyle[];
   emptyChatPlaceholderText: TextStyle;
+}
+
+export interface ThemeStatusIcon {
+  activityIndicator: {
+    color: ColorValue;
+    size: number;
+  };
+  image: ImageStyle;
+  imageError: ImageStyle;
 }
 
 export interface User {
@@ -219,6 +242,7 @@ export interface User {
   firstName?: string;
   id: string;
   imageUrl?: ImageURISource['uri'];
+  avatarColor?: ColorValue;
   lastName?: string;
   lastSeen?: number;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

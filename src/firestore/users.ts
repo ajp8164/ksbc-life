@@ -82,7 +82,7 @@ export const usersCollectionChangeListener = (
     orderBy = { fieldPath: 'name', directionStr: 'asc' },
     where,
   } = opts || {};
-  return collectionChangeListener('User', handler, {
+  return collectionChangeListener('Users', handler, {
     lastDocument,
     limit,
     orderBy,

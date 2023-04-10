@@ -56,11 +56,19 @@ export const defaultTheme: Theme = {
     },
   },
   bubble: {
+    containerLeft: {
+      marginLeft: 12,
+    },
+    containerRight: {
+      marginRight: 12,
+    },
     contentLeftContainer: {
       borderRadius: 20,
+      backgroundColor: SECONDARY,
     },
     contentRightContainer: {
       borderRadius: 20,
+      backgroundColor: PRIMARY,
     },
     fileLeftContainer: {
       padding: 16,
@@ -152,8 +160,13 @@ export const defaultTheme: Theme = {
     },
   },
   composer: {
-    contentOffsetKeyboardOpened: 0,
-    tabBarHeight: 0,
+    activityIndicator: {
+      color: PRIMARY,
+      size: 16,
+    },
+    attachmentIcon: {
+      tintColor: PRIMARY,
+    },
     container: {
       position: 'absolute',
       bottom: 0,
@@ -161,11 +174,7 @@ export const defaultTheme: Theme = {
       borderTopLeftRadius: 15,
       borderTopRightRadius: 15,
     },
-    activityIndicator: {
-      color: NEUTRAL_7,
-      size: 24,
-      style: {},
-    },
+    contentOffsetKeyboardOpened: 0,
     inputStyle: {
       color: NEUTRAL_7,
       fontSize: 16,
@@ -174,6 +183,10 @@ export const defaultTheme: Theme = {
       borderRadius: 20,
       backgroundColor: SECONDARY_DARK,
     },
+    sendIcon: {
+      tintColor: PRIMARY,
+    },
+    tabBarHeight: 0,
   },
   date: {
     text: {
@@ -184,6 +197,10 @@ export const defaultTheme: Theme = {
     },
   },
   list: {
+    activityIndicator: {
+      color: PRIMARY,
+      size: 24,
+    },
     container: {
       backgroundColor: NEUTRAL_7,
     },
@@ -196,6 +213,18 @@ export const defaultTheme: Theme = {
       fontWeight: '500',
       lineHeight: 24,
       textAlign: 'center',
+    },
+  },
+  statusIcon: {
+    activityIndicator: {
+      color: PRIMARY,
+      size: 10,
+    },
+    image: {
+      tintColor: PRIMARY,
+    },
+    imageError: {
+      tintColor: ERROR,
     },
   },
 };

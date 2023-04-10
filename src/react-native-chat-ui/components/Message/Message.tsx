@@ -121,9 +121,22 @@ export const Message = React.memo(
       const child = renderMessage();
       return oneOf(
         renderBubble,
-        <View style={contentContainer} testID="ContentContainer">
-          {child}
-        </View>,
+        <>
+          <View style={contentContainer} testID="ContentContainer">
+            {child}
+          </View>
+          <View style={{ alignItems: 'flex-end' }}>
+            {showStatus && (
+              <StatusIcon
+                {...{
+                  currentUserIsAuthor,
+                  status: message.status,
+                  theme,
+                }}
+              />
+            )}
+          </View>
+        </>,
       )({
         child,
         message: excludeDerivedMessageProps(message),
@@ -206,7 +219,6 @@ export const Message = React.memo(
               theme,
             }}
           />
-          {/* {showName === 'outside' ? renderUsername() : null} */}
           <Pressable
             onLongPress={() =>
               onMessageLongPress?.(excludeDerivedMessageProps(message))
@@ -217,14 +229,6 @@ export const Message = React.memo(
             style={pressable}>
             {renderBubbleContainer()}
           </Pressable>
-          <StatusIcon
-            {...{
-              currentUserIsAuthor,
-              showStatus,
-              status: message.status,
-              theme,
-            }}
-          />
         </View>
         <View style={username}>
           {showName === 'outside' ? renderUsername() : null}

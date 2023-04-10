@@ -15,19 +15,28 @@ const styles = ({
   roundBorder: boolean;
   theme: Theme;
 }) => {
+  const restContainer = currentUserIsAuthor
+    ? theme.bubble.containerRight
+    : theme.bubble.containerLeft;
   const restContentContainer = currentUserIsAuthor
     ? theme.bubble.contentRightContainer
     : theme.bubble.contentLeftContainer;
 
   return StyleSheet.create({
     container: {
+      ...restContainer, // Preserve built in layout
       alignItems: 'flex-end',
       alignSelf: currentUserIsAuthor ? 'flex-end' : 'flex-start',
       justifyContent: !currentUserIsAuthor ? 'flex-end' : 'flex-start',
       flex: 1,
       flexDirection: 'row',
       marginBottom: message.type === 'dateHeader' ? 0 : 4 + message.offset,
-      marginLeft: 20,
+      marginLeft: currentUserIsAuthor
+        ? 0
+        : theme.bubble.containerLeft.marginLeft || 0,
+      marginRight: currentUserIsAuthor
+        ? theme.bubble.containerRight.marginRight || 0
+        : 0,
     },
     contentContainer: {
       overflow: 'hidden',
@@ -56,8 +65,11 @@ const styles = ({
       maxWidth: messageWidth,
     },
     username: {
-      // Avatar - marginLeft + width + marginRight + some additional padding
-      marginLeft: 20 + 32 + 8 + 10,
+      // See Message Avatar style. margin + width + marginRight + some additional padding
+      marginLeft:
+        typeof theme.bubble.containerLeft === 'number'
+          ? theme.bubble.containerLeft + 32 + 8 + 10
+          : 32 + 8 + 10,
     },
   });
 };

@@ -8,6 +8,7 @@ import { InitStatus, initApp } from 'app';
 import { MainNavigatorParamList, StartupScreen } from 'types/navigation';
 import { useEffect, useRef, useState } from 'react';
 
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { AppError } from 'lib/errors';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { ColorModeSwitch } from '@react-native-ajp-elements/ui';
@@ -96,16 +97,18 @@ const AppMain = () => {
       linking={linking}
       // Removes default background (white) flash on tab change when in dark mode.
       theme={scheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <BottomSheetModalProvider>
-        <ColorModeSwitch themeSettings={themeSettings}>
-          <ErrorBoundary onError={onError}>
-            <AuthContext.Provider value={auth}>
-              <MainNavigator startupScreen={startupScreen} />
-              <SignInModal ref={signInModalRef} />
-            </AuthContext.Provider>
-          </ErrorBoundary>
-        </ColorModeSwitch>
-      </BottomSheetModalProvider>
+      <ActionSheetProvider>
+        <BottomSheetModalProvider>
+          <ColorModeSwitch themeSettings={themeSettings}>
+            <ErrorBoundary onError={onError}>
+              <AuthContext.Provider value={auth}>
+                <MainNavigator startupScreen={startupScreen} />
+                <SignInModal ref={signInModalRef} />
+              </AuthContext.Provider>
+            </ErrorBoundary>
+          </ColorModeSwitch>
+        </BottomSheetModalProvider>
+      </ActionSheetProvider>
     </NavigationContainer>
   );
 };

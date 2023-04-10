@@ -4,13 +4,10 @@ import {
   AttachmentButton,
   AttachmentButtonAdditionalProps,
 } from '../AttachmentButton';
-import {
-  CircularActivityIndicator,
-  CircularActivityIndicatorProps,
-} from '../CircularActivityIndicator';
 import { L10nContext, ThemeContext, UserContext, unwrap } from '../../utils';
 import { LayoutChangeEvent, TextInput, View } from 'react-native';
 
+import { CircularActivityIndicator } from '../CircularActivityIndicator';
 import { MessageType } from '../../types';
 import { SendButton } from '../SendButton';
 import styles from './styles';
@@ -35,7 +32,6 @@ export interface InputTopLevelProps {
 
 export interface InputAdditionalProps {
   attachmentButtonProps?: AttachmentButtonAdditionalProps;
-  attachmentCircularActivityIndicatorProps?: CircularActivityIndicatorProps;
 }
 
 export type InputProps = InputTopLevelProps & InputAdditionalProps;
@@ -44,7 +40,6 @@ export type InputProps = InputTopLevelProps & InputAdditionalProps;
  * send buttons inside. By default hides send button when text input is empty. */
 export const Input = ({
   attachmentButtonProps,
-  attachmentCircularActivityIndicatorProps,
   isAttachmentUploading,
   onAttachmentPress,
   onLayout,
@@ -82,13 +77,14 @@ export const Input = ({
     <View style={[container, theme.composer.container]} onLayout={onLayout}>
       {user &&
         (isAttachmentUploading ? (
-          <CircularActivityIndicator
-            {...{
-              ...attachmentCircularActivityIndicatorProps,
-              color: theme.composer.inputStyle.color || theme.colors.primary,
-              style: marginRight,
-            }}
-          />
+          <View style={marginRight}>
+            <CircularActivityIndicator
+              {...{
+                color: theme.composer.activityIndicator.color,
+                size: theme.composer.activityIndicator.size,
+              }}
+            />
+          </View>
         ) : (
           !!onAttachmentPress && (
             <AttachmentButton

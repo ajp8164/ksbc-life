@@ -1,10 +1,16 @@
-import { Chat, MessageType, defaultTheme } from '../react-native-chat-ui';
+import { Chat, MessageType } from '../react-native-chat-ui';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  addChatMessage,
   chatMessagesDocumentChangeListener,
   sendTypingState,
 } from 'firestore/chatMessages';
+import {
+  chatTheme,
+  handleMessagePress,
+  renderHeader,
+  sendTextMessage,
+  useSendAttachment,
+} from 'components/molecules/chat';
 
 import { ChatMessage } from 'types/chatMessage';
 import { ChatNavigatorParamList } from 'types/navigation';
@@ -12,14 +18,11 @@ import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import InfoMessage from 'components/atoms/InfoMessage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { launchImageLibrary } from 'react-native-image-picker';
 import lodash from 'lodash';
-import { renderHeader } from 'components/molecules/chat';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useSelector } from 'react-redux';
 import { useTheme } from 'theme';
-import { uuidv4 } from 'lib/uuid';
 
 export type Props = NativeStackScreenProps<
   ChatNavigatorParamList,
@@ -28,6 +31,8 @@ export type Props = NativeStackScreenProps<
 
 const ChatThreadScreen = ({ navigation, route }: Props) => {
   const theme = useTheme();
+
+  const sendAttachmentMessage = useSendAttachment();
 
   const tabBarHeight = useBottomTabBarHeight();
   const recipient = route.params.recipient;
@@ -40,71 +45,6 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
   const [chatMessages, setChatMessages] = useState<MessageType.Any[]>([]);
 
   //////////////////////////////
-  const handleImageSelection = () => {
-    if (!userProfile) return;
-    launchImageLibrary(
-      {
-        includeBase64: true,
-        maxWidth: 1440,
-        mediaType: 'photo',
-        quality: 0.7,
-      },
-      ({ assets }) => {
-        const response = assets?.[0];
-
-        if (response?.base64) {
-          const imageMessage: MessageType.Image = {
-            id: uuidv4(),
-            author: {
-              id: userProfile.id || '',
-              firstName:
-                userProfile.name?.split(' ')[0] || userProfile.email[0],
-              lastName: userProfile.name?.split(' ')[1] || '',
-              imageUrl: userProfile.photoUrl || '',
-            },
-            height: response.height,
-            name: response.fileName ?? response.uri?.split('/').pop() ?? '🖼',
-            size: response.fileSize ?? 0,
-            type: 'image',
-            uri: `data:image/*;base64,${response.base64}`,
-            width: response.width,
-          };
-          // addMessage(imageMessage);
-          threadId.current && addChatMessage(imageMessage, threadId.current);
-        }
-      },
-    );
-  };
-
-  // const handleFileSelection = async () => {
-  //   try {
-  //     const response = await DocumentPicker.pickSingle({
-  //       type: [DocumentPicker.types.allFiles],
-  //     });
-  //     const fileMessage: MessageType.File = {
-  //       author: user,
-  //       createdAt: Date.now(),
-  //       id: uuidv4(),
-  //       mimeType: response.type ?? undefined,
-  //       name: response.name || 'temp',
-  //       size: response.size ?? 0,
-  //       type: 'file',
-  //       uri: response.uri,
-  //     };
-  //     addMessage(fileMessage);
-  //   } catch {}
-  // };
-
-  // const handleMessagePress = async (
-  //   message: MessageType.DerivedUserMessage,
-  // ) => {
-  //   if (message.type === 'file') {
-  //     try {
-  //       await FileViewer.open(message.uri, { showOpenWithDialog: true });
-  //     } catch {}
-  //   }
-  // };
-
   // const renderBubble = ({
   //   child,
   //   message,
@@ -164,6 +104,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
   //   );
   // };
   //////////////////////////////
+
   useEffect(() => {
     // Create the chat thread id by combining recipient and sender id's. Use a comparison to get the
     // same id everytime.
@@ -173,7 +114,6 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
           ? `${userProfile?.id}-${recipient.id}`
           : `${recipient.id}-${userProfile?.id}`;
     }
-
     if (!threadId.current) return;
 
     const subscription = chatMessagesDocumentChangeListener(
@@ -208,6 +148,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
             // messages[0].received = true;
           }
 
+          messages[1].status = 'seen';
           setChatMessages(messages);
 
           // Set typing state on our ui,
@@ -236,20 +177,14 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleSendPress = (message: MessageType.PartialText) => {
-    if (!userProfile) return;
-    const textMessage: MessageType.Text = {
-      id: uuidv4(),
-      author: {
-        id: userProfile.id || '',
-        firstName: userProfile.name?.split(' ')[0] || userProfile.email[0],
-        lastName: userProfile.name?.split(' ')[1] || '',
-        imageUrl: userProfile.photoUrl || '',
-      },
-      text: message.text,
-      type: 'text',
-    };
-    threadId.current && addChatMessage(textMessage, threadId.current);
+  const sendAttachment = () => {
+    if (!userProfile || !threadId.current) return;
+    sendAttachmentMessage(userProfile, threadId.current);
+  };
+
+  const sendText = (message: MessageType.PartialText) => {
+    if (!userProfile || !threadId.current) return;
+    sendTextMessage(message, userProfile, threadId.current);
   };
 
   const onInputTextChanged = (text: string) => {
@@ -278,101 +213,19 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
       {userProfile?.id ? (
         <Chat
           messages={chatMessages}
-          onSendPress={handleSendPress}
           user={{
             id: userProfile.id,
             firstName: userProfile.name?.split(' ')[0] || userProfile.email[0],
             lastName: userProfile.name?.split(' ')[1] || '',
             imageUrl: userProfile.photoUrl || '',
+            avatarColor: userProfile.avatar.color,
           }}
-          onAttachmentPress={handleImageSelection}
-          // onAttachmentPress={handleFileSelection}
-          // onMessagePress={handleMessagePress}
-          showUserAvatars={true}
+          onSendPress={sendText}
+          onAttachmentPress={sendAttachment}
+          onMessagePress={handleMessagePress}
+          showUserAvatars={true} //  Only if group
           showUserNames={'outside'}
-          theme={{
-            ...defaultTheme,
-            avatar: {
-              ...defaultTheme.avatar,
-              text: {
-                ...theme.styles.textSmall,
-                ...theme.styles.textBold,
-                color: theme.colors.textInv,
-              },
-            },
-            bubble: {
-              ...defaultTheme.bubble,
-              contentLeftContainer: {
-                ...defaultTheme.bubble.contentLeftContainer,
-                backgroundColor: theme.colors.brandSecondary,
-                borderRadius: 20,
-              },
-              contentRightContainer: {
-                ...defaultTheme.bubble.contentRightContainer,
-                backgroundColor: theme.colors.brandPrimary,
-                borderRadius: 20,
-              },
-              messageTextLeft: {
-                ...theme.styles.textNormal,
-              },
-              messageTextRight: {
-                ...theme.styles.textNormal,
-                color: theme.colors.textInv,
-              },
-              headerText: {
-                ...defaultTheme.bubble.headerText,
-                ...theme.styles.textTiny,
-              },
-              textLeftContainer: {
-                ...defaultTheme.bubble.textLeftContainer,
-                marginHorizontal: 15,
-                marginVertical: 8,
-              },
-              textRightContainer: {
-                ...defaultTheme.bubble.textRightContainer,
-                marginHorizontal: 15,
-                marginVertical: 8,
-              },
-            },
-            colors: {
-              ...defaultTheme.colors,
-            },
-            composer: {
-              ...defaultTheme.composer,
-              contentOffsetKeyboardOpened: 11,
-              tabBarHeight,
-              container: {
-                ...defaultTheme.composer.container,
-                backgroundColor: theme.colors.subtleGray,
-                borderTopLeftRadius: 0,
-                borderTopRightRadius: 0,
-                paddingVertical: 10,
-              },
-              inputStyle: {
-                ...defaultTheme.composer.inputStyle,
-                ...theme.styles.textNormal,
-                backgroundColor: theme.colors.white,
-                color: theme.colors.text,
-                borderRadius: 5,
-              },
-            },
-            date: {
-              text: {
-                ...theme.styles.textTiny,
-                ...theme.styles.textBold,
-              },
-            },
-            list: {
-              ...defaultTheme.list,
-              container: {
-                ...defaultTheme.list.container,
-                backgroundColor: theme.colors.white,
-              },
-              contentContainer: {
-                backgroundColor: theme.colors.white,
-              },
-            },
-          }}
+          theme={chatTheme(theme, { tabBarHeight })}
           // renderBubble={renderBubble}
           // renderCustomMessage={renderCustomMessage}
           // customBottomComponent={() => <Text>hello</Text>}

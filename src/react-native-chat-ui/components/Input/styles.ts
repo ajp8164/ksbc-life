@@ -21,6 +21,6 @@ export default ({ theme }: { theme: Theme }) =>
       paddingTop: 0,
     },
     marginRight: {
-      marginRight: 16,
+      marginRight: 24,
     },
   });

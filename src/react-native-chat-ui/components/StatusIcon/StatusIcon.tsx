@@ -8,55 +8,54 @@ import { CircularActivityIndicator } from '../CircularActivityIndicator';
 export const StatusIcon = React.memo(
   ({
     currentUserIsAuthor,
-    showStatus,
     status,
     theme,
   }: {
     currentUserIsAuthor: boolean;
-    showStatus: boolean;
     status?: MessageType.Any['status'];
     theme: Theme;
   }) => {
     let statusIcon: React.ReactNode | null = null;
 
-    if (showStatus) {
-      switch (status) {
-        case 'delivered':
-        case 'sent':
-          statusIcon = theme.icons?.deliveredIcon?.() ?? (
-            <Image
-              source={require('../../assets/icon-delivered.png')}
-              style={{ tintColor: theme.colors.primary }}
-              testID="DeliveredIcon"
-            />
-          );
-          break;
-        case 'error':
-          statusIcon = theme.icons?.errorIcon?.() ?? (
-            <Image
-              source={require('../../assets/icon-error.png')}
-              style={{ tintColor: theme.colors.error }}
-              testID="ErrorIcon"
-            />
-          );
-          break;
-        case 'seen':
-          statusIcon = theme.icons?.seenIcon?.() ?? (
-            <Image
-              source={require('../../assets/icon-seen.png')}
-              style={{ tintColor: theme.colors.primary }}
-              testID="SeenIcon"
-            />
-          );
-          break;
-        case 'sending':
-          statusIcon = theme.icons?.sendingIcon?.() ?? (
-            <CircularActivityIndicator color={theme.colors.primary} size={10} />
-          );
-          break;
-        default:
-          break;
-      }
+    switch (status) {
+      case 'delivered':
+      case 'sent':
+        statusIcon = theme.icons?.deliveredIcon?.() ?? (
+          <Image
+            source={require('../../assets/icon-delivered.png')}
+            style={theme.statusIcon.image}
+            testID="DeliveredIcon"
+          />
+        );
+        break;
+      case 'error':
+        statusIcon = theme.icons?.errorIcon?.() ?? (
+          <Image
+            source={require('../../assets/icon-error.png')}
+            style={theme.statusIcon.imageError}
+            testID="ErrorIcon"
+          />
+        );
+        break;
+      case 'seen':
+        statusIcon = theme.icons?.seenIcon?.() ?? (
+          <Image
+            source={require('../../assets/icon-seen.png')}
+            style={theme.statusIcon.image}
+            testID="SeenIcon"
+          />
+        );
+        break;
+      case 'sending':
+        statusIcon = theme.icons?.sendingIcon?.() ?? (
+          <CircularActivityIndicator
+            color={theme.statusIcon.activityIndicator.color}
+            size={theme.statusIcon.activityIndicator.size}
+          />
+        );
+        break;
+      default:
+        break;
     }
 
     return currentUserIsAuthor ? (

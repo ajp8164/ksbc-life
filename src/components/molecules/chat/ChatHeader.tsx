@@ -1,9 +1,10 @@
 import { AppTheme, useTheme } from 'theme';
-import { Avatar, Icon } from '@rneui/base';
 import { Header, HeaderBackButton } from '@react-navigation/elements';
 import { Text, View } from 'react-native';
 
+import { Avatar } from '@rneui/base';
 import { UserProfile } from 'types/user';
+import { fontSizes } from '@react-native-ajp-elements/ui';
 import { makeStyles } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/core';
 
@@ -39,15 +40,17 @@ const ChatHeader = ({ userProfile }: ChatHeaderInterface) => {
           <Avatar
             source={{ uri: userProfile.photoUrl }}
             imageProps={{ resizeMode: 'contain' }}
-            avatarStyle={{ borderRadius: 45 }}
-            size={45}
+            containerStyle={[theme.styles.avatar, s.avatar]}
           />
         ) : (
-          <Icon
-            name={'account-circle-outline'}
-            type={'material-community'}
-            color={theme.colors.icon}
-            size={45}
+          <Avatar
+            title={userProfile?.avatar.title}
+            titleStyle={[theme.styles.avatarTitle, s.avatarTitle]}
+            containerStyle={[
+              theme.styles.avatar,
+              s.avatar,
+              { backgroundColor: userProfile?.avatar.color },
+            ]}
           />
         )}
         <Text style={s.title}>
@@ -76,5 +79,12 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   title: {
     ...theme.styles.textTiny,
     top: 5,
+  },
+  avatar: {
+    width: 45,
+    height: 45,
+  },
+  avatarTitle: {
+    fontSize: fontSizes.xl,
   },
 }));
