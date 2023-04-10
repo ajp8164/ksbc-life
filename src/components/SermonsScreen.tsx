@@ -1,7 +1,10 @@
 import { AppTheme, useTheme } from 'theme';
 import { FlatList, ListRenderItem, View } from 'react-native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { getSermons, sermonsCollectionChangeListener } from 'firestore/sermons';
+import {
+  getSermons,
+  sermonsCollectionChangeListener,
+} from 'firebase/firestore/sermons';
 
 import { AuthContext } from 'lib/auth';
 import { DateTime } from 'luxon';

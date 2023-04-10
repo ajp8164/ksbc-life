@@ -1,6 +1,6 @@
 import { ISODateString } from 'types/common';
 import { YouTubeVideo } from 'types/youTube';
-import { addSermonVideos } from 'firestore/sermonVideos';
+import { addSermonVideos } from 'firebase/firestore/sermonVideos';
 import { appConfig } from 'config';
 import { log } from '@react-native-ajp-elements/core';
 

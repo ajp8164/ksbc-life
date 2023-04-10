@@ -11,7 +11,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   getSermonVideos,
   sermonVideosCollectionChangeListener,
-} from 'firestore/sermonVideos';
+} from 'firebase/firestore/sermonVideos';
 
 import { DateTime } from 'luxon';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';

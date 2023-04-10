@@ -7,7 +7,7 @@ import { DateTime } from 'luxon';
 import { SignInModalMethods } from 'components/modals/SignInModal';
 import { UserRole } from 'types/user';
 import { appConfig } from 'config';
-import { deleteUser } from 'firestore/users';
+import { deleteUser } from 'firebase/firestore/users';
 import lodash from 'lodash';
 import { selectUser } from 'store/selectors/userSelectors';
 import { useSelector } from 'react-redux';

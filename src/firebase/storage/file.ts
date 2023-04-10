@@ -1,31 +1,30 @@
-import * as ImagePicker from 'react-native-image-picker';
-
+import { DocumentPickerResponse } from 'react-native-document-picker';
 import { log } from '@react-native-ajp-elements/core';
 import storage from '@react-native-firebase/storage';
 import { uuidv4 } from 'lib/uuid';
 
 /**
- * Save a previously obtained image asset (see selectImage()) to storage. This function
- * deletes the specified old image if it exists.
- * @param args.imageAsset - the image asset obtained from selectImage()
- * @param args.storagePath - path in storage where the image will be stored
- * @param args.oldImage - (optional) if it exists, this image will be deleted from storage
+ * Save a previously obtained file asset to storage. This function deletes the specified old
+ * file if specified.
+ * @param args.file - the local file, a DocumentPickerResponse
+ * @param args.storagePath - path in storage where the file will be stored
+ * @param args.oldFile - (optional) if it exists, this file will be deleted from storage
  * @param args.onSuccess - callback with a storage public url
  * @param args.onError - callback when an error occurs
  */
-export const saveImage = async (args: {
-  imageAsset: ImagePicker.Asset;
+export const saveFile = async (args: {
+  file: DocumentPickerResponse;
   storagePath: string;
-  oldImage?: string;
+  oldFile?: string;
   onSuccess: (url: string) => void;
   onError: () => void;
 }) => {
-  const { imageAsset, storagePath, oldImage, onSuccess, onError } = args;
+  const { file, storagePath, oldFile, onSuccess, onError } = args;
   try {
-    if (imageAsset?.type && imageAsset?.uri) {
-      const imageType = imageAsset.type.split('/')[1];
-      const destFilename = `${storagePath}${uuidv4()}.${imageType}`;
-      const sourceFilename = imageAsset.uri.replace('file://', '');
+    if (file?.type && file?.uri) {
+      const fileType = file.type.split('/')[1];
+      const destFilename = `${storagePath}${uuidv4()}.${fileType}`;
+      const sourceFilename = file.uri.replace('file://', '');
       const storageRef = storage().ref(destFilename);
 
       try {
@@ -33,7 +32,7 @@ export const saveImage = async (args: {
           // Need a handler here to swallow possible second throw inside putFile().
         });
         const url = await storageRef.getDownloadURL();
-        oldImage && (await deleteImage({ filename: oldImage, storagePath }));
+        oldFile && (await deleteFile({ filename: oldFile, storagePath }));
         onSuccess(url);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
@@ -42,19 +41,19 @@ export const saveImage = async (args: {
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
-    log.error(`Image save failed: ${e.message}`);
+    log.error(`File save failed: ${e.message}`);
     onError();
   }
 };
 
 /**
- * Delete an image from storage.
+ * Delete a file from storage.
  * @param args.filename - the file to delete
- * @param args.storagePath - path in storage where the image is stored
+ * @param args.storagePath - path in storage where the file is stored
  * @param args.onSuccess - callback when complete
  * @param args.onError - callback when an error occurs
  */
-export const deleteImage = async (args: {
+export const deleteFile = async (args: {
   filename: string;
   storagePath: string;
   onSuccess?: () => void;
@@ -71,7 +70,7 @@ export const deleteImage = async (args: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .catch((e: any) => {
       if (!e.message.includes('storage/object-not-found')) {
-        log.error(`Failed to delete image: ${e.message}`);
+        log.error(`Failed to delete file: ${e.message}`);
       }
       onError && onError();
     });

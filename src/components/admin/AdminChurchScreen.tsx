@@ -14,7 +14,7 @@ import {
   deleteLocation,
   getLocations,
   locationsCollectionChangeListener,
-} from 'firestore/locations';
+} from 'firebase/firestore/locations';
 
 import { Church } from 'types/church';
 import { EditChurchModal } from 'components/admin/modals/EditChurchModal';
@@ -22,7 +22,7 @@ import { EditLocationModal } from 'components/admin/modals/EditLocationModal';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { Location } from 'types/location';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { churchCollectionChangeListener } from 'firestore/churches';
+import { churchCollectionChangeListener } from 'firebase/firestore/churches';
 import { makeStyles } from '@rneui/themed';
 
 const AdminChurchScreen = () => {

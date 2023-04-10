@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   chatMessagesDocumentChangeListener,
   sendTypingState,
-} from 'firestore/chatMessages';
+} from 'firebase/firestore/chatMessages';
 import {
   chatTheme,
   handleMessagePress,
@@ -12,9 +12,9 @@ import {
   useSendAttachment,
 } from 'components/molecules/chat';
 
-import { ChatMessage } from 'types/chat';
 import { ChatNavigatorParamList } from 'types/navigation';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+import { FirestoreMessageType } from 'types/chat';
 import InfoMessage from 'components/atoms/InfoMessage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -121,8 +121,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
       snapshot => {
         const data = snapshot.data();
         if (!snapshot.metadata.hasPendingWrites && data) {
-          const rawMessages =
-            (data.messages as { [key in string]: ChatMessage }) || [];
+          const rawMessages = (data.messages as FirestoreMessageType) || [];
           const isTyping = (data.isTyping as string[]) || [];
 
           const messages = Object.keys(rawMessages)
@@ -134,7 +133,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
 
               // rawMessages[key].received = false; // Reset all message received status.
               // rawMessages[key].sent = false; // Reset all message sent status.
-              return rawMessages[key] as ChatMessage;
+              return rawMessages[key] as MessageType.Any;
             })
             .sort((a, b) => {
               return (b.createdAt as number) - (a.createdAt as number);
@@ -148,7 +147,6 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
             // messages[0].received = true;
           }
 
-          messages[1].status = 'seen';
           setChatMessages(messages);
 
           // Set typing state on our ui,

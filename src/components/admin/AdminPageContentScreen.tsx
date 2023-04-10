@@ -13,7 +13,7 @@ import {
   getPageContentItems,
   pageContentItemCollectionChangeListener,
   updatePageContentItem,
-} from 'firestore/pageContentItems';
+} from 'firebase/firestore/pageContentItems';
 
 import { ActionSheet } from 'react-native-ui-lib';
 import { DateTime } from 'luxon';

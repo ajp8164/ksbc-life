@@ -2,7 +2,10 @@ import { AppTheme, useTheme } from 'theme';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import { FlatList, ListRenderItem, ScrollView, View } from 'react-native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { getUsers, usersCollectionChangeListener } from 'firestore/users';
+import {
+  getUsers,
+  usersCollectionChangeListener,
+} from 'firebase/firestore/users';
 
 import { AuthContext } from 'lib/auth';
 import { Avatar } from '@rneui/base';

@@ -3,19 +3,19 @@ import {
   QueryWhere,
   collectionChangeListener,
   documentChangeListener,
-} from 'firestore/utils';
+} from 'firebase/firestore/utils';
 import firestore, {
   FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';
 
-import { ChatMessage } from 'types/chat';
+import { MessageType } from '../../react-native-chat-ui';
 import { log } from '@react-native-ajp-elements/core';
 import { uuidv4 } from 'lib/uuid';
 
 export const initChatThread = (
-  message: ChatMessage,
+  message: MessageType.Any,
   threadId: string,
-): Promise<ChatMessage> => {
+): Promise<MessageType.Any> => {
   const key = uuidv4();
   const outgoingMessage = {
     ...message,
@@ -42,9 +42,9 @@ export const initChatThread = (
 };
 
 export const addChatMessage = (
-  message: ChatMessage,
+  message: MessageType.Any,
   threadId: string,
-): Promise<ChatMessage> => {
+): Promise<MessageType.Any> => {
   const outgoingMessage = {
     ...message,
     createdAt: firestore.FieldValue.serverTimestamp(),

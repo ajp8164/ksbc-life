@@ -19,7 +19,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
 import { Text } from 'react-native';
 import { makeStyles } from '@rneui/themed';
-import { pageContentItemCollectionChangeListener } from 'firestore/pageContentItems';
+import { pageContentItemCollectionChangeListener } from 'firebase/firestore/pageContentItems';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { useSelector } from 'react-redux';
 import { viewport } from '@react-native-ajp-elements/ui';

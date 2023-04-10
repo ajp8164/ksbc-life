@@ -1,11 +1,8 @@
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
-import { MessageType } from '@flyerhq/react-native-chat-ui';
+import { MessageType } from '../react-native-chat-ui';
 
-export type ChatMessage =
-  | (MessageType.Any | MessageType.Text | MessageType.Image) & {
-      createdAt?:
-        | MessageType.Any['createdAt']
-        | MessageType.Text['createdAt']
-        | MessageType.Image['createdAt']
-        | FirebaseFirestoreTypes.Timestamp;
-    };
+export type FirestoreMessageType = {
+  [key in string]: MessageType.Any & {
+    createdAt: MessageType.Any['createdAt'] | FirebaseFirestoreTypes.Timestamp;
+  };
+};

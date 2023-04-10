@@ -37,7 +37,6 @@ export const getTextSizeInBytes = (text: string) => new Blob([text]).size;
 
 /** Returns user avatar and name color based on the ID */
 export const getUserAvatarNameColor = (user: User, colors: ColorValue[]) => {
-  console.log(user);
   return user.avatarColor || colors[hashCode(user.id) % colors.length];
 };
 

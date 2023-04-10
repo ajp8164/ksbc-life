@@ -6,93 +6,94 @@ import {
   documentChangeListener,
   getDocument,
   getDocuments,
-} from 'firestore/utils';
+} from 'firebase/firestore/utils';
 import firestore, {
   FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';
 
-import { Pasteur } from 'types/pasteur';
+import { Location } from 'types/location';
 import { log } from '@react-native-ajp-elements/core';
 
-export const getPasteur = (id: string): Promise<Pasteur | undefined> => {
-  return getDocument('Pasteurs', id);
+export const getLocation = (id: string): Promise<Location | undefined> => {
+  return getDocument('Locations', id);
 };
 
-export const getPasteurs = (opts?: {
-  lastDocument?: FirebaseFirestoreTypes.DocumentData;
+export const getLocations = (opts?: {
   limit?: number;
+  lastDocument?: FirebaseFirestoreTypes.DocumentData;
   orderBy?: QueryOrderBy;
-}): Promise<QueryResult<Pasteur>> => {
+}): Promise<QueryResult<Location>> => {
   const {
     lastDocument,
     limit = 10,
-    orderBy = { fieldPath: 'firstName', directionStr: 'asc' },
+    orderBy = { fieldPath: 'name', directionStr: 'asc' },
   } = opts || {};
-  return getDocuments('Pasteurs', { orderBy, limit, lastDocument });
+  return getDocuments('Locations', { orderBy, limit, lastDocument });
 };
 
-export const addPasteur = (pasteur: Pasteur): Promise<Pasteur> => {
+export const addLocation = (location: Location): Promise<Location> => {
   return (
     firestore()
-      .collection('Pasteurs')
-      .add(pasteur)
-      .then(() => {
-        return pasteur;
+      .collection('Locations')
+      .add(location)
+      .then(documentSnapshot => {
+        location.id = documentSnapshot.id;
+        return location;
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((e: any) => {
-        log.error(`Failed to add pasteur document: ${e.message}`);
+        log.error(`Failed to add location document: ${e.message}`);
         throw e;
       })
   );
 };
 
-export const updatePasteur = (pasteur: Pasteur): Promise<Pasteur> => {
-  const updated = Object.assign({}, pasteur); // Don't mutate input.
+export const updateLocation = (location: Location): Promise<Location> => {
+  const updated = Object.assign({}, location); // Don't mutate input.
   const id = updated.id;
   delete updated.id; // Not storing the doc id in the object.
   return (
     firestore()
-      .collection('Pasteurs')
+      .collection('Locations')
       .doc(id)
       .update(updated)
       .then(() => {
-        return pasteur;
+        return location;
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((e: any) => {
         if (e.message.includes('firestore/not-found')) {
-          return addPasteur(pasteur);
+          return addLocation(location);
         }
-        log.error(`Failed to update pasteur document: ${e.message}`);
+        log.error(`Failed to update location document: ${e.message}`);
         throw e;
       })
   );
 };
 
-export const savePasteur = (pasteur: Pasteur): Promise<Pasteur> => {
-  if (pasteur.id) {
-    return updatePasteur(pasteur);
+export const saveLocation = (location: Location): Promise<Location> => {
+  if (location.id) {
+    return updateLocation(location);
   } else {
-    return addPasteur(pasteur);
+    return addLocation(location);
   }
 };
 
-export const deletePasteur = (id: string): Promise<void> => {
+export const deleteLocation = (id: string): Promise<void> => {
   return (
     firestore()
-      .collection('Pasteurs')
+      .collection('Locations')
       .doc(id)
       .delete()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((e: any) => {
-        log.error(`Failed to delete pasteur document: ${e.message}`);
+        log.error(`Failed to delete location document: ${e.message}`);
         throw e;
       })
   );
 };
 
-export const pasteursCollectionChangeListener = (
+export const locationsCollectionChangeListener = (
   handler: (
     snapshot: FirebaseFirestoreTypes.QuerySnapshot<FirebaseFirestoreTypes.DocumentData>,
   ) => void,
@@ -106,10 +107,10 @@ export const pasteursCollectionChangeListener = (
   const {
     lastDocument,
     limit,
-    orderBy = { fieldPath: 'firstName', directionStr: 'asc' },
+    orderBy = { fieldPath: 'name', directionStr: 'asc' },
     where,
   } = opts || {};
-  return collectionChangeListener('Pasteurs', handler, {
+  return collectionChangeListener('Locations', handler, {
     lastDocument,
     limit,
     orderBy,
@@ -117,11 +118,11 @@ export const pasteursCollectionChangeListener = (
   });
 };
 
-export const pasteursDocumentChangeListener = (
+export const locationsDocumentChangeListener = (
   documentPath: string,
   handler: (
     snapshot: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>,
   ) => void,
 ): (() => void) => {
-  return documentChangeListener('Pasteurs', documentPath, handler);
+  return documentChangeListener('Locations', documentPath, handler);
 };

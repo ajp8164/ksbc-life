@@ -1,37 +1,50 @@
+import { Asset } from 'react-native-image-picker';
 import { MessageType } from '../../../react-native-chat-ui';
 import { UserProfile } from 'types/user';
-import { addChatMessage } from 'firestore/chatMessages';
+import { addChatMessage } from 'firebase/firestore/chatMessages';
+import { appConfig } from 'config';
 import { createAuthor } from './createAuthor';
-import { launchImageLibrary } from 'react-native-image-picker';
+import { saveImage } from 'firebase/storage/image';
+import { selectImage } from '@react-native-ajp-elements/ui';
 import { uuidv4 } from 'lib/uuid';
 
 export const sendImageMessage = (
   userProfile: UserProfile,
   threadId: string,
 ) => {
-  launchImageLibrary(
-    {
-      includeBase64: true,
-      maxWidth: 1440,
-      mediaType: 'photo',
-      quality: 0.7,
-    },
-    ({ assets }) => {
-      const response = assets?.[0];
-
-      if (response?.base64) {
-        const imageMessage: MessageType.Image = {
-          id: uuidv4(),
-          author: createAuthor(userProfile),
-          height: response.height,
-          name: response.fileName ?? response.uri?.split('/').pop() ?? '🖼',
-          size: response.fileSize ?? 0,
-          type: 'image',
-          uri: `data:image/*;base64,${response.base64}`,
-          width: response.width,
-        };
-        threadId && addChatMessage(imageMessage, threadId);
+  selectImage({
+    onSuccess: async imageAssets => {
+      const imageAsset = imageAssets[0];
+      if (imageAsset) {
+        await saveImage({
+          imageAsset,
+          storagePath: appConfig.storageImageChat,
+          onSuccess: url => send(imageAsset, url, userProfile, threadId),
+          onError: () => {
+            return;
+          },
+        });
       }
     },
-  );
+  });
+};
+
+const send = (
+  imageAsset: Asset,
+  url: string,
+  userProfile: UserProfile,
+  threadId: string,
+) => {
+  const imageMessage: MessageType.Image = {
+    id: uuidv4(),
+    author: createAuthor(userProfile),
+    height: imageAsset.height,
+    metadata: {},
+    name: url?.split('/').pop() ?? '🖼',
+    size: imageAsset.fileSize ?? 0,
+    type: 'image',
+    uri: url,
+    width: imageAsset.width,
+  };
+  threadId && addChatMessage(imageMessage, threadId);
 };

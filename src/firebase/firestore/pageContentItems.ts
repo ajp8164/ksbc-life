@@ -6,94 +6,105 @@ import {
   documentChangeListener,
   getDocument,
   getDocuments,
-} from 'firestore/utils';
+} from 'firebase/firestore/utils';
 import firestore, {
   FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';
 
-import { Location } from 'types/location';
+import { PageContentItem } from 'types/pageContentItem';
 import { log } from '@react-native-ajp-elements/core';
 
-export const getLocation = (id: string): Promise<Location | undefined> => {
-  return getDocument('Locations', id);
+export const getPageContentItem = (
+  id: string,
+): Promise<PageContentItem | undefined> => {
+  return getDocument('PageContentItems', id);
 };
 
-export const getLocations = (opts?: {
-  limit?: number;
+export const getPageContentItems = (opts?: {
   lastDocument?: FirebaseFirestoreTypes.DocumentData;
+  limit?: number;
   orderBy?: QueryOrderBy;
-}): Promise<QueryResult<Location>> => {
+}): Promise<QueryResult<PageContentItem>> => {
   const {
     lastDocument,
     limit = 10,
     orderBy = { fieldPath: 'name', directionStr: 'asc' },
   } = opts || {};
-  return getDocuments('Locations', { orderBy, limit, lastDocument });
+  return getDocuments('PageContentItems', { orderBy, limit, lastDocument });
 };
 
-export const addLocation = (location: Location): Promise<Location> => {
+export const addPageContentItem = (
+  pageContentItem: PageContentItem,
+): Promise<PageContentItem> => {
   return (
     firestore()
-      .collection('Locations')
-      .add(location)
-      .then(documentSnapshot => {
-        location.id = documentSnapshot.id;
-        return location;
+      .collection('PageContentItems')
+      .add(pageContentItem)
+      .then(() => {
+        return pageContentItem;
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((e: any) => {
-        log.error(`Failed to add location document: ${e.message}`);
+        log.error(`Failed to add screen content item document: ${e.message}`);
         throw e;
       })
   );
 };
 
-export const updateLocation = (location: Location): Promise<Location> => {
-  const updated = Object.assign({}, location); // Don't mutate input.
+export const updatePageContentItem = (
+  pageContentItem: PageContentItem,
+): Promise<PageContentItem> => {
+  const updated = Object.assign({}, pageContentItem); // Don't mutate input.
   const id = updated.id;
   delete updated.id; // Not storing the doc id in the object.
   return (
     firestore()
-      .collection('Locations')
+      .collection('PageContentItems')
       .doc(id)
       .update(updated)
       .then(() => {
-        return location;
+        return pageContentItem;
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((e: any) => {
         if (e.message.includes('firestore/not-found')) {
-          return addLocation(location);
+          return addPageContentItem(pageContentItem);
         }
-        log.error(`Failed to update location document: ${e.message}`);
+        log.error(
+          `Failed to update screen content item document: ${e.message}`,
+        );
         throw e;
       })
   );
 };
 
-export const saveLocation = (location: Location): Promise<Location> => {
-  if (location.id) {
-    return updateLocation(location);
+export const savePageContentItem = (
+  pageContentItem: PageContentItem,
+): Promise<PageContentItem> => {
+  if (pageContentItem.id) {
+    return updatePageContentItem(pageContentItem);
   } else {
-    return addLocation(location);
+    return addPageContentItem(pageContentItem);
   }
 };
 
-export const deleteLocation = (id: string): Promise<void> => {
+export const deletePageContentItem = (id: string): Promise<void> => {
   return (
     firestore()
-      .collection('Locations')
+      .collection('PageContentItems')
       .doc(id)
       .delete()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((e: any) => {
-        log.error(`Failed to delete location document: ${e.message}`);
+        log.error(
+          `Failed to delete screen content item document: ${e.message}`,
+        );
         throw e;
       })
   );
 };
 
-export const locationsCollectionChangeListener = (
+export const pageContentItemCollectionChangeListener = (
   handler: (
     snapshot: FirebaseFirestoreTypes.QuerySnapshot<FirebaseFirestoreTypes.DocumentData>,
   ) => void,
@@ -110,7 +121,7 @@ export const locationsCollectionChangeListener = (
     orderBy = { fieldPath: 'name', directionStr: 'asc' },
     where,
   } = opts || {};
-  return collectionChangeListener('Locations', handler, {
+  return collectionChangeListener('PageContentItems', handler, {
     lastDocument,
     limit,
     orderBy,
@@ -118,11 +129,11 @@ export const locationsCollectionChangeListener = (
   });
 };
 
-export const locationsDocumentChangeListener = (
+export const pageContentItemDocumentChangeListener = (
   documentPath: string,
   handler: (
     snapshot: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>,
   ) => void,
 ): (() => void) => {
-  return documentChangeListener('Locations', documentPath, handler);
+  return documentChangeListener('PageContentItems', documentPath, handler);
 };

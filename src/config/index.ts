@@ -15,6 +15,8 @@ export interface AppConfig
   requireReAuthDays: number;
   sentryEndpoint: string;
   sentryLoggingEnabled: boolean;
+  storageFileChat: string;
+  storageImageChat: string;
   storageImageChurch: string;
   storageImageLocations: string;
   storageImagePasteurs: string;
@@ -42,6 +44,8 @@ export const appConfig: AppConfig = {
   requireReAuthDays: Number(Config.REQUIRE_REAUTH_DAYS) || 0,
   sentryEndpoint: Config.SENTRY_ENDPOINT || '',
   sentryLoggingEnabled: Config.SENTRY_LOGGING_ENABLED === 'true' ? true : false,
+  storageFileChat: Config.STORAGE_FILE_CHAT || '',
+  storageImageChat: Config.STORAGE_IMAGE_CHAT || '',
   storageImageChurch: Config.STORAGE_IMAGE_CHURCH || '',
   storageImageLocations: Config.STORAGE_IMAGE_LOCATIONS || '',
   storageImagePasteurs: Config.STORAGE_IMAGE_PASTEURS || '',

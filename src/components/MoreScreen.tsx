@@ -16,7 +16,7 @@ import { appConfig } from 'config';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { updateUserProfile } from 'store/slices/user';
 import { useTheme } from 'theme';
-import { usersDocumentChangeListener } from 'firestore/users';
+import { usersDocumentChangeListener } from 'firebase/firestore/users';
 
 export type Props = CompositeScreenProps<
   NativeStackScreenProps<MoreNavigatorParamList, 'More'>,
