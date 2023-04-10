@@ -69,6 +69,9 @@ export type TabNavigatorParamList = {
   ChatTab: undefined;
   GivingTab: undefined;
   HomeTab: undefined;
-  MoreTab: undefined;
+  MoreTab: {
+    screen: string;
+    params: object;
+  };
   SermonsTab: undefined;
 };

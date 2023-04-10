@@ -8,7 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
 import { useTheme } from 'theme';
 
-type Props = NativeStackScreenProps<MoreNavigatorParamList, 'AdminPageContent'>;
+type Props = NativeStackScreenProps<MoreNavigatorParamList, 'AdminContent'>;
 
 const AdminContentScreen = ({ navigation }: Props) => {
   const theme = useTheme();

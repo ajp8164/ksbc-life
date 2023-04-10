@@ -1,8 +1,8 @@
 import { AppTheme, useTheme } from 'theme';
-import { Button, Icon, Image } from '@rneui/base';
+import { Avatar, Button, Icon, Image } from '@rneui/base';
 import {
   HomeNavigatorParamList,
-  MoreNavigatorParamList,
+  TabNavigatorParamList,
 } from 'types/navigation';
 import {
   PageContentItem,
@@ -18,6 +18,7 @@ import PageContentItemsView from 'components/views/PageContentItemsView';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
 import { Text } from 'react-native';
+import { UserRole } from 'types/user';
 import { makeStyles } from '@rneui/themed';
 import { pageContentItemCollectionChangeListener } from 'firebase/firestore/pageContentItems';
 import { selectUserProfile } from 'store/selectors/userSelectors';
@@ -26,7 +27,7 @@ import { viewport } from '@react-native-ajp-elements/ui';
 
 type Props = CompositeScreenProps<
   NativeStackScreenProps<HomeNavigatorParamList, 'Home'>,
-  NativeStackScreenProps<MoreNavigatorParamList>
+  NativeStackScreenProps<TabNavigatorParamList>
 >;
 
 const HomeScreen = ({ navigation }: Props) => {
@@ -110,12 +111,21 @@ const HomeScreen = ({ navigation }: Props) => {
                   source={{ uri: userProfile.photoUrl }}
                   containerStyle={s.avatar}
                 />
-              ) : (
+              ) : userProfile?.role === UserRole.Anonymous ? (
                 <Icon
                   name="account-circle"
                   type={'material-community'}
                   color={theme.colors.brandSecondary}
                   size={28}
+                />
+              ) : (
+                <Avatar
+                  title={userProfile?.avatar.title}
+                  titleStyle={theme.styles.avatarTitle}
+                  containerStyle={{
+                    ...theme.styles.avatar,
+                    backgroundColor: userProfile?.avatar.color,
+                  }}
                 />
               )
             }
@@ -127,8 +137,13 @@ const HomeScreen = ({ navigation }: Props) => {
   };
 
   const doAccountAction = () => {
-    if (auth.userIsAuthenticated) {
-      navigation.navigate('More', { subNav: 'UserProfile' });
+    if (auth.userIsAuthenticated && userProfile?.role !== UserRole.Anonymous) {
+      navigation.navigate('MoreTab', {
+        screen: 'More',
+        params: {
+          subNav: 'UserProfile',
+        },
+      });
     } else {
       auth.presentSignInModal();
     }
