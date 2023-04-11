@@ -9,8 +9,10 @@ export default ({ theme }: { theme: Theme }) =>
     },
     emptyComponentContainer: {
       alignItems: 'center',
-      marginHorizontal: 24,
+      justifyContent: 'center',
       transform: [{ rotateX: '180deg' }],
+      height: '100%',
+      width: '100%',
     },
     emptyComponentTitle: {
       ...theme.list.emptyChatPlaceholderText,

@@ -18,7 +18,7 @@ export const TypingIndicator = React.memo(
   }) => {
     const { bubbleContainer, container, namesText } = styles({ theme });
 
-    const yCoords = React.useRef(new Animated.Value(isTyping ? 200 : 0));
+    const yCoords = React.useRef(new Animated.Value(isTyping ? 500 : 0));
     const heightScale = React.useRef(
       new Animated.Value(isTyping ? (typingNames ? 60 : 35) : 0),
     );
@@ -49,7 +49,7 @@ export const TypingIndicator = React.memo(
     const slideOut = () => {
       Animated.parallel([
         Animated.spring(yCoords.current, {
-          toValue: 200,
+          toValue: 500,
           useNativeDriver: false,
         }),
         Animated.timing(heightScale.current, {

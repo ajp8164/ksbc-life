@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   chatMessagesDocumentChangeListener,
   sendTypingState,
+  updateChatMessage,
 } from 'firebase/firestore/chatMessages';
 import {
   chatTheme,
@@ -133,20 +134,24 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
                 (rawMessages[key].createdAt as FirebaseFirestoreTypes.Timestamp)
                   .seconds * 1000;
 
-              // rawMessages[key].received = false; // Reset all message received status.
-              // rawMessages[key].sent = false; // Reset all message sent status.
               return rawMessages[key] as MessageType.Any;
             })
             .sort((a, b) => {
               return (b.createdAt as number) - (a.createdAt as number);
             });
 
-          // Use the last message in the list to set status.
-          // This status is used to create a status message and space at the end of the list.
-          if (messages[0].author.id === userProfile?.id) {
-            // messages[0].sent = true;
-          } else {
-            // messages[0].received = true;
+          // Use the latest message in the list to set status.
+          if (
+            messages[0].author.id === userProfile?.id &&
+            messages[0].status !== 'seen'
+          ) {
+            messages[0].status = 'delivered';
+            threadId.current &&
+              updateChatMessage(messages[0], threadId.current);
+          } else if (messages[0].status !== 'seen') {
+            messages[0].status = 'seen';
+            threadId.current &&
+              updateChatMessage(messages[0], threadId.current);
           }
 
           // Set typing state on our ui.
@@ -202,6 +207,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
 
   const sendText = (message: MessageType.PartialText) => {
     if (!userProfile || !threadId.current) return;
+    console.log(message);
     sendTextMessage(message, userProfile, threadId.current);
   };
 

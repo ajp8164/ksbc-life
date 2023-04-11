@@ -10,13 +10,12 @@ import firestore, {
 
 import { MessageType } from '../../react-native-chat-ui';
 import { log } from '@react-native-ajp-elements/core';
-import { uuidv4 } from 'lib/uuid';
 
-export const initChatThread = (
+const initChatThread = (
   message: MessageType.Any,
   threadId: string,
 ): Promise<MessageType.Any> => {
-  const key = uuidv4();
+  console.log(message);
   const outgoingMessage = {
     ...message,
     createdAt: firestore.FieldValue.serverTimestamp(),
@@ -27,7 +26,7 @@ export const initChatThread = (
       .doc(threadId)
       .set({
         messages: {
-          [key]: outgoingMessage,
+          [message.id]: outgoingMessage,
         },
       })
       .then(() => {
@@ -65,6 +64,28 @@ export const addChatMessage = (
           return initChatThread(message, threadId);
         }
         log.error(`Failed to add chat message: ${e.message}`);
+        throw e;
+      })
+  );
+};
+
+export const updateChatMessage = (
+  message: MessageType.Any,
+  threadId: string,
+): Promise<MessageType.Any> => {
+  return (
+    firestore()
+      .collection('ChatMessages')
+      .doc(threadId)
+      .update({
+        [`messages.${message.id}`]: message,
+      })
+      .then(() => {
+        return message;
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch((e: any) => {
+        log.error(`Failed to update chat message document: ${e.message}`);
         throw e;
       })
   );
