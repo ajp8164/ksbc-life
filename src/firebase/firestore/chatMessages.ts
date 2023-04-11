@@ -73,6 +73,7 @@ export const addChatMessage = (
 export const sendTypingState = (
   isTyping: boolean,
   userId: string,
+  username: string,
   threadId: string,
 ): Promise<void> => {
   return (
@@ -81,8 +82,8 @@ export const sendTypingState = (
       .doc(threadId)
       .update({
         isTyping: isTyping
-          ? firestore.FieldValue.arrayUnion(userId)
-          : firestore.FieldValue.arrayRemove(userId),
+          ? firestore.FieldValue.arrayUnion({ [userId]: username })
+          : firestore.FieldValue.arrayRemove({ [userId]: username }),
       })
       .then(() => {
         return;

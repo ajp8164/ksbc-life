@@ -32,7 +32,9 @@ export default ({ theme }: { theme: Theme }) =>
       marginTop: 16,
       height: 32,
     },
-    header: {
-      height: 4,
+    headerIsTyping: {
+      marginBottom: theme.bubble.containerLeft.marginLeft,
+      marginLeft: theme.bubble.containerLeft.marginLeft,
+      justifyContent: 'center',
     },
   });

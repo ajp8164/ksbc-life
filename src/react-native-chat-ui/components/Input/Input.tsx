@@ -20,6 +20,8 @@ export interface InputTopLevelProps {
   isAttachmentUploading?: boolean;
   /** @see {@link AttachmentButtonProps.onPress} */
   onAttachmentPress?: () => void;
+  /** Called when the input text is changed. */
+  onInputTextChanged?: (text: string) => void;
   /** Returns the layout for the composer. */
   onLayout?: (event: LayoutChangeEvent) => void;
   /** Will be called on {@link SendButton} tap. Has {@link MessageType.PartialText} which can
@@ -44,6 +46,7 @@ export const Input = ({
   onAttachmentPress,
   onLayout,
   onSendPress,
+  onInputTextChanged,
   sendButtonVisibilityMode,
 }: InputProps) => {
   const l10n = React.useContext(L10nContext);
@@ -59,6 +62,7 @@ export const Input = ({
   const handleChangeText = (newText: string) => {
     // Track local state in case `onChangeText` is provided and `value` is not
     setText(newText);
+    onInputTextChanged && onInputTextChanged(newText);
   };
 
   const handleSend = () => {

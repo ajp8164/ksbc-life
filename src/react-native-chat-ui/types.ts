@@ -153,6 +153,7 @@ export interface Theme {
   icons?: ThemeIcons;
   list: ThemeList;
   statusIcon: ThemeStatusIcon;
+  typingIndicator: ThemeTypingIndicator;
 }
 
 export interface ThemeAvatar {
@@ -211,7 +212,7 @@ export interface ThemeComposer {
     size: number;
   };
   attachmentIcon: ImageStyle;
-  container: ViewStyle | ViewStyle[];
+  container: ViewStyle;
   contentOffsetKeyboardOpened: number;
   inputStyle: TextStyle;
   sendIcon: ImageStyle;
@@ -223,8 +224,8 @@ export interface ThemeList {
     color: ColorValue;
     size: number;
   };
-  container: ViewStyle | ViewStyle[];
-  contentContainer: ViewStyle | ViewStyle[];
+  container: ViewStyle;
+  contentContainer: ViewStyle;
   emptyChatPlaceholderText: TextStyle;
 }
 
@@ -235,6 +236,10 @@ export interface ThemeStatusIcon {
   };
   image: ImageStyle;
   imageError: ImageStyle;
+}
+
+export interface ThemeTypingIndicator {
+  dotColor: ColorValue;
 }
 
 export interface User {

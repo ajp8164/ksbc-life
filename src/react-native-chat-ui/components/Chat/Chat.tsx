@@ -29,6 +29,7 @@ import { MessageType, Theme, User, UsernameLocation } from '../../types';
 
 import { CircularActivityIndicator } from '../CircularActivityIndicator';
 import ImageView from './ImageView';
+import TypingIndicator from '../TypingIndicator/TypingIndicator';
 import calendar from 'dayjs/plugin/calendar';
 import dayjs from 'dayjs';
 import { defaultTheme } from '../../theme';
@@ -77,6 +78,8 @@ export interface ChatProps extends ChatTopLevelProps {
    * When true, indicates that there are no more pages to load and
    * pagination will not be triggered. */
   isLastPage?: boolean;
+  /** Whether or not the typing indicator should be shown. */
+  isTyping?: boolean;
   /** Override the default localized copy. */
   l10nOverride?: Partial<
     Record<keyof (typeof l10n)[keyof typeof l10n], string>
@@ -99,6 +102,8 @@ export interface ChatProps extends ChatTopLevelProps {
    * @see {@link ChatProps.customDateHeaderText} for more customization.
    */
   timeFormat?: string;
+  /** A list of name that may be displayed with the typing indicator. */
+  typingNames?: string;
   user: User;
 }
 
@@ -114,11 +119,13 @@ export const Chat = ({
   inputProps,
   isAttachmentUploading,
   isLastPage,
+  isTyping,
   l10nOverride,
   locale = 'en',
   messages,
   onAttachmentPress,
   onEndReached,
+  onInputTextChanged,
   onMessageLongPress,
   onMessagePress,
   onPreviewDataFetched,
@@ -133,6 +140,7 @@ export const Chat = ({
   showUserNames = 'inside',
   theme = defaultTheme,
   timeFormat,
+  typingNames,
   usePreviewData = true,
   user,
 }: ChatProps) => {
@@ -144,7 +152,7 @@ export const Chat = ({
     flatListContentContainer,
     footer,
     footerLoadingPage,
-    header,
+    headerIsTyping,
   } = styles({ theme });
 
   const { onLayout, size } = useComponentSize();
@@ -360,6 +368,19 @@ export const Chat = ({
     [footer, footerLoadingPage, isNextPageLoading],
   );
 
+  const renderListHeaderComponent = React.useCallback(
+    () => (
+      <View style={headerIsTyping}>
+        <TypingIndicator
+          isTyping={isTyping || false}
+          typingNames={typingNames}
+          theme={theme}
+        />
+      </View>
+    ),
+    [headerIsTyping, isTyping, theme, typingNames],
+  );
+
   const renderScrollable = React.useCallback(
     () => (
       <FlatList
@@ -371,8 +392,7 @@ export const Chat = ({
         initialNumToRender={10}
         ListEmptyComponent={renderListEmptyComponent}
         ListFooterComponent={renderListFooterComponent}
-        ListHeaderComponent={<View />}
-        ListHeaderComponentStyle={header}
+        ListHeaderComponent={renderListHeaderComponent}
         maxToRenderPerBatch={6}
         onEndReachedThreshold={0.75}
         style={[flatList]}
@@ -393,11 +413,11 @@ export const Chat = ({
       flatListContentContainer,
       flatListProps,
       handleEndReached,
-      header,
       keyExtractor,
       renderItem,
       renderListEmptyComponent,
       renderListFooterComponent,
+      renderListHeaderComponent,
     ],
   );
 
@@ -430,6 +450,7 @@ export const Chat = ({
                     isAttachmentUploading,
                     onAttachmentPress,
                     onSendPress,
+                    onInputTextChanged,
                     renderScrollable,
                     sendButtonVisibilityMode,
                     onLayout: (event: LayoutChangeEvent) => {

@@ -227,4 +227,7 @@ export const defaultTheme: Theme = {
       tintColor: ERROR,
     },
   },
+  typingIndicator: {
+    dotColor: NEUTRAL_2,
+  },
 };

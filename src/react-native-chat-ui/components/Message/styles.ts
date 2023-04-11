@@ -68,8 +68,8 @@ const styles = ({
       // See Message Avatar style. margin + width + marginRight + some additional padding
       marginLeft:
         typeof theme.bubble.containerLeft === 'number'
-          ? theme.bubble.containerLeft + 32 + 8 + 10
-          : 32 + 8 + 10,
+          ? theme.bubble.containerLeft + 32 + 8 + 20
+          : 32 + 8 + 20,
     },
   });
 };

@@ -39,7 +39,8 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
   const userProfile = useSelector(selectUserProfile);
   const threadId = useRef<string>();
   const isInitializing = useRef(true);
-  const [isTyping, setIsTyping] = useState(false);
+  const isTyping = useRef(false);
+  const typingNames = useRef<string | undefined>();
   const iAmTyping = useRef(false);
 
   const [chatMessages, setChatMessages] = useState<MessageType.Any[]>([]);
@@ -122,7 +123,8 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
         const data = snapshot.data();
         if (!snapshot.metadata.hasPendingWrites && data) {
           const rawMessages = (data.messages as FirestoreMessageType) || [];
-          const isTyping = (data.isTyping as string[]) || [];
+          const typingState =
+            (data.isTyping as { [key in string]: string }[]) || [];
 
           const messages = Object.keys(rawMessages)
             .map(key => {
@@ -147,13 +149,26 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
             // messages[0].received = true;
           }
 
-          setChatMessages(messages);
-
-          // Set typing state on our ui,
-          const othersTyping = lodash.reject(isTyping, el => {
-            return el === userProfile?.id;
+          // Set typing state on our ui.
+          const othersTyping = lodash.reject(typingState, el => {
+            return el[userProfile?.id || ''] !== undefined;
           });
-          setIsTyping(othersTyping.length > 0);
+
+          isTyping.current = Object.keys(othersTyping).length > 0;
+          typingNames.current = '';
+
+          othersTyping.forEach(other => {
+            typingNames.current = typingNames.current?.concat(
+              `${typingNames.current?.length ? ', ' : ''}${
+                other[Object.keys(other)[0]]
+              }`,
+            );
+          });
+          typingNames.current = typingNames.current.length
+            ? typingNames.current
+            : undefined;
+
+          setChatMessages(messages);
         }
       },
     );
@@ -162,7 +177,12 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
 
       if (userProfile?.id && threadId.current) {
         // Make sure we stop typing when the view is dismissed.
-        sendTypingState(false, userProfile.id, threadId.current);
+        sendTypingState(
+          false,
+          userProfile.id,
+          userProfile.firstName,
+          threadId.current,
+        );
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -198,10 +218,20 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
       // This logic ensures we send typing updates on state transitions, not on every keystroke.
       if (text.length > 0 && !iAmTyping.current) {
         iAmTyping.current = true;
-        sendTypingState(true, userProfile.id, threadId.current);
+        sendTypingState(
+          true,
+          userProfile.id,
+          userProfile.firstName,
+          threadId.current,
+        );
       } else if (text.length === 0 && iAmTyping.current) {
         iAmTyping.current = false;
-        sendTypingState(false, userProfile.id, threadId.current);
+        sendTypingState(
+          false,
+          userProfile.id,
+          userProfile.firstName,
+          threadId.current,
+        );
       }
     }
   };
@@ -218,8 +248,11 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
             imageUrl: userProfile.photoUrl || '',
             avatarColor: userProfile.avatar.color,
           }}
+          isTyping={isTyping.current}
+          typingNames={typingNames.current}
           onSendPress={sendText}
           onAttachmentPress={sendAttachment}
+          onInputTextChanged={onInputTextChanged}
           onMessagePress={handleMessagePress}
           showUserAvatars={true} //  Only if group
           showUserNames={'outside'}

@@ -129,5 +129,8 @@ export const chatTheme = (
         tintColor: theme.colors.assertive,
       },
     },
+    typingIndicator: {
+      dotColor: theme.colors.blackTransparentLight,
+    },
   };
 };
