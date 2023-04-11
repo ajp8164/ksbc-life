@@ -207,7 +207,6 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
 
   const sendText = (message: MessageType.PartialText) => {
     if (!userProfile || !threadId.current) return;
-    console.log(message);
     sendTextMessage(message, userProfile, threadId.current);
   };
 

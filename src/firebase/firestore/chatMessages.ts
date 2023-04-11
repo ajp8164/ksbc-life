@@ -15,7 +15,6 @@ const initChatThread = (
   message: MessageType.Any,
   threadId: string,
 ): Promise<MessageType.Any> => {
-  console.log(message);
   const outgoingMessage = {
     ...message,
     createdAt: firestore.FieldValue.serverTimestamp(),
