@@ -129,11 +129,18 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
 
           const messages = Object.keys(rawMessages)
             .map(key => {
-              // Convert server timestamp to be compatible with GiftedChat (javascript ms timestamp).
+              // Convert server timestamps to be compatible with chat library (javascript ms timestamp).
               rawMessages[key].createdAt =
                 (rawMessages[key].createdAt as FirebaseFirestoreTypes.Timestamp)
                   .seconds * 1000;
 
+              if (rawMessages[key].updatedAt) {
+                rawMessages[key].updatedAt =
+                  (
+                    rawMessages[key]
+                      .updatedAt as FirebaseFirestoreTypes.Timestamp
+                  ).seconds * 1000;
+              }
               return rawMessages[key] as MessageType.Any;
             })
             .sort((a, b) => {
