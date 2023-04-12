@@ -217,7 +217,7 @@ export const calculateChatMessages = (
           !!getUserName(message.author)
             ? showUserNames
             : 'none',
-        showStatus: true,
+        showStatus: !notMyMessage && isLast,
       },
       ...chatMessages,
     ];

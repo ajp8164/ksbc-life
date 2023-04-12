@@ -152,12 +152,17 @@ export const collectionChangeListener = (
       lastDocument,
     ) as FirebaseFirestoreTypes.CollectionReference<FirebaseFirestoreTypes.DocumentData>;
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return query.onSnapshot(handler, (e: any) => {
-    log.error(
-      `Failed onSnapshot for ${collectionPath} collection: ${e.message}`,
-    );
-  });
+
+  return query.onSnapshot(
+    { includeMetadataChanges: true },
+    handler,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (e: any) => {
+      log.error(
+        `Failed onSnapshot for ${collectionPath} collection: ${e.message}`,
+      );
+    },
+  );
 };
 
 export const documentChangeListener = (
@@ -172,7 +177,7 @@ export const documentChangeListener = (
       .collection(collectionPath)
       .doc(documentPath)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .onSnapshot(handler, (e: any) => {
+      .onSnapshot({ includeMetadataChanges: true }, handler, (e: any) => {
         if (!e.message.includes('firestore/permission-denied')) {
           log.error(
             `Failed onSnapshot for ${collectionPath}.${documentPath} document: ${e.message}`,

@@ -69,6 +69,7 @@ export const addChatMessage = (
 };
 
 export const updateChatMessage = (
+  property: keyof MessageType.Any,
   message: MessageType.Any,
   threadId: string,
 ): Promise<MessageType.Any> => {
@@ -77,7 +78,7 @@ export const updateChatMessage = (
       .collection('ChatMessages')
       .doc(threadId)
       .update({
-        [`messages.${message.id}`]: message,
+        [`messages.${message.id}.${property}`]: message[property],
       })
       .then(() => {
         return message;

@@ -146,12 +146,10 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
             messages[0].status !== 'seen'
           ) {
             messages[0].status = 'delivered';
-            threadId.current &&
-              updateChatMessage(messages[0], threadId.current);
           } else if (messages[0].status !== 'seen') {
             messages[0].status = 'seen';
             threadId.current &&
-              updateChatMessage(messages[0], threadId.current);
+              updateChatMessage('status', messages[0], threadId.current);
           }
 
           // Set typing state on our ui.
