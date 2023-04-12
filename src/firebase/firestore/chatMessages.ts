@@ -79,6 +79,8 @@ export const updateChatMessage = (
       .doc(threadId)
       .update({
         [`messages.${message.id}.${property}`]: message[property],
+        [`messages.${message.id}.updatedAt`]:
+          firestore.FieldValue.serverTimestamp(),
       })
       .then(() => {
         return message;
