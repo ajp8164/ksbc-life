@@ -22,13 +22,15 @@ export const getChurches = (opts?: {
   lastDocument?: FirebaseFirestoreTypes.DocumentData;
   limit?: number;
   orderBy?: QueryOrderBy;
+  where?: QueryWhere[];
 }): Promise<QueryResult<Church>> => {
   const {
     lastDocument,
     limit = 10,
     orderBy = { fieldPath: 'name', directionStr: 'asc' },
+    where,
   } = opts || {};
-  return getDocuments('Churches', { orderBy, limit, lastDocument });
+  return getDocuments('Churches', { orderBy, limit, lastDocument, where });
 };
 
 export const addChurch = (church: Church): Promise<Church> => {
@@ -86,7 +88,7 @@ export const churchCollectionChangeListener = (
     lastDocument?: FirebaseFirestoreTypes.DocumentData;
     limit?: number;
     orderBy?: QueryOrderBy;
-    where?: QueryWhere;
+    where?: QueryWhere[];
   },
 ): (() => void) => {
   const {

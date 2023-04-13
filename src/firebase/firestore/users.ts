@@ -22,13 +22,15 @@ export const getUsers = (opts?: {
   limit?: number;
   lastDocument?: FirebaseFirestoreTypes.DocumentData;
   orderBy?: QueryOrderBy;
+  where?: QueryWhere[];
 }): Promise<QueryResult<UserProfile>> => {
   const {
     lastDocument,
     limit = 10,
     orderBy = { fieldPath: 'name', directionStr: 'asc' },
+    where,
   } = opts || {};
-  return getDocuments('Users', { orderBy, limit, lastDocument });
+  return getDocuments('Users', { lastDocument, orderBy, limit, where });
 };
 
 export const updateUser = (user: UserProfile): Promise<UserProfile> => {
@@ -73,7 +75,7 @@ export const usersCollectionChangeListener = (
     lastDocument?: FirebaseFirestoreTypes.DocumentData;
     limit?: number;
     orderBy?: QueryOrderBy;
-    where?: QueryWhere;
+    where?: QueryWhere[];
   },
 ): (() => void) => {
   const {

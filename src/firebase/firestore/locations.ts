@@ -22,13 +22,15 @@ export const getLocations = (opts?: {
   limit?: number;
   lastDocument?: FirebaseFirestoreTypes.DocumentData;
   orderBy?: QueryOrderBy;
+  where?: QueryWhere[];
 }): Promise<QueryResult<Location>> => {
   const {
     lastDocument,
     limit = 10,
     orderBy = { fieldPath: 'name', directionStr: 'asc' },
+    where,
   } = opts || {};
-  return getDocuments('Locations', { orderBy, limit, lastDocument });
+  return getDocuments('Locations', { orderBy, limit, lastDocument, where });
 };
 
 export const addLocation = (location: Location): Promise<Location> => {
@@ -101,7 +103,7 @@ export const locationsCollectionChangeListener = (
     lastDocument?: FirebaseFirestoreTypes.DocumentData;
     limit?: number;
     orderBy?: QueryOrderBy;
-    where?: QueryWhere;
+    where?: QueryWhere[];
   },
 ): (() => void) => {
   const {

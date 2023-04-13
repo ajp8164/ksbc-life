@@ -131,7 +131,7 @@ export const chatMessagesCollectionChangeListener = (
     lastDocument?: FirebaseFirestoreTypes.DocumentData;
     limit?: number;
     orderBy?: QueryOrderBy;
-    where?: QueryWhere;
+    where?: QueryWhere[];
   },
 ): (() => void) => {
   const {

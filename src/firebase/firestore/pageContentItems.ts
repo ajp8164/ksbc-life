@@ -24,13 +24,20 @@ export const getPageContentItems = (opts?: {
   lastDocument?: FirebaseFirestoreTypes.DocumentData;
   limit?: number;
   orderBy?: QueryOrderBy;
+  where?: QueryWhere[];
 }): Promise<QueryResult<PageContentItem>> => {
   const {
     lastDocument,
     limit = 10,
     orderBy = { fieldPath: 'name', directionStr: 'asc' },
+    where,
   } = opts || {};
-  return getDocuments('PageContentItems', { orderBy, limit, lastDocument });
+  return getDocuments('PageContentItems', {
+    orderBy,
+    limit,
+    lastDocument,
+    where,
+  });
 };
 
 export const addPageContentItem = (
@@ -112,7 +119,7 @@ export const pageContentItemCollectionChangeListener = (
     lastDocument?: FirebaseFirestoreTypes.DocumentData;
     limit?: number;
     orderBy?: QueryOrderBy;
-    where?: QueryWhere;
+    where?: QueryWhere[];
   },
 ): (() => void) => {
   const {

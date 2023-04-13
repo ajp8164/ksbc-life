@@ -23,16 +23,19 @@ export const getSermonVideos = (opts?: {
   lastDocument?: FirebaseFirestoreTypes.DocumentData;
   limit?: number;
   orderBy?: QueryOrderBy;
+  where?: QueryWhere[];
 }): Promise<QueryResult<SermonVideo>> => {
   const {
     lastDocument,
     limit = 10,
     orderBy = { fieldPath: 'snippet.publishedAt', directionStr: 'desc' },
+    where,
   } = opts || {};
   return getDocuments('SermonVideos', {
     orderBy,
     limit,
     lastDocument,
+    where,
     skipIdMap: true,
   });
 };
@@ -55,7 +58,7 @@ export const sermonVideosCollectionChangeListener = (
     lastDocument?: FirebaseFirestoreTypes.DocumentData;
     limit?: number;
     orderBy?: QueryOrderBy;
-    where?: QueryWhere;
+    where?: QueryWhere[];
   },
 ): (() => void) => {
   const {

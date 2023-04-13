@@ -22,13 +22,15 @@ export const getGroups = (opts?: {
   lastDocument?: FirebaseFirestoreTypes.DocumentData;
   limit?: number;
   orderBy?: QueryOrderBy;
+  where?: QueryWhere[];
 }): Promise<QueryResult<Group>> => {
   const {
     lastDocument,
     limit = 10,
     orderBy = { fieldPath: 'name', directionStr: 'asc' },
+    where,
   } = opts || {};
-  return getDocuments('Groups', { orderBy, limit, lastDocument });
+  return getDocuments('Groups', { orderBy, limit, lastDocument, where });
 };
 
 export const addGroup = (group: Group): Promise<Group> => {
@@ -97,7 +99,7 @@ export const groupsCollectionChangeListener = (
     lastDocument?: FirebaseFirestoreTypes.DocumentData;
     limit?: number;
     orderBy?: QueryOrderBy;
-    where?: QueryWhere;
+    where?: QueryWhere[];
   },
 ): (() => void) => {
   const {

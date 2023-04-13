@@ -22,13 +22,15 @@ export const getPasteurs = (opts?: {
   lastDocument?: FirebaseFirestoreTypes.DocumentData;
   limit?: number;
   orderBy?: QueryOrderBy;
+  where?: QueryWhere[];
 }): Promise<QueryResult<Pasteur>> => {
   const {
     lastDocument,
     limit = 10,
     orderBy = { fieldPath: 'firstName', directionStr: 'asc' },
+    where,
   } = opts || {};
-  return getDocuments('Pasteurs', { orderBy, limit, lastDocument });
+  return getDocuments('Pasteurs', { orderBy, limit, lastDocument, where });
 };
 
 export const addPasteur = (pasteur: Pasteur): Promise<Pasteur> => {
@@ -100,7 +102,7 @@ export const pasteursCollectionChangeListener = (
     lastDocument?: FirebaseFirestoreTypes.DocumentData;
     limit?: number;
     orderBy?: QueryOrderBy;
-    where?: QueryWhere;
+    where?: QueryWhere[];
   },
 ): (() => void) => {
   const {

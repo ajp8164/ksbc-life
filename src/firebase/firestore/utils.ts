@@ -53,12 +53,23 @@ export const getDocuments = <T extends { id?: string | undefined }>(
   opts?: {
     orderBy?: QueryOrderBy;
     limit?: number;
+    where?: QueryWhere[];
     lastDocument?: FirebaseFirestoreTypes.DocumentData;
     skipIdMap?: boolean;
   },
 ): Promise<QueryResult<T>> => {
-  const { orderBy, limit = 1, lastDocument, skipIdMap } = opts || {};
+  const { orderBy, limit = 1, lastDocument, skipIdMap, where } = opts || {};
   let query = firestore().collection(collectionPath);
+
+  if (where) {
+    where.forEach(w => {
+      query = query.where(
+        w.fieldPath,
+        w.opStr,
+        w.value,
+      ) as FirebaseFirestoreTypes.CollectionReference<FirebaseFirestoreTypes.DocumentData>;
+    });
+  }
 
   if (orderBy) {
     query = query.orderBy(
@@ -120,7 +131,7 @@ export const collectionChangeListener = (
     lastDocument?: FirebaseFirestoreTypes.DocumentData;
     limit?: number;
     orderBy?: QueryOrderBy;
-    where?: QueryWhere;
+    where?: QueryWhere[];
   },
 ): (() => void) => {
   const { lastDocument, limit, orderBy, where } = opts;
@@ -134,11 +145,13 @@ export const collectionChangeListener = (
   }
 
   if (where) {
-    query = query.where(
-      where.fieldPath,
-      where.opStr,
-      where.value,
-    ) as FirebaseFirestoreTypes.CollectionReference<FirebaseFirestoreTypes.DocumentData>;
+    where.forEach(w => {
+      query = query.where(
+        w.fieldPath,
+        w.opStr,
+        w.value,
+      ) as FirebaseFirestoreTypes.CollectionReference<FirebaseFirestoreTypes.DocumentData>;
+    });
   }
 
   if (limit) {
