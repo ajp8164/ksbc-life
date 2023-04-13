@@ -33,6 +33,12 @@ export const useStyles = makeStyles(
       fontFamily,
       fontWeight: 'normal',
     },
+    navigationBarTitle: {
+      color: theme.colors.black,
+      fontSize: fontSizes.heading5,
+      fontFamily,
+      // fontWeight: 'normal',
+    },
 
     /**
      * Content Styles

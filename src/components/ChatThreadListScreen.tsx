@@ -1,4 +1,5 @@
 import { AppTheme, useTheme } from 'theme';
+import { Avatar, Button, Icon } from '@rneui/base';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import { FlatList, ListRenderItem, ScrollView, View } from 'react-native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
@@ -8,7 +9,6 @@ import {
 } from 'firebase/firestore/users';
 
 import { AuthContext } from 'lib/auth';
-import { Avatar } from '@rneui/base';
 import { ChatNavigatorParamList } from 'types/navigation';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import InfoMessage from 'components/atoms/InfoMessage';
@@ -37,6 +37,27 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const lastDocument = useRef<FirebaseFirestoreTypes.DocumentData>();
   const [users, setUsers] = useState<UserProfile[]>([]);
+
+  useEffect(() => {
+    navigation.setOptions({
+      // eslint-disable-next-line react/no-unstable-nested-components
+      headerRight: () => (
+        <Button
+          type={'clear'}
+          icon={
+            <Icon
+              name="square-edit-outline"
+              type={'material-community'}
+              color={theme.colors.brandSecondary}
+              size={28}
+            />
+          }
+          onPress={() => navigation.navigate('ChatThread', {})}
+        />
+      ),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const subscription = usersCollectionChangeListener(

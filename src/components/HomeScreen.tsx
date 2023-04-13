@@ -82,11 +82,13 @@ const HomeScreen = ({ navigation }: Props) => {
         setPageContentItems(sortContentItems(items));
       },
       {
-        where: {
-          fieldPath: 'assignment',
-          opStr: '==',
-          value: PageContentItemAssignment.Ministries,
-        },
+        where: [
+          {
+            fieldPath: 'assignment',
+            opStr: '==',
+            value: PageContentItemAssignment.Ministries,
+          },
+        ],
       },
     );
     return subscription;

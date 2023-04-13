@@ -1,29 +1,40 @@
+import { Avatar, Button, Icon } from '@rneui/base';
 import { Chat, MessageType } from '../react-native-chat-ui';
+import {
+  ChatHeader,
+  chatTheme,
+  handleMessagePress,
+  sendTextMessage,
+  useSendAttachment,
+} from 'components/molecules/chat';
+import { FirestoreMessageType, SearchCriteria, SearchScope } from 'types/chat';
+import { Keyboard, Platform, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   chatMessagesDocumentChangeListener,
   sendTypingState,
   updateChatMessage,
 } from 'firebase/firestore/chatMessages';
-import {
-  chatTheme,
-  handleMessagePress,
-  renderHeader,
-  sendTextMessage,
-  useSendAttachment,
-} from 'components/molecules/chat';
 
 import { ChatNavigatorParamList } from 'types/navigation';
+import { Chip } from 'react-native-ui-lib';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
-import { FirestoreMessageType } from 'types/chat';
 import InfoMessage from 'components/atoms/InfoMessage';
+import { ListItem } from '@react-native-ajp-elements/ui';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { SearchBar } from '@rneui/themed';
+import { UserPickerModal } from 'components/modals/UserPickerModal';
+import { UserProfile } from 'types/user';
+import { getUsers } from 'firebase/firestore/users';
 import lodash from 'lodash';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useSelector } from 'react-redux';
 import { useTheme } from 'theme';
+
+const initialSearchCriteria = { text: '', scope: SearchScope.Username };
+const minimumRequiredCharsForSearch = 2;
 
 export type Props = NativeStackScreenProps<
   ChatNavigatorParamList,
@@ -37,6 +48,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
 
   const tabBarHeight = useBottomTabBarHeight();
   const recipient = route.params.recipient;
+  const newThread = !recipient;
   const userProfile = useSelector(selectUserProfile);
   const threadId = useRef<string>();
   const isInitializing = useRef(true);
@@ -46,68 +58,18 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
 
   const [chatMessages, setChatMessages] = useState<MessageType.Any[]>([]);
 
-  //////////////////////////////
-  // const renderBubble = ({
-  //   child,
-  //   message,
-  //   nextMessageInGroup,
-  // }: {
-  //   child: ReactNode;
-  //   message: MessageType.Any;
-  //   nextMessageInGroup: boolean;
-  // }) => {
-  //   if (message.type !== 'custom') {
-  //     return (
-  //       <View
-  //         style={{
-  //           backgroundColor:
-  //             user.id !== message.author.id ? '#ffffff' : '#1d1c21',
-  //           borderBottomLeftRadius:
-  //             !nextMessageInGroup && user.id !== message.author.id ? 20 : 0,
-  //           borderBottomRightRadius:
-  //             !nextMessageInGroup && user.id === message.author.id ? 20 : 0,
-  //           borderColor: '#1d1c21',
-  //           borderWidth: 1,
-  //           overflow: 'hidden',
-  //         }}>
-  //         {child}
-  //       </View>
-  //     );
-  //   } else {
-  //     return (
-  //       <View
-  //         style={{
-  //           borderColor: '#ff9900',
-  //           borderWidth: 2,
-  //           overflow: 'hidden',
-  //         }}>
-  //         {child}
-  //       </View>
-  //     );
-  //   }
-  // };
-
-  // const renderCustomMessage = (
-  //   message: MessageType.Custom,
-  //   messageWidth: number,
-  // ) => {
-  //   console.log(message, messageWidth);
-  //   return (
-  //     <View
-  //       style={{
-  //         borderColor: '#1d1c21',
-  //         borderWidth: 1,
-  //         overflow: 'hidden',
-  //       }}>
-  //       <Text style={{ width: 100 || messageWidth }}>
-  //         {message?.metadata?.custom}
-  //       </Text>
-  //     </View>
-  //   );
-  // };
-  //////////////////////////////
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [searchCriteria, setSearchCriteria] = useState<SearchCriteria>(
+    initialSearchCriteria,
+  );
+  const [addedUsers, setAddedUsers] = useState<UserProfile[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<UserProfile[]>([]);
+  const [userSearchSet, setUserSearchSet] = useState<UserProfile[]>([]);
+  const userPickerModalRef = useRef<UserPickerModal>(null);
 
   useEffect(() => {
+    if (!recipient) return;
+
     // Create the chat thread id by combining recipient and sender id's. Use a comparison to get the
     // same id everytime.
     if (userProfile?.id && recipient.id) {
@@ -199,11 +161,83 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
   }, []);
 
   useEffect(() => {
-    navigation.setOptions({
-      header: () => renderHeader(recipient),
-    });
+    if (recipient) {
+      navigation.setOptions({
+        header: () => renderHeader(recipient),
+      });
+    } else {
+      // Get the list of users for search.
+      getUsers().then(users => {
+        setUserSearchSet(users.result);
+      });
+
+      navigation.setOptions({
+        title: 'New Message',
+        // eslint-disable-next-line react/no-unstable-nested-components
+        headerRight: () => (
+          <Button
+            type={'clear'}
+            icon={
+              <Icon
+                name={'plus-circle-outline'}
+                type={'material-community'}
+                color={theme.colors.brandSecondary}
+                size={28}
+              />
+            }
+            onPress={() => {
+              Keyboard.dismiss();
+              userPickerModalRef.current?.present();
+            }}
+          />
+        ),
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    // On initial entry to search (user tapped search input)...
+    // clear filtered data so only filtered results will display when search text is set.
+    if (searchFocused && searchCriteria.text === '') {
+      setFilteredUsers([]);
+    }
+  }, [searchFocused, searchCriteria]);
+
+  const resetSearch = () => {
+    setSearchFocused(false);
+    searchFilter(initialSearchCriteria);
+  };
+
+  const searchFilter = async ({ text, scope }: SearchCriteria) => {
+    setSearchCriteria({ text, scope });
+    if (text.length >= minimumRequiredCharsForSearch) {
+      if (scope === SearchScope.Username) {
+        //Case insensitive match.
+        const usersFirstName = lodash.filter(userSearchSet, u =>
+          u.firstName.toLowerCase().includes(text.toLowerCase()),
+        );
+        const usersLastName = lodash.filter(userSearchSet, u =>
+          u.lastName.toLowerCase().includes(text.toLowerCase()),
+        );
+
+        // Ensure no duplicates in the result.
+        const searchResult = lodash.uniqBy(
+          usersFirstName.concat(usersLastName ? usersLastName : []),
+          'id',
+        );
+
+        // Remove users that are already added.
+        const filtered = lodash.reject(searchResult, u => {
+          return lodash.findIndex(addedUsers, u) >= 0;
+        });
+
+        setFilteredUsers(filtered);
+      }
+    } else {
+      setFilteredUsers([]);
+    }
+  };
 
   const sendAttachment = () => {
     if (!userProfile || !threadId.current) return;
@@ -246,15 +280,87 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
     }
   };
 
+  const renderHeader = (recipient: UserProfile) => {
+    return <ChatHeader userProfile={recipient} />;
+  };
+
   return (
     <SafeAreaView edges={['left', 'right']} style={{ flex: 1 }}>
+      {newThread && (
+        <View style={{}}>
+          <SearchBar
+            placeholder={'To:'}
+            platform={Platform.OS === 'ios' ? 'ios' : 'android'}
+            onChangeText={text =>
+              searchFilter({
+                text,
+                scope: SearchScope.Username,
+              })
+            }
+            onBlur={() => setSearchFocused(false)}
+            onFocus={() => setSearchFocused(true)}
+            value={searchCriteria.text}
+          />
+          {addedUsers.length > 0 && (
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                marginHorizontal: 10,
+                marginTop: 5,
+              }}>
+              {addedUsers.map(u => (
+                <Chip
+                  label={u.name || u.email}
+                  containerStyle={{ marginRight: 5, marginBottom: 5 }}
+                  iconProps={{ tintColor: theme.colors.text }}
+                  dismissIconStyle={{ width: 10, height: 10 }}
+                  onDismiss={() => {
+                    const current = ([] as UserProfile[]).concat(addedUsers);
+                    lodash.remove(current, u);
+                    setAddedUsers(current);
+                  }}
+                />
+              ))}
+            </View>
+          )}
+          {filteredUsers.map(u => (
+            <ListItem
+              title={u.name || u.email}
+              leftImage={
+                u.photoUrl ? (
+                  <Avatar
+                    source={{ uri: u.photoUrl }}
+                    imageProps={{ resizeMode: 'contain' }}
+                    containerStyle={theme.styles.avatar}
+                  />
+                ) : (
+                  <Avatar
+                    title={u?.avatar.title}
+                    titleStyle={[theme.styles.avatarTitle]}
+                    containerStyle={{
+                      ...theme.styles.avatar,
+                      backgroundColor: u.avatar.color,
+                    }}
+                  />
+                )
+              }
+              rightImage={false}
+              onPress={() => {
+                setAddedUsers(addedUsers.concat(u));
+                resetSearch();
+              }}
+            />
+          ))}
+        </View>
+      )}
       {userProfile?.id ? (
         <Chat
           messages={chatMessages}
           user={{
             id: userProfile.id,
-            firstName: userProfile.name?.split(' ')[0] || userProfile.email[0],
-            lastName: userProfile.name?.split(' ')[1] || '',
+            firstName: userProfile.firstName,
+            lastName: userProfile.lastName,
             imageUrl: userProfile.photoUrl || '',
             avatarColor: userProfile.avatar.color,
           }}
@@ -267,13 +373,25 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
           showUserAvatars={true} //  Only if group
           showUserNames={'outside'}
           theme={chatTheme(theme, { tabBarHeight })}
-          // renderBubble={renderBubble}
-          // renderCustomMessage={renderCustomMessage}
-          // customBottomComponent={() => <Text>hello</Text>}
         />
       ) : (
         <InfoMessage text={'User id not found'} />
       )}
+      <UserPickerModal
+        ref={userPickerModalRef}
+        multiple
+        snapPoints={['65%']}
+        onSelect={userProfile => {
+          setAddedUsers(addedUsers.concat(userProfile));
+        }}
+        onDeselect={userProfile => {
+          const current = ([] as UserProfile[]).concat(addedUsers);
+          lodash.remove(current, u => u.id === userProfile.id);
+          setAddedUsers(current);
+        }}
+        userProfiles={userSearchSet}
+        selected={addedUsers}
+      />
     </SafeAreaView>
   );
 };

@@ -4,6 +4,7 @@ export type Styles = {
   avatar: ViewStyle;
   avatarForListItem: ViewStyle;
   avatarTitle: TextStyle;
+  navigationBarTitle: TextStyle;
   pageContentCardDefaultStyle: ViewStyle;
   pageContentCardTransparentStyle: ViewStyle;
   pageContentCardTitleStyle: TextStyle;

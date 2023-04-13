@@ -12,7 +12,7 @@ export enum StartupScreen {
 
 export type ChatNavigatorParamList = {
   ChatThread: {
-    recipient: UserProfile;
+    recipient?: UserProfile;
   };
   ChatThreadList: undefined;
 };

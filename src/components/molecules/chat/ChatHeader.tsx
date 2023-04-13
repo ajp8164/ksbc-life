@@ -1,22 +1,32 @@
 import { AppTheme, useTheme } from 'theme';
+import { Avatar, Button, Icon } from '@rneui/base';
 import { Header, HeaderBackButton } from '@react-navigation/elements';
 import { Text, View } from 'react-native';
 
-import { Avatar } from '@rneui/base';
 import { UserProfile } from 'types/user';
 import { fontSizes } from '@react-native-ajp-elements/ui';
 import { makeStyles } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/core';
 
 interface ChatHeaderInterface {
+  buttonIconName?: string;
+  buttonIconColor?: string;
+  buttonIconSize?: number;
+  buttonIconType?: string;
+  onPressButton?: () => void;
   userProfile?: UserProfile;
 }
 
-export const renderHeader = (recipient: UserProfile) => {
-  return <ChatHeader userProfile={recipient} />;
-};
-
-const ChatHeader = ({ userProfile }: ChatHeaderInterface) => {
+export const ChatHeader = ({
+  buttonIconName,
+  buttonIconColor,
+  buttonIconSize = 28,
+  buttonIconType = 'material-community',
+  onPressButton = () => {
+    return;
+  },
+  userProfile,
+}: ChatHeaderInterface) => {
   const theme = useTheme();
   const s = useStyles(theme);
   const navigation = useNavigation();
@@ -33,6 +43,25 @@ const ChatHeader = ({ userProfile }: ChatHeaderInterface) => {
     );
   };
 
+  const renderRightButton = () => {
+    if (!buttonIconName) return null;
+    return (
+      <Button
+        type={'clear'}
+        containerStyle={{ top: 18 }}
+        icon={
+          <Icon
+            name={buttonIconName}
+            type={buttonIconType}
+            color={buttonIconColor || theme.colors.brandSecondary}
+            size={buttonIconSize}
+          />
+        }
+        onPress={onPressButton}
+      />
+    );
+  };
+
   const renderTitle = () => {
     return (
       <View style={s.container}>
@@ -42,7 +71,7 @@ const ChatHeader = ({ userProfile }: ChatHeaderInterface) => {
             imageProps={{ resizeMode: 'contain' }}
             containerStyle={[theme.styles.avatar, s.avatar]}
           />
-        ) : (
+        ) : userProfile ? (
           <Avatar
             title={userProfile?.avatar.title}
             titleStyle={[theme.styles.avatarTitle, s.avatarTitle]}
@@ -52,7 +81,7 @@ const ChatHeader = ({ userProfile }: ChatHeaderInterface) => {
               { backgroundColor: userProfile?.avatar.color },
             ]}
           />
-        )}
+        ) : null}
         <Text style={s.title}>
           {userProfile?.name || userProfile?.email || ''}
         </Text>
@@ -66,6 +95,7 @@ const ChatHeader = ({ userProfile }: ChatHeaderInterface) => {
       headerStyle={{ height: 118 }}
       headerShadowVisible={true}
       headerLeft={() => renderBackButton()}
+      headerRight={() => renderRightButton()}
       headerTitle={() => renderTitle()}
     />
   );

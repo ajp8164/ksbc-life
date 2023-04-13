@@ -7,3 +7,12 @@ export type FirestoreMessageType = {
     updatedAt: MessageType.Any['updatedAt'] | FirebaseFirestoreTypes.Timestamp;
   };
 };
+
+export enum SearchScope {
+  Username,
+}
+
+export type SearchCriteria = {
+  text: string;
+  scope: SearchScope;
+};

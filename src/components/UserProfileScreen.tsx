@@ -30,8 +30,8 @@ const UserProfileScreen = ({ navigation }: Props) => {
 
   useEffect(() => {
     navigation.setOptions({
-      // headerTitle: user?.displayName || 'My  Profile',
-      headerTitle: 'My  Profile',
+      // headerTitle: user?.displayName || 'My Profile',
+      headerTitle: 'My Profile',
     });
   });
 
