@@ -6,6 +6,7 @@ import { AppError } from 'lib/errors';
 import { BackHandler } from 'react-native';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { appConfig } from 'config';
+import { cacheUsers } from './cacheUsers';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import { svgImages } from 'theme';
@@ -43,6 +44,9 @@ export const initApp = async (): Promise<InitStatus> => {
     GoogleSignin.configure({
       webClientId: appConfig.firebaseOauthClientId,
     });
+
+    // Cache data from firestore.
+    cacheUsers();
 
     return InitStatus.Success;
 
