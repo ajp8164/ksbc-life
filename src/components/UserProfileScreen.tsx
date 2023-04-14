@@ -71,7 +71,7 @@ const UserProfileScreen = ({ navigation }: Props) => {
         style={theme.styles.view}
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior={'automatic'}>
-        {userProfile?.photoUrl ? (
+        {userProfile?.photoUrl.length ? (
           <Avatar
             source={{ uri: userProfile?.photoUrl }}
             imageProps={{ resizeMode: 'contain' }}

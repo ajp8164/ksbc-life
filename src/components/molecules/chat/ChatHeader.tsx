@@ -65,7 +65,7 @@ export const ChatHeader = ({
   const renderTitle = () => {
     return (
       <View style={s.container}>
-        {userProfile?.photoUrl ? (
+        {userProfile?.photoUrl.length ? (
           <Avatar
             source={{ uri: userProfile.photoUrl }}
             imageProps={{ resizeMode: 'contain' }}

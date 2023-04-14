@@ -108,7 +108,7 @@ const HomeScreen = ({ navigation }: Props) => {
           <Button
             type={'clear'}
             icon={
-              userProfile && userProfile.photoUrl ? (
+              userProfile && userProfile.photoUrl.length ? (
                 <Image
                   source={{ uri: userProfile.photoUrl }}
                   containerStyle={s.avatar}

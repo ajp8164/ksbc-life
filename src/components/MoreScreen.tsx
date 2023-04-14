@@ -67,7 +67,7 @@ const MoreScreen = ({ navigation, route }: Props) => {
         <ListItem
           title={userProfile.name || userProfile.email || 'My Profile'}
           leftImage={
-            userProfile.photoUrl ? (
+            userProfile.photoUrl.length ? (
               <Avatar
                 source={{ uri: userProfile.photoUrl }}
                 imageProps={{ resizeMode: 'contain' }}

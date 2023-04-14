@@ -125,11 +125,11 @@ const createProfile = (
     credentials.displayName?.split(' ')[0] || credentials.email || '';
   const lastName = credentials.displayName?.split(' ')[1] || '';
   return {
-    name: credentials.displayName,
+    name: credentials.displayName || '',
     firstName,
     lastName,
     email: credentials.email,
-    photoUrl: credentials.photoURL,
+    photoUrl: credentials.photoURL || '',
     avatar: {
       color: getUserAvatarColor(`${firstName}${lastName}`, colors),
       title: getUserInitials(firstName, lastName),

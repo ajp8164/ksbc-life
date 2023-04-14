@@ -35,7 +35,7 @@ const UsersView = React.forwardRef<UsersView, UsersViewProps>((props, ref) => {
       <ListItemCheckbox
         title={userProfile.name || userProfile.email}
         leftImage={
-          userProfile.photoUrl ? (
+          userProfile.photoUrl.length ? (
             <Avatar
               source={{ uri: userProfile.photoUrl }}
               imageProps={{ resizeMode: 'contain' }}
