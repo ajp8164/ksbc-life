@@ -19,7 +19,8 @@
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint .",
-    "firebase:start": "firebase emulators:start"
+    "firebase:start": "firebase emulators:start",
+    "firebase:process": "lsof -i tcp:4000"
   },
   "dependencies": {
     "@flyerhq/react-native-chat-ui": "^1.4.3",
