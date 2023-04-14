@@ -1,3 +1,4 @@
+import { AppTheme, useTheme } from 'theme';
 import { Avatar, Button, Icon } from '@rneui/base';
 import { Chat, MessageType } from '../react-native-chat-ui';
 import {
@@ -8,7 +9,7 @@ import {
   useSendAttachment,
 } from 'components/molecules/chat';
 import { FirestoreMessageType, SearchCriteria, SearchScope } from 'types/chat';
-import { Keyboard, Platform, View } from 'react-native';
+import { FlatList, Keyboard, ListRenderItem, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   chatMessagesDocumentChangeListener,
@@ -17,21 +18,20 @@ import {
 } from 'firebase/firestore/chatMessages';
 
 import { ChatNavigatorParamList } from 'types/navigation';
-import { Chip } from 'react-native-ui-lib';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
-import InfoMessage from 'components/atoms/InfoMessage';
+import { Incubator } from 'react-native-ui-lib';
 import { ListItem } from '@react-native-ajp-elements/ui';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import NoItems from 'components/atoms/NoItems';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { SearchBar } from '@rneui/themed';
 import { UserPickerModal } from 'components/modals/UserPickerModal';
 import { UserProfile } from 'types/user';
 import { getUsers } from 'firebase/firestore/users';
 import lodash from 'lodash';
+import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useSelector } from 'react-redux';
-import { useTheme } from 'theme';
 
 const initialSearchCriteria = { text: '', scope: SearchScope.Username };
 const minimumRequiredCharsForSearch = 2;
@@ -43,6 +43,7 @@ export type Props = NativeStackScreenProps<
 
 const ChatThreadScreen = ({ navigation, route }: Props) => {
   const theme = useTheme();
+  const s = useStyles(theme);
 
   const sendAttachmentMessage = useSendAttachment();
 
@@ -284,14 +285,90 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
     return <ChatHeader userProfile={recipient} />;
   };
 
+  const renderUser: ListRenderItem<UserProfile> = ({ item }) => {
+    return (
+      <ListItem
+        title={item.name || item.email}
+        leftImage={
+          item.photoUrl ? (
+            <Avatar
+              source={{ uri: item.photoUrl }}
+              imageProps={{ resizeMode: 'contain' }}
+              containerStyle={theme.styles.avatar}
+            />
+          ) : (
+            <Avatar
+              title={item.avatar.title}
+              titleStyle={[theme.styles.avatarTitle]}
+              containerStyle={{
+                ...theme.styles.avatar,
+                backgroundColor: item.avatar.color,
+              }}
+            />
+          )
+        }
+        rightImage={false}
+        onPress={() => {
+          setAddedUsers(addedUsers.concat(item));
+          resetSearch();
+        }}
+      />
+    );
+  };
+
+  const renderListEmptyComponent = () => {
+    return (
+      <View style={s.emptyListContainer}>
+        <NoItems title={'No messages'} />
+      </View>
+    );
+  };
+
+  const addedUserChips = () => {
+    const chips = addedUsers.map(u => {
+      return {
+        label: u.name || u.email,
+        labelStyle: theme.styles.textSmall,
+        dismissColor: theme.colors.text,
+        dismissIconStyle: s.userChipDismissIcon,
+        onDismiss: () => {
+          const current = ([] as UserProfile[]).concat(addedUsers);
+          lodash.remove(current, u);
+          console.log(current);
+          setAddedUsers(current);
+        },
+      };
+    });
+
+    // Use a stylized chip for the "To:" label since the components leftElement forces
+    // an undesirable left indent for all wrapped rows or chips.
+    return [
+      {
+        label: 'To:',
+        labelStyle: s.toLabel,
+        style: s.toLabelContainer,
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ].concat(chips as any);
+  };
+
   return (
     <SafeAreaView edges={['left', 'right']} style={{ flex: 1 }}>
       {newThread && (
         <View style={{}}>
-          <SearchBar
-            placeholder={'To:'}
-            platform={Platform.OS === 'ios' ? 'ios' : 'android'}
-            onChangeText={text =>
+          <Incubator.ChipsInput
+            style={s.chipInputText}
+            fieldStyle={s.chipInput}
+            chips={addedUserChips()}
+            // @ts-ignore property is incorrectly typed
+            onChange={(_chips, changeReason, updatedChip) => {
+              if (changeReason === 'removed') {
+                // @ts-ignore property is incorrectly typed
+                updatedChip.onDismiss && updatedChip.onDismiss();
+              }
+            }}
+            // }}
+            onChangeText={(text: string) =>
               searchFilter({
                 text,
                 scope: SearchScope.Username,
@@ -301,60 +378,19 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
             onFocus={() => setSearchFocused(true)}
             value={searchCriteria.text}
           />
-          {addedUsers.length > 0 && (
-            <View
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                marginHorizontal: 10,
-                marginTop: 5,
-              }}>
-              {addedUsers.map(u => (
-                <Chip
-                  label={u.name || u.email}
-                  containerStyle={{ marginRight: 5, marginBottom: 5 }}
-                  iconProps={{ tintColor: theme.colors.text }}
-                  dismissIconStyle={{ width: 10, height: 10 }}
-                  onDismiss={() => {
-                    const current = ([] as UserProfile[]).concat(addedUsers);
-                    lodash.remove(current, u);
-                    setAddedUsers(current);
-                  }}
-                />
-              ))}
-            </View>
-          )}
-          {filteredUsers.map(u => (
-            <ListItem
-              title={u.name || u.email}
-              leftImage={
-                u.photoUrl ? (
-                  <Avatar
-                    source={{ uri: u.photoUrl }}
-                    imageProps={{ resizeMode: 'contain' }}
-                    containerStyle={theme.styles.avatar}
-                  />
-                ) : (
-                  <Avatar
-                    title={u?.avatar.title}
-                    titleStyle={[theme.styles.avatarTitle]}
-                    containerStyle={{
-                      ...theme.styles.avatar,
-                      backgroundColor: u.avatar.color,
-                    }}
-                  />
-                )
-              }
-              rightImage={false}
-              onPress={() => {
-                setAddedUsers(addedUsers.concat(u));
-                resetSearch();
-              }}
-            />
-          ))}
+          <FlatList
+            data={filteredUsers}
+            renderItem={renderUser}
+            keyExtractor={item => `${item.id}`}
+            style={{
+              height:
+                searchFocused || addedUsers.length === 0 ? '100%' : undefined,
+            }}
+            contentInsetAdjustmentBehavior={'automatic'}
+          />
         </View>
       )}
-      {userProfile?.id ? (
+      {!searchFocused && addedUsers.length > 0 && userProfile?.id && (
         <Chat
           messages={chatMessages}
           user={{
@@ -373,9 +409,8 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
           showUserAvatars={true} //  Only if group
           showUserNames={'outside'}
           theme={chatTheme(theme, { tabBarHeight })}
+          emptyState={renderListEmptyComponent}
         />
-      ) : (
-        <InfoMessage text={'User id not found'} />
       )}
       <UserPickerModal
         ref={userPickerModalRef}
@@ -395,5 +430,32 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
     </SafeAreaView>
   );
 };
+
+const useStyles = makeStyles((_theme, theme: AppTheme) => ({
+  emptyListContainer: {},
+  chipInput: {
+    backgroundColor: theme.colors.white,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.subtleGray,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+  },
+  chipInputText: {
+    ...theme.styles.textNormal,
+    flexGrow: undefined,
+  },
+  userChipDismissIcon: {
+    width: 15,
+    height: 15,
+  },
+  toLabel: {
+    ...theme.styles.textNormal,
+    marginTop: 3,
+  },
+  toLabelContainer: {
+    marginLeft: -10,
+    marginRight: -5,
+  },
+}));
 
 export default ChatThreadScreen;
