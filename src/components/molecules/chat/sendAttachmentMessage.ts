@@ -1,3 +1,4 @@
+import { Group } from 'types/group';
 import { UserProfile } from 'types/user';
 import { sendFileMessage } from './sendFileMessage';
 import { sendImageMessage } from './sendImageMessage';
@@ -6,7 +7,7 @@ import { useActionSheet } from '@expo/react-native-action-sheet';
 export const useSendAttachment = () => {
   const { showActionSheetWithOptions } = useActionSheet();
 
-  return (userProfile: UserProfile, threadId: string) => {
+  return (userProfile: UserProfile, group: Group) => {
     return showActionSheetWithOptions(
       {
         options: ['Photo', 'File', 'Cancel'],
@@ -15,10 +16,10 @@ export const useSendAttachment = () => {
       buttonIndex => {
         switch (buttonIndex) {
           case 0:
-            sendImageMessage(userProfile, threadId);
+            group.id && sendImageMessage(userProfile, group.id);
             break;
           case 1:
-            sendFileMessage(userProfile, threadId);
+            group.id && sendFileMessage(userProfile, group.id);
             break;
         }
       },

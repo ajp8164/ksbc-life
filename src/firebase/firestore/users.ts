@@ -23,14 +23,22 @@ export const getUsers = (opts?: {
   lastDocument?: FirebaseFirestoreTypes.DocumentData;
   orderBy?: QueryOrderBy;
   where?: QueryWhere[];
+  fromCache?: boolean;
 }): Promise<QueryResult<UserProfile>> => {
   const {
     lastDocument,
     limit = 10,
     orderBy = { fieldPath: 'name', directionStr: 'asc' },
     where,
+    fromCache = false,
   } = opts || {};
-  return getDocuments('Users', { lastDocument, orderBy, limit, where });
+  return getDocuments('Users', {
+    lastDocument,
+    orderBy,
+    limit,
+    where,
+    fromCache,
+  });
 };
 
 export const updateUser = (user: UserProfile): Promise<UserProfile> => {

@@ -3,8 +3,9 @@ import { Avatar, Button, Icon } from '@rneui/base';
 import { Header, HeaderBackButton } from '@react-navigation/elements';
 import { Text, View } from 'react-native';
 
-import { UserProfile } from 'types/user';
+import { Group } from 'types/group';
 import { fontSizes } from '@react-native-ajp-elements/ui';
+import { getGroupName } from 'lib/group';
 import { makeStyles } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/core';
 
@@ -13,8 +14,8 @@ interface ChatHeaderInterface {
   buttonIconColor?: string;
   buttonIconSize?: number;
   buttonIconType?: string;
+  group?: Group;
   onPressButton?: () => void;
-  userProfile?: UserProfile;
 }
 
 export const ChatHeader = ({
@@ -22,10 +23,10 @@ export const ChatHeader = ({
   buttonIconColor,
   buttonIconSize = 28,
   buttonIconType = 'material-community',
+  group,
   onPressButton = () => {
     return;
   },
-  userProfile,
 }: ChatHeaderInterface) => {
   const theme = useTheme();
   const s = useStyles(theme);
@@ -65,26 +66,24 @@ export const ChatHeader = ({
   const renderTitle = () => {
     return (
       <View style={s.container}>
-        {userProfile?.photoUrl.length ? (
+        {group?.photoUrl.length ? (
           <Avatar
-            source={{ uri: userProfile.photoUrl }}
+            source={{ uri: group.photoUrl }}
             imageProps={{ resizeMode: 'contain' }}
             containerStyle={[theme.styles.avatar, s.avatar]}
           />
-        ) : userProfile ? (
+        ) : group ? (
           <Avatar
-            title={userProfile?.avatar.title}
+            title={group?.avatar.title}
             titleStyle={[theme.styles.avatarTitle, s.avatarTitle]}
             containerStyle={[
               theme.styles.avatar,
               s.avatar,
-              { backgroundColor: userProfile?.avatar.color },
+              { backgroundColor: group?.avatar.color },
             ]}
           />
         ) : null}
-        <Text style={s.title}>
-          {userProfile?.name || userProfile?.email || ''}
-        </Text>
+        <Text style={s.title}>{group && getGroupName(group)}</Text>
       </View>
     );
   };

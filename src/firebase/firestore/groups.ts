@@ -38,7 +38,8 @@ export const addGroup = (group: Group): Promise<Group> => {
     firestore()
       .collection('Groups')
       .add(group)
-      .then(() => {
+      .then(data => {
+        group.id = data.id;
         return group;
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

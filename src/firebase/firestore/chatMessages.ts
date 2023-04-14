@@ -11,37 +11,9 @@ import firestore, {
 import { MessageType } from '../../react-native-chat-ui';
 import { log } from '@react-native-ajp-elements/core';
 
-const initChatThread = (
-  message: MessageType.Any,
-  threadId: string,
-): Promise<MessageType.Any> => {
-  const outgoingMessage = {
-    ...message,
-    createdAt: firestore.FieldValue.serverTimestamp(),
-  };
-  return (
-    firestore()
-      .collection('ChatMessages')
-      .doc(threadId)
-      .set({
-        messages: {
-          [message.id]: outgoingMessage,
-        },
-      })
-      .then(() => {
-        return message;
-      })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch((e: any) => {
-        log.error(`Failed to init chat thread: ${e.message}`);
-        throw e;
-      })
-  );
-};
-
 export const addChatMessage = (
   message: MessageType.Any,
-  threadId: string,
+  groupId: string,
 ): Promise<MessageType.Any> => {
   const outgoingMessage = {
     ...message,
@@ -50,18 +22,15 @@ export const addChatMessage = (
   return (
     firestore()
       .collection('ChatMessages')
-      .doc(threadId)
-      .update({
-        [`messages.${outgoingMessage.id}`]: outgoingMessage,
-      })
+      .doc(groupId)
+      .collection('Messages')
+      .doc(message.id)
+      .set(outgoingMessage)
       .then(() => {
         return message;
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((e: any) => {
-        if (e.message.includes('firestore/not-found')) {
-          return initChatThread(message, threadId);
-        }
         log.error(`Failed to add chat message: ${e.message}`);
         throw e;
       })
@@ -69,21 +38,20 @@ export const addChatMessage = (
 };
 
 export const updateChatMessage = (
-  property: keyof MessageType.Any,
-  message: MessageType.Any,
-  threadId: string,
-): Promise<MessageType.Any> => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  updates: { [key in string]: any },
+  messageId: string,
+  groupId: string,
+): Promise<void> => {
   return (
     firestore()
       .collection('ChatMessages')
-      .doc(threadId)
+      .doc(groupId)
+      .collection('Messages')
+      .doc(messageId)
       .update({
-        [`messages.${message.id}.${property}`]: message[property],
-        [`messages.${message.id}.updatedAt`]:
-          firestore.FieldValue.serverTimestamp(),
-      })
-      .then(() => {
-        return message;
+        ...updates,
+        updatedAt: firestore.FieldValue.serverTimestamp(),
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((e: any) => {
@@ -97,12 +65,12 @@ export const sendTypingState = (
   isTyping: boolean,
   userId: string,
   username: string,
-  threadId: string,
+  groupId: string,
 ): Promise<void> => {
   return (
     firestore()
-      .collection('ChatMessages')
-      .doc(threadId)
+      .collection('Groups')
+      .doc(groupId)
       .update({
         isTyping: isTyping
           ? firestore.FieldValue.arrayUnion({ [userId]: username })
@@ -113,17 +81,14 @@ export const sendTypingState = (
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((e: any) => {
-        if (e.message.includes('firestore/not-found')) {
-          // If chat thread not initialized just ignore request to set isTyping.
-          return;
-        }
-        log.error(`Failed to add chat message: ${e.message}`);
+        log.error(`Failed to update chat typing state: ${e.message}`);
         throw e;
       })
   );
 };
 
 export const chatMessagesCollectionChangeListener = (
+  groupId: string,
   handler: (
     snapshot: FirebaseFirestoreTypes.QuerySnapshot<FirebaseFirestoreTypes.DocumentData>,
   ) => void,
@@ -145,6 +110,10 @@ export const chatMessagesCollectionChangeListener = (
     limit,
     orderBy,
     where,
+    subCollection: {
+      documentPath: groupId,
+      name: 'Messages',
+    },
   });
 };
 

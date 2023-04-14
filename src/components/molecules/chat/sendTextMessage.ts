@@ -1,3 +1,4 @@
+import { Group } from 'types/group';
 import { MessageType } from '../../../react-native-chat-ui';
 import { UserProfile } from 'types/user';
 import { addChatMessage } from 'firebase/firestore/chatMessages';
@@ -7,7 +8,7 @@ import { uuidv4 } from 'lib/uuid';
 export const sendTextMessage = (
   message: MessageType.PartialText,
   userProfile: UserProfile,
-  threadId: string,
+  group: Group,
 ) => {
   const textMessage: MessageType.Text = {
     id: uuidv4(),
@@ -17,5 +18,5 @@ export const sendTextMessage = (
     text: message.text,
     type: 'text',
   };
-  threadId && addChatMessage(textMessage, threadId);
+  group.id && addChatMessage(textMessage, group.id);
 };

@@ -1,10 +1,16 @@
 export type Group = {
-  id: string;
+  id?: string;
   createdBy: string;
   createdAt?: number;
-  name?: string;
+  updatedAt?: number;
+  name: string;
   type: 'public' | 'private';
   members: string[];
   leaders: string[];
-  updatedAt?: number;
+  photoUrl: string;
+  avatar: {
+    color: string;
+    title: string;
+  };
+  isTyping?: { [key in string]: string }[];
 };

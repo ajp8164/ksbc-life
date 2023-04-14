@@ -3,20 +3,18 @@ import { Avatar, Button, Icon } from '@rneui/base';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import { FlatList, ListRenderItem, ScrollView, View } from 'react-native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import {
-  getUsers,
-  usersCollectionChangeListener,
-} from 'firebase/firestore/users';
 
 import { AuthContext } from 'lib/auth';
 import { ChatNavigatorParamList } from 'types/navigation';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+import { Group } from 'types/group';
 import InfoMessage from 'components/atoms/InfoMessage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import NoItems from 'components/atoms/NoItems';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { UserProfile } from 'types/user';
 import { UserRole } from 'types/user';
+import { getGroupName } from 'lib/group';
+import { groupsCollectionChangeListener } from 'firebase/firestore/groups';
 import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { useSelector } from 'react-redux';
@@ -36,7 +34,7 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
   const allLoaded = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
   const lastDocument = useRef<FirebaseFirestoreTypes.DocumentData>();
-  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [groups, setGroups] = useState<Group[]>([]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -60,13 +58,13 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
   }, []);
 
   useEffect(() => {
-    const subscription = usersCollectionChangeListener(
+    const subscription = groupsCollectionChangeListener(
       snapshot => {
-        const updated: UserProfile[] = [];
+        const updated: Group[] = [];
         snapshot.docs.forEach(d => {
-          updated.push({ ...d.data(), id: d.id } as UserProfile);
+          updated.push({ ...d.data(), id: d.id } as Group);
         });
-        setUsers(filterUsers(updated));
+        setGroups(updated);
         lastDocument.current = snapshot.docs[snapshot.docs.length - 1];
         allLoaded.current = false;
       },
@@ -75,54 +73,38 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
     return subscription;
   }, []);
 
-  const getMoreUsers = async () => {
-    if (!allLoaded.current) {
-      setIsLoading(true);
-      const s = await getUsers({ lastDocument: lastDocument.current });
-      lastDocument.current = s.lastDocument;
-      setUsers(filterUsers(users.concat(s.result)));
-      allLoaded.current = s.allLoaded;
-      setIsLoading(false);
-    }
-  };
-
-  const filterUsers = (users: UserProfile[]) => {
-    return users.filter(u => u.role !== UserRole.Anonymous);
-  };
-
-  const renderUser: ListRenderItem<UserProfile> = ({ item, index }) => {
-    const recipient = item;
-    if (!users || !recipient.id || recipient.role === UserRole.Anonymous) {
-      return null;
-    }
+  const renderGroup: ListRenderItem<Group> = ({ item: group, index }) => {
+    // if (!users || !recipient.id || recipient.role === UserRole.Anonymous) {
+    //   return null;
+    // }
     return (
       <ListItem
-        title={recipient.name || recipient.email}
+        title={group.name || getGroupName(group)}
         leftImage={
-          recipient.photoUrl ? (
+          group.photoUrl.length ? (
             <Avatar
-              source={{ uri: recipient.photoUrl }}
+              source={{ uri: group.photoUrl }}
               imageProps={{ resizeMode: 'contain' }}
               containerStyle={theme.styles.avatar}
             />
           ) : (
             <Avatar
-              title={recipient?.avatar.title}
+              title={group?.avatar.title}
               titleStyle={[theme.styles.avatarTitle]}
               containerStyle={{
                 ...theme.styles.avatar,
-                backgroundColor: recipient?.avatar.color,
+                backgroundColor: group?.avatar.color,
               }}
             />
           )
         }
         position={[
           index === 0 ? 'first' : undefined,
-          index === users.length - 1 ? 'last' : undefined,
+          index === groups.length - 1 ? 'last' : undefined,
         ]}
         onPress={() =>
           navigation.navigate('ChatThread', {
-            recipient,
+            group,
           })
         }
       />
@@ -144,8 +126,8 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
       style={[theme.styles.view, { paddingHorizontal: 0 }]}>
       {userProfile?.role !== UserRole.Anonymous ? (
         <FlatList
-          data={users}
-          renderItem={renderUser}
+          data={groups}
+          renderItem={renderGroup}
           ListEmptyComponent={renderListEmptyComponent}
           keyExtractor={item => `${item.id}`}
           contentContainerStyle={{
@@ -153,8 +135,6 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
             ...theme.styles.viewHorizontalInset,
           }}
           contentInsetAdjustmentBehavior={'automatic'}
-          onEndReached={getMoreUsers}
-          onEndReachedThreshold={0.2}
         />
       ) : (
         <ScrollView

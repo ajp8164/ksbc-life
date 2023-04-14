@@ -60,7 +60,8 @@ export const useAuthorizeUser = () => {
 
             if (profile.status === UserStatus.Active) {
               const updatedProfile = Object.assign({}, profile, {
-                photoUrl: credentials?.photoURL,
+                photoUrl:
+                  credentials?.photoURL !== null ? credentials?.photoURL : '',
               }) as UserProfile;
 
               if (!lodash.isEqual(updatedProfile, profile)) {
@@ -68,7 +69,7 @@ export const useAuthorizeUser = () => {
                   .collection('Users')
                   .doc(credentials.uid)
                   .update({
-                    photoUrl: credentials?.photoURL,
+                    photoUrl: updatedProfile.photoUrl,
                   })
                   .then(() => {
                     log.debug(
@@ -129,13 +130,14 @@ const createProfile = (
     firstName,
     lastName,
     email: credentials.email,
-    photoUrl: credentials.photoURL || '',
+    photoUrl: credentials.photoURL !== null ? credentials.photoURL : '',
     avatar: {
       color: getUserAvatarColor(`${firstName}${lastName}`, colors),
       title: getUserInitials(firstName, lastName),
     },
     role: credentials.isAnonymous ? UserRole.Anonymous : UserRole.User,
     status: UserStatus.Active,
+    groups: [],
   } as UserProfile;
 };
 

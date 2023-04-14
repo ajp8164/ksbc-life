@@ -56,9 +56,17 @@ export const getDocuments = <T extends { id?: string | undefined }>(
     where?: QueryWhere[];
     lastDocument?: FirebaseFirestoreTypes.DocumentData;
     skipIdMap?: boolean;
+    fromCache?: boolean;
   },
 ): Promise<QueryResult<T>> => {
-  const { orderBy, limit = 1, lastDocument, skipIdMap, where } = opts || {};
+  const {
+    orderBy,
+    limit = 1,
+    lastDocument,
+    skipIdMap,
+    where,
+    fromCache,
+  } = opts || {};
   let query = firestore().collection(collectionPath);
 
   if (where) {
@@ -88,7 +96,7 @@ export const getDocuments = <T extends { id?: string | undefined }>(
     query
       // Limit must be positive value. Load one more than requested to detect end of list.
       .limit(limit + 1 || 2)
-      .get()
+      .get({ source: fromCache ? 'cache' : 'default' })
       .then(querySnapshot => {
         const result: T[] = [];
         querySnapshot.forEach((doc, index) => {
@@ -132,11 +140,22 @@ export const collectionChangeListener = (
     limit?: number;
     orderBy?: QueryOrderBy;
     where?: QueryWhere[];
+    subCollection?: {
+      documentPath: string;
+      name: string;
+    };
   },
 ): (() => void) => {
-  const { lastDocument, limit, orderBy, where } = opts;
+  const { lastDocument, limit, orderBy, where, subCollection } = opts;
 
   let query = firestore().collection(collectionPath);
+
+  if (subCollection) {
+    query = query
+      .doc(subCollection.documentPath)
+      .collection(subCollection.name);
+  }
+
   if (orderBy) {
     query = query.orderBy(
       orderBy.fieldPath,

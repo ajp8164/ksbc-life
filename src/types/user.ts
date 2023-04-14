@@ -25,6 +25,7 @@ export type UserProfile = {
   };
   role: UserRole;
   status: UserStatus;
+  groups: string[];
 };
 
 export type User = {

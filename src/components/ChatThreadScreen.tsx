@@ -12,13 +12,20 @@ import { FirestoreMessageType, SearchCriteria, SearchScope } from 'types/chat';
 import { FlatList, Keyboard, ListRenderItem, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  chatMessagesDocumentChangeListener,
+  addGroup,
+  groupsDocumentChangeListener,
+} from 'firebase/firestore/groups';
+import {
+  chatMessagesCollectionChangeListener,
   sendTypingState,
   updateChatMessage,
 } from 'firebase/firestore/chatMessages';
+import { createGroupName, getGroupAvatarColor } from 'lib/group';
+import { getUsers, updateUser } from 'firebase/firestore/users';
 
 import { ChatNavigatorParamList } from 'types/navigation';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+import { Group } from 'types/group';
 import { Incubator } from 'react-native-ui-lib';
 import { ListItem } from '@react-native-ajp-elements/ui';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -26,7 +33,6 @@ import NoItems from 'components/atoms/NoItems';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { UserPickerModal } from 'components/modals/UserPickerModal';
 import { UserProfile } from 'types/user';
-import { getUsers } from 'firebase/firestore/users';
 import lodash from 'lodash';
 import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
@@ -48,10 +54,8 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
   const sendAttachmentMessage = useSendAttachment();
 
   const tabBarHeight = useBottomTabBarHeight();
-  const recipient = route.params.recipient;
-  const newThread = !recipient;
+  const [group, setGroup] = useState(route.params.group);
   const userProfile = useSelector(selectUserProfile);
-  const threadId = useRef<string>();
   const isInitializing = useRef(true);
   const isTyping = useRef(false);
   const typingNames = useRef<string | undefined>();
@@ -69,46 +73,32 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
   const userPickerModalRef = useRef<UserPickerModal>(null);
 
   useEffect(() => {
-    if (!recipient) return;
+    if (!group || !group.id) return;
 
-    // Create the chat thread id by combining recipient and sender id's. Use a comparison to get the
-    // same id everytime.
-    if (userProfile?.id && recipient.id) {
-      threadId.current =
-        userProfile?.id < recipient.id
-          ? `${userProfile?.id}-${recipient.id}`
-          : `${recipient.id}-${userProfile?.id}`;
-    }
-    if (!threadId.current) return;
-
-    const subscription = chatMessagesDocumentChangeListener(
-      threadId.current,
+    const subscription = chatMessagesCollectionChangeListener(
+      group.id,
       snapshot => {
-        const data = snapshot.data();
-        if (!snapshot.metadata.hasPendingWrites && data) {
-          const rawMessages = (data.messages as FirestoreMessageType) || [];
-          const typingState =
-            (data.isTyping as { [key in string]: string }[]) || [];
+        if (snapshot.metadata.hasPendingWrites || snapshot.empty) return;
 
-          const messages = Object.keys(rawMessages)
-            .map(key => {
-              // Convert server timestamps to be compatible with chat library (javascript ms timestamp).
-              rawMessages[key].createdAt =
-                (rawMessages[key].createdAt as FirebaseFirestoreTypes.Timestamp)
-                  .seconds * 1000;
+        const messages: MessageType.Any[] = [];
+        snapshot.docs.forEach(d => {
+          const msg = d.data() as FirestoreMessageType;
+          // Convert server timestamps to be compatible with chat library (javascript ms timestamp).
+          msg.createdAt =
+            (msg.createdAt as FirebaseFirestoreTypes.Timestamp).seconds * 1000;
 
-              if (rawMessages[key].updatedAt) {
-                rawMessages[key].updatedAt =
-                  (
-                    rawMessages[key]
-                      .updatedAt as FirebaseFirestoreTypes.Timestamp
-                  ).seconds * 1000;
-              }
-              return rawMessages[key] as MessageType.Any;
-            })
-            .sort((a, b) => {
-              return (b.createdAt as number) - (a.createdAt as number);
-            });
+          if (msg.updatedAt) {
+            msg.updatedAt =
+              (msg.updatedAt as FirebaseFirestoreTypes.Timestamp).seconds *
+              1000;
+          }
+          messages.push(msg as MessageType.Any);
+        });
+
+        if (!snapshot.metadata.hasPendingWrites && messages) {
+          messages.sort((a, b) => {
+            return (b.createdAt as number) - (a.createdAt as number);
+          });
 
           // Use the latest message in the list to set status.
           if (
@@ -118,28 +108,14 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
             messages[0].status = 'delivered';
           } else if (messages[0].status !== 'seen') {
             messages[0].status = 'seen';
-            threadId.current &&
-              updateChatMessage('status', messages[0], threadId.current);
-          }
 
-          // Set typing state on our ui.
-          const othersTyping = lodash.reject(typingState, el => {
-            return el[userProfile?.id || ''] !== undefined;
-          });
-
-          isTyping.current = Object.keys(othersTyping).length > 0;
-          typingNames.current = '';
-
-          othersTyping.forEach(other => {
-            typingNames.current = typingNames.current?.concat(
-              `${typingNames.current?.length ? ', ' : ''}${
-                other[Object.keys(other)[0]]
-              }`,
+            updateChatMessage(
+              { status: messages[0].status },
+              messages[0].id,
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              group.id!,
             );
-          });
-          typingNames.current = typingNames.current.length
-            ? typingNames.current
-            : undefined;
+          }
 
           setChatMessages(messages);
         }
@@ -147,24 +123,53 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
     );
     return () => {
       subscription();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [group]);
 
-      if (userProfile?.id && threadId.current) {
-        // Make sure we stop typing when the view is dismissed.
-        sendTypingState(
-          false,
-          userProfile.id,
-          userProfile.firstName,
-          threadId.current,
+  useEffect(() => {
+    if (!group || !group.id) return;
+
+    const subscription = groupsDocumentChangeListener(group.id, snapshot => {
+      if (snapshot.metadata.hasPendingWrites || !snapshot.exists) return;
+
+      const doc = snapshot.data() as Group;
+      const typingState = (doc.isTyping as { [key in string]: string }[]) || [];
+
+      // Set typing state on our ui.
+      const othersTyping = lodash.reject(typingState, el => {
+        return el[userProfile?.id || ''] !== undefined;
+      });
+
+      isTyping.current = Object.keys(othersTyping).length > 0;
+      typingNames.current = '';
+
+      othersTyping.forEach(other => {
+        typingNames.current = typingNames.current?.concat(
+          `${typingNames.current?.length ? ', ' : ''}${
+            other[Object.keys(other)[0]]
+          }`,
         );
+      });
+      typingNames.current = typingNames.current.length
+        ? typingNames.current
+        : undefined;
+    });
+    return () => {
+      subscription();
+
+      if (userProfile?.id && group.id) {
+        // Make sure we stop typing when the view is dismissed.
+        sendTypingState(false, userProfile.id, userProfile.firstName, group.id);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (recipient) {
+    if (group) {
       navigation.setOptions({
-        header: () => renderHeader(recipient),
+        header: () => renderHeader(group),
       });
     } else {
       // Get the list of users for search.
@@ -195,7 +200,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [group]);
 
   useEffect(() => {
     // On initial entry to search (user tapped search input)...
@@ -208,6 +213,41 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
   const resetSearch = () => {
     setSearchFocused(false);
     searchFilter(initialSearchCriteria);
+  };
+
+  const createGroup = async (): Promise<Group> => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const members = [userProfile!].concat(addedUsers);
+    const memberIds = members.map(u => {
+      return u.id;
+    }) as string[];
+    const groupName = createGroupName(members);
+
+    const newGroup = {
+      createdBy: userProfile?.id,
+      name: '',
+      type: 'private',
+      members: memberIds,
+      leaders: [userProfile?.id],
+      photoUrl: '',
+      avatar: {
+        color: getGroupAvatarColor(`${groupName}`, theme.colors.avatarColors),
+        title: '',
+      },
+    } as Group;
+
+    const addedGroup = await addGroup(newGroup);
+    setGroup(addedGroup);
+
+    // Add group membership to each user (including myself).
+    members.forEach(u => {
+      if (addedGroup.id) {
+        u.groups = u.groups.concat(addedGroup.id);
+        updateUser(u);
+      }
+    });
+
+    return addedGroup;
   };
 
   const searchFilter = async ({ text, scope }: SearchCriteria) => {
@@ -240,14 +280,26 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
     }
   };
 
-  const sendAttachment = () => {
-    if (!userProfile || !threadId.current) return;
-    sendAttachmentMessage(userProfile, threadId.current);
+  const sendAttachment = async () => {
+    if (!userProfile) return;
+
+    let newGroup: Group;
+    if (!group) {
+      newGroup = await createGroup();
+    }
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    sendAttachmentMessage(userProfile, group || newGroup!);
   };
 
-  const sendText = (message: MessageType.PartialText) => {
-    if (!userProfile || !threadId.current) return;
-    sendTextMessage(message, userProfile, threadId.current);
+  const sendText = async (message: MessageType.PartialText) => {
+    if (!userProfile) return;
+
+    let newGroup: Group;
+    if (!group) {
+      newGroup = await createGroup();
+    }
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    sendTextMessage(message, userProfile, group || newGroup!);
   };
 
   const onInputTextChanged = (text: string) => {
@@ -259,30 +311,20 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
   };
 
   const setTypingState = (text: string) => {
-    if (userProfile?.id && threadId.current) {
+    if (userProfile?.id && group?.id) {
       // This logic ensures we send typing updates on state transitions, not on every keystroke.
       if (text.length > 0 && !iAmTyping.current) {
         iAmTyping.current = true;
-        sendTypingState(
-          true,
-          userProfile.id,
-          userProfile.firstName,
-          threadId.current,
-        );
+        sendTypingState(true, userProfile.id, userProfile.firstName, group.id);
       } else if (text.length === 0 && iAmTyping.current) {
         iAmTyping.current = false;
-        sendTypingState(
-          false,
-          userProfile.id,
-          userProfile.firstName,
-          threadId.current,
-        );
+        sendTypingState(false, userProfile.id, userProfile.firstName, group.id);
       }
     }
   };
 
-  const renderHeader = (recipient: UserProfile) => {
-    return <ChatHeader userProfile={recipient} />;
+  const renderHeader = (group: Group) => {
+    return <ChatHeader group={group} />;
   };
 
   const renderUser: ListRenderItem<UserProfile> = ({ item }) => {
@@ -290,7 +332,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
       <ListItem
         title={item.name || item.email}
         leftImage={
-          item.photoUrl ? (
+          item.photoUrl.length ? (
             <Avatar
               source={{ uri: item.photoUrl }}
               imageProps={{ resizeMode: 'contain' }}
@@ -334,7 +376,6 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
         onDismiss: () => {
           const current = ([] as UserProfile[]).concat(addedUsers);
           lodash.remove(current, u);
-          console.log(current);
           setAddedUsers(current);
         },
       };
@@ -354,7 +395,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
 
   return (
     <SafeAreaView edges={['left', 'right']} style={{ flex: 1 }}>
-      {newThread && (
+      {!group && (
         <View style={{}}>
           <Incubator.ChipsInput
             style={s.chipInputText}
@@ -390,7 +431,8 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
           />
         </View>
       )}
-      {!searchFocused && addedUsers.length > 0 && userProfile?.id && (
+      {/* {!searchFocused && addedUsers.length > 0 && userProfile?.id && ( */}
+      {userProfile?.id && (
         <Chat
           messages={chatMessages}
           user={{
