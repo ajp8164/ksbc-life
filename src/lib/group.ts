@@ -30,7 +30,11 @@ export const getGroupName = (group: Group) => {
   if (group.name.length > 0) {
     return group.name;
   }
+  return getGroupMembers(group);
+};
 
+// Returns a string of group member names.
+export const getGroupMembers = (group: Group) => {
   let userProfiles = store.getState().cache.userProfiles;
   userProfiles = userProfiles
     .filter(u => {

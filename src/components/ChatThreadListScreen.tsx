@@ -3,6 +3,7 @@ import { Avatar, Button, Icon } from '@rneui/base';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import { FlatList, ListRenderItem, ScrollView, View } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
+import { getGroupMembers, getGroupName } from 'lib/group';
 
 import { AuthContext } from 'lib/auth';
 import { ChatNavigatorParamList } from 'types/navigation';
@@ -12,7 +13,6 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import NoItems from 'components/atoms/NoItems';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { UserRole } from 'types/user';
-import { getGroupName } from 'lib/group';
 import { groupsCollectionChangeListener } from 'firebase/firestore/groups';
 import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
@@ -71,11 +71,12 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
     return (
       <ListItem
         title={group.name || getGroupName(group)}
+        subtitle={group.name.length > 0 ? getGroupMembers(group) : undefined}
         leftImage={
           group.photoUrl.length ? (
             <Avatar
               source={{ uri: group.photoUrl }}
-              imageProps={{ resizeMode: 'contain' }}
+              imageProps={{ resizeMode: 'cover' }}
               containerStyle={theme.styles.avatar}
             />
           ) : (

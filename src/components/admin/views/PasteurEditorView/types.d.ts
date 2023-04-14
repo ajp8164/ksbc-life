@@ -3,7 +3,7 @@ import React from 'react';
 
 export declare type PasteurEditorView = PasteurEditorViewMethods;
 
-declare const PasteurView: React.MemoExoticComponent<
+declare const PasteurEditorView: React.MemoExoticComponent<
   React.ForwardRefExoticComponent<
     PasteurEditorViewProps & React.RefAttributes<PasteurEditorViewMethods>
   >

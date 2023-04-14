@@ -156,6 +156,8 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
       typingNames.current = typingNames.current.length
         ? typingNames.current
         : undefined;
+
+      setGroup(doc);
     });
     return () => {
       subscription();

@@ -18,6 +18,7 @@ export interface AppConfig
   storageFileChat: string;
   storageImageChat: string;
   storageImageChurch: string;
+  storageImageGroups: string;
   storageImageLocations: string;
   storageImagePasteurs: string;
   storageImagePageContentItems: string;
@@ -47,6 +48,7 @@ export const appConfig: AppConfig = {
   storageFileChat: Config.STORAGE_FILE_CHAT || '',
   storageImageChat: Config.STORAGE_IMAGE_CHAT || '',
   storageImageChurch: Config.STORAGE_IMAGE_CHURCH || '',
+  storageImageGroups: Config.STORAGE_IMAGE_GROUPS || '',
   storageImageLocations: Config.STORAGE_IMAGE_LOCATIONS || '',
   storageImagePasteurs: Config.STORAGE_IMAGE_PASTEURS || '',
   storageImagePageContentItems: Config.STORAGE_IMAGE_SCREEN_CONTENT_ITEMS || '',
