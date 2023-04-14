@@ -2,11 +2,10 @@ import { AppTheme, useTheme } from 'theme';
 import { Avatar, Button, Icon } from '@rneui/base';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import { FlatList, ListRenderItem, ScrollView, View } from 'react-native';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import { AuthContext } from 'lib/auth';
 import { ChatNavigatorParamList } from 'types/navigation';
-import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { Group } from 'types/group';
 import InfoMessage from 'components/atoms/InfoMessage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -31,9 +30,7 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
   const auth = useContext(AuthContext);
   const userProfile = useSelector(selectUserProfile);
 
-  const allLoaded = useRef(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const lastDocument = useRef<FirebaseFirestoreTypes.DocumentData>();
+  const [isLoading, setIsLoading] = useState(true);
   const [groups, setGroups] = useState<Group[]>([]);
 
   useEffect(() => {
@@ -58,25 +55,19 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
   }, []);
 
   useEffect(() => {
-    const subscription = groupsCollectionChangeListener(
-      snapshot => {
-        const updated: Group[] = [];
-        snapshot.docs.forEach(d => {
-          updated.push({ ...d.data(), id: d.id } as Group);
-        });
-        setGroups(updated);
-        lastDocument.current = snapshot.docs[snapshot.docs.length - 1];
-        allLoaded.current = false;
-      },
-      { lastDocument: lastDocument.current },
-    );
+    const subscription = groupsCollectionChangeListener(snapshot => {
+      const updated: Group[] = [];
+      snapshot.docs.forEach(d => {
+        updated.push({ ...d.data(), id: d.id } as Group);
+      });
+      setGroups(updated);
+      isLoading ? setIsLoading(false) : null;
+    });
     return subscription;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const renderGroup: ListRenderItem<Group> = ({ item: group, index }) => {
-    // if (!users || !recipient.id || recipient.role === UserRole.Anonymous) {
-    //   return null;
-    // }
     return (
       <ListItem
         title={group.name || getGroupName(group)}
@@ -115,7 +106,7 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
     if (isLoading) return null;
     return (
       <View style={s.emptyListContainer}>
-        <NoItems title={'No messages yet'} />
+        <NoItems title={'No groups'} />
       </View>
     );
   };

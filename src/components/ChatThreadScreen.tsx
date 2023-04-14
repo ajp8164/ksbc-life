@@ -57,6 +57,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
   const [group, setGroup] = useState(route.params.group);
   const userProfile = useSelector(selectUserProfile);
   const isInitializing = useRef(true);
+  const [isLoading, setIsLoading] = useState(true);
   const isTyping = useRef(false);
   const typingNames = useRef<string | undefined>();
   const iAmTyping = useRef(false);
@@ -118,6 +119,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
           }
 
           setChatMessages(messages);
+          isLoading && setIsLoading(false);
         }
       },
     );
@@ -431,8 +433,9 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
           />
         </View>
       )}
-      {/* {!searchFocused && addedUsers.length > 0 && userProfile?.id && ( */}
-      {userProfile?.id && (
+      {!isLoading &&
+      userProfile?.id &&
+      (group || (!group && !searchFocused && addedUsers.length > 0)) ? (
         <Chat
           messages={chatMessages}
           user={{
@@ -453,7 +456,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
           theme={chatTheme(theme, { tabBarHeight })}
           emptyState={renderListEmptyComponent}
         />
-      )}
+      ) : null}
       <UserPickerModal
         ref={userPickerModalRef}
         multiple
