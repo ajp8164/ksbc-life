@@ -88,7 +88,7 @@ export const ChatHeader = ({
               ]}
             />
           ) : null}
-          <Text style={s.title}>{group && getGroupName(group)}</Text>
+          <Text style={s.title}>{group && `${getGroupName(group)} >`}</Text>
         </View>
       </TouchableWithoutFeedback>
     );
