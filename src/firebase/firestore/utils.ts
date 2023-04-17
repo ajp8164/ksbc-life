@@ -135,7 +135,7 @@ export const collectionChangeListener = (
   handler: (
     snapshot: FirebaseFirestoreTypes.QuerySnapshot<FirebaseFirestoreTypes.DocumentData>,
   ) => void,
-  opts: {
+  opts?: {
     lastDocument?: FirebaseFirestoreTypes.DocumentData;
     limit?: number;
     orderBy?: QueryOrderBy;
@@ -146,7 +146,7 @@ export const collectionChangeListener = (
     };
   },
 ): (() => void) => {
-  const { lastDocument, limit, orderBy, where, subCollection } = opts;
+  const { lastDocument, limit, orderBy, where, subCollection } = opts || {};
 
   let query = firestore().collection(collectionPath);
 
