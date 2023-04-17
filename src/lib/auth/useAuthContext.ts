@@ -7,7 +7,7 @@ import { DateTime } from 'luxon';
 import { SignInModalMethods } from 'components/modals/SignInModal';
 import { UserRole } from 'types/user';
 import { appConfig } from 'config';
-import { cacheUsers } from 'app/cacheUsers';
+import { cacheUsers } from 'firebase/firestore/cache';
 import { deleteUser } from 'firebase/firestore/users';
 import lodash from 'lodash';
 import { selectUser } from 'store/selectors/userSelectors';
