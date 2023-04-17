@@ -30,6 +30,7 @@ import { Incubator } from 'react-native-ui-lib';
 import { ListItem } from '@react-native-ajp-elements/ui';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import NoItems from 'components/atoms/NoItems';
+import { PreviewData } from '@flyerhq/react-native-link-preview';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { UserPickerModal } from 'components/modals/UserPickerModal';
 import { UserProfile } from 'types/user';
@@ -306,6 +307,17 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
     sendTextMessage(message, userProfile, group || newGroup!);
   };
 
+  const handlePreviewDataFetched = ({
+    message,
+    previewData,
+  }: {
+    message: MessageType.Text;
+    previewData: PreviewData;
+  }) => {
+    if (!group || !group.id) return;
+    updateChatMessage({ previewData }, message.id, group.id);
+  };
+
   const onInputTextChanged = (text: string) => {
     setTypingState(text);
     // The first time text is entered we declare that initial message loading is complete.
@@ -427,17 +439,11 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
             data={filteredUsers}
             renderItem={renderUser}
             keyExtractor={item => `${item.id}`}
-            style={{
-              height:
-                searchFocused || addedUsers.length === 0 ? '100%' : undefined,
-            }}
             contentInsetAdjustmentBehavior={'automatic'}
           />
         </View>
       )}
-      {!isLoading &&
-      userProfile?.id &&
-      (group || (!group && !searchFocused && addedUsers.length > 0)) ? (
+      {(!isLoading || !group) && userProfile?.id && (
         <Chat
           messages={chatMessages}
           user={{
@@ -453,12 +459,14 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
           onAttachmentPress={sendAttachment}
           onInputTextChanged={onInputTextChanged}
           onMessagePress={handleMessagePress}
-          showUserAvatars={true} //  Only if group
+          onPreviewDataFetched={handlePreviewDataFetched}
+          showUserAvatars={true} // Only if group
           showUserNames={'outside'}
+          disableSend={!group && !addedUsers.length}
           theme={chatTheme(theme, { tabBarHeight })}
           emptyState={renderListEmptyComponent}
         />
-      ) : null}
+      )}
       <UserPickerModal
         ref={userPickerModalRef}
         multiple
