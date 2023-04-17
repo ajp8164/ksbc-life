@@ -7,6 +7,7 @@ import { DateTime } from 'luxon';
 import { SignInModalMethods } from 'components/modals/SignInModal';
 import { UserRole } from 'types/user';
 import { appConfig } from 'config';
+import { cacheUsers } from 'app/cacheUsers';
 import { deleteUser } from 'firebase/firestore/users';
 import lodash from 'lodash';
 import { selectUser } from 'store/selectors/userSelectors';
@@ -61,7 +62,7 @@ export const useAuthContext = (
 
       authorizeUserDebounced.current(credentials, {
         onError: onAuthError,
-        onAuthorized: dismiss,
+        onAuthorized: onAuthorized,
         onUnauthorized: onNotAuthorized,
       });
     });
@@ -93,6 +94,13 @@ export const useAuthContext = (
         { cancelable: false },
       );
     }
+  };
+
+  const onAuthorized = () => {
+    dismiss();
+
+    // Cache data from firestore.
+    cacheUsers();
   };
 
   const onNotAuthorized = (accountNotActive?: boolean) => {
