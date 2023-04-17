@@ -66,6 +66,8 @@ export interface ChatProps extends ChatTopLevelProps {
   dateFormat?: string;
   /** Disable automatic image preview on tap. */
   disableImageGallery?: boolean;
+  /** Disable the send button. */
+  disableSend?: boolean;
   /** Allows you to change what the user sees when there are no messages.
    * `emptyChatPlaceholder` and `emptyChatPlaceholderText` are ignored
    * in this case. */
@@ -113,6 +115,7 @@ export const Chat = ({
   customDateHeaderText,
   dateFormat,
   disableImageGallery,
+  disableSend,
   emptyState,
   enableAnimation,
   flatListProps,
@@ -447,6 +450,7 @@ export const Chat = ({
                 <Input
                   {...{
                     ...unwrap(inputProps),
+                    disableSend,
                     isAttachmentUploading,
                     onAttachmentPress,
                     onSendPress,

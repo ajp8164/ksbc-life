@@ -13,6 +13,8 @@ import { SendButton } from '../SendButton';
 import styles from './styles';
 
 export interface InputTopLevelProps {
+  /** Disables the send button. */
+  disableSend?: boolean;
   /** Whether attachment is uploading. Will replace attachment button with a
    * {@link CircularActivityIndicator}. Since we don't have libraries for
    * managing media in dependencies we have no way of knowing if
@@ -42,6 +44,7 @@ export type InputProps = InputTopLevelProps & InputAdditionalProps;
  * send buttons inside. By default hides send button when text input is empty. */
 export const Input = ({
   attachmentButtonProps,
+  disableSend,
   isAttachmentUploading,
   onAttachmentPress,
   onLayout,
@@ -109,7 +112,7 @@ export const Input = ({
       />
       {sendButtonVisibilityMode === 'always' ||
       (sendButtonVisibilityMode === 'editing' && user && value.trim()) ? (
-        <SendButton onPress={handleSend} />
+        <SendButton disabled={disableSend} onPress={handleSend} />
       ) : null}
     </View>
   );

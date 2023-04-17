@@ -14,11 +14,13 @@ export interface SendButtonPropsAdditionalProps {
 }
 
 export interface SendButtonProps extends SendButtonPropsAdditionalProps {
+  disabled?: boolean;
   /** Callback for send button tap event */
   onPress: () => void;
 }
 
 export const SendButton = ({
+  disabled = false,
   onPress,
   touchableOpacityProps,
 }: SendButtonProps) => {
@@ -36,7 +38,8 @@ export const SendButton = ({
       accessibilityRole="button"
       {...touchableOpacityProps}
       onPress={handlePress}
-      style={styles.sendButton}>
+      disabled={disabled}
+      style={[styles.sendButton, disabled ? styles.disabled : {}]}>
       {theme.icons?.sendButtonIcon?.() ?? (
         <Image
           source={require('../../assets/icon-send.png')}
@@ -48,6 +51,7 @@ export const SendButton = ({
 };
 
 const styles = StyleSheet.create({
+  disabled: { opacity: 0.25 },
   sendButton: {
     marginLeft: 16,
   },

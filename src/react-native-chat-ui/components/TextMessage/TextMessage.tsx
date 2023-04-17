@@ -1,11 +1,11 @@
 import * as React from 'react';
 
+import { Dimensions, Linking, Text, View } from 'react-native';
 import {
   LinkPreview,
   PreviewData,
   REGEX_LINK,
 } from '@flyerhq/react-native-link-preview';
-import { Linking, Text, View } from 'react-native';
 import { MessageType, UsernameLocation } from '../../types';
 import {
   ThemeContext,
@@ -47,7 +47,11 @@ export const TextMessage = ({
 }: TextMessageProps) => {
   const theme = React.useContext(ThemeContext);
   const user = React.useContext(UserContext);
-  const [previewData, setPreviewData] = React.useState(message.previewData);
+  const previewData = React.useRef(
+    message.previewData && Object.keys(message.previewData).length > 0
+      ? message.previewData
+      : undefined,
+  );
   const { descriptionText, headerText, titleText, text, textContainer } =
     styles({
       message,
@@ -60,7 +64,7 @@ export const TextMessage = ({
   };
 
   const handlePreviewDataFetched = (data: PreviewData) => {
-    setPreviewData(data);
+    previewData.current = data;
     onPreviewDataFetched?.({
       // It's okay to cast here since we know it is a text message
       // type-coverage:ignore-next-line
@@ -133,11 +137,14 @@ export const TextMessage = ({
     !!onPreviewDataFetched &&
     REGEX_LINK.test(message.text.toLowerCase()) ? (
     <LinkPreview
-      containerStyle={{ width: previewData?.image ? messageWidth : undefined }}
+      containerStyle={{
+        width: previewData.current?.image ? messageWidth : undefined,
+        minWidth: Math.min(messageWidth, Dimensions.get('window').width * 0.45),
+      }}
       enableAnimation={enableAnimation}
       header={showName === 'inside' ? getUserName(message.author) : undefined}
       onPreviewDataFetched={handlePreviewDataFetched}
-      previewData={previewData}
+      previewData={previewData.current}
       renderDescription={renderPreviewDescription}
       renderHeader={renderPreviewHeader}
       renderText={renderPreviewText}
