@@ -76,7 +76,7 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
         subtitle={
           group.name.length > 0 ? getGroupMembersStr(group.members) : undefined
         }
-        leftImage={<ChatAvatar group={group} />}
+        leftImage={<ChatAvatar group={group} size={'medium'} />}
         position={[
           index === 0 ? 'first' : undefined,
           index === groups.length - 1 ? 'last' : undefined,

@@ -35,7 +35,7 @@ const UsersView = React.forwardRef<UsersView, UsersViewProps>((props, ref) => {
       <ListItemCheckbox
         title={userProfile.name || userProfile.email}
         titleStyle={{ left: 20 }}
-        leftImage={<ChatAvatar userProfile={userProfile} />}
+        leftImage={<ChatAvatar userProfile={userProfile} size={'medium'} />}
         checkedIcon={'check'}
         checkIconType={'material-community'}
         uncheckedIcon={'checkbox-blank-outline'}

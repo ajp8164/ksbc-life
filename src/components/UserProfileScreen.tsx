@@ -73,8 +73,8 @@ const UserProfileScreen = ({ navigation }: Props) => {
         contentInsetAdjustmentBehavior={'automatic'}>
         <ChatAvatar
           userProfile={userProfile}
-          avatarStyle={{ ...theme.styles.avatarGiant, ...s.avatar }}
-          titleStyle={theme.styles.avatarTitleGiant}
+          size={'giant'}
+          avatarStyle={s.avatar}
         />
         {userProfile?.name && (
           <Text style={s.profileName}>{userProfile.name}</Text>

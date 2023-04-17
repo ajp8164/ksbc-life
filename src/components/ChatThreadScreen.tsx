@@ -1,5 +1,5 @@
 import { AppTheme, useTheme } from 'theme';
-import { Avatar, Button, Icon } from '@rneui/base';
+import { Button, Icon } from '@rneui/base';
 import { Chat, MessageType } from '@flyerhq/react-native-chat-ui';
 import { FirestoreMessageType, SearchCriteria, SearchScope } from 'types/chat';
 import { FlatList, Keyboard, ListRenderItem, View } from 'react-native';
@@ -22,6 +22,7 @@ import {
 import { getGroupAvatarColor, getGroupMembersStr } from 'lib/group';
 import { getUsers, updateUser } from 'firebase/firestore/users';
 
+import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { ChatHeader } from 'components/molecules/ChatHeader';
 import { ChatNavigatorParamList } from 'types/navigation';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
@@ -343,24 +344,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
     return (
       <ListItem
         title={item.name || item.email}
-        leftImage={
-          item.photoUrl.length ? (
-            <Avatar
-              source={{ uri: item.photoUrl }}
-              imageProps={{ resizeMode: 'contain' }}
-              containerStyle={theme.styles.avatarMedium}
-            />
-          ) : (
-            <Avatar
-              title={item.avatar.title}
-              titleStyle={[theme.styles.avatarTitleMedium]}
-              containerStyle={{
-                ...theme.styles.avatarMedium,
-                backgroundColor: item.avatar.color,
-              }}
-            />
-          )
-        }
+        leftImage={<ChatAvatar userProfile={item} size={'medium'} />}
         rightImage={false}
         onPress={() => {
           setAddedUsers(addedUsers.concat(item));

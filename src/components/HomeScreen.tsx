@@ -1,4 +1,3 @@
-import { Avatar, Button, Icon } from '@rneui/base';
 import {
   HomeNavigatorParamList,
   TabNavigatorParamList,
@@ -11,6 +10,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { TabBar, TabView } from 'react-native-tab-view';
 
 import { AuthContext } from 'lib/auth';
+import { Button } from '@rneui/base';
+import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { CompositeScreenProps } from '@react-navigation/core';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import PageContentItemsView from 'components/views/PageContentItemsView';
@@ -106,29 +107,10 @@ const HomeScreen = ({ navigation }: Props) => {
           <Button
             type={'clear'}
             icon={
-              userProfile && userProfile.photoUrl?.length ? (
-                <Avatar
-                  source={{ uri: userProfile.photoUrl }}
-                  imageProps={{ resizeMode: 'contain' }}
-                  containerStyle={theme.styles.avatarSmall}
-                />
-              ) : userProfile?.role === UserRole.Anonymous ? (
-                <Icon
-                  name="account-circle"
-                  type={'material-community'}
-                  color={theme.colors.brandSecondary}
-                  size={28}
-                />
-              ) : (
-                <Avatar
-                  title={userProfile?.avatar.title}
-                  titleStyle={theme.styles.avatarTitleSmall}
-                  containerStyle={{
-                    ...theme.styles.avatarSmall,
-                    backgroundColor: userProfile?.avatar.color,
-                  }}
-                />
-              )
+              <ChatAvatar
+                userProfile={userProfile}
+                anonymous={userProfile?.role === UserRole.Anonymous}
+              />
             }
             onPress={doAccountAction}
           />

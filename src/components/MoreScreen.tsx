@@ -9,7 +9,7 @@ import { UserProfile, UserRole } from 'types/user';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { AuthContext } from 'lib/auth';
-import { Avatar } from '@rneui/base';
+import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { CompositeScreenProps } from '@react-navigation/core';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ScrollView } from 'react-native';
@@ -70,22 +70,7 @@ const MoreScreen = ({ navigation, route }: Props) => {
         <ListItem
           title={userProfile.name || userProfile.email || 'My Profile'}
           leftImage={
-            userProfile.photoUrl.length ? (
-              <Avatar
-                source={{ uri: userProfile.photoUrl }}
-                imageProps={{ resizeMode: 'contain' }}
-                containerStyle={s.avatar}
-              />
-            ) : (
-              <Avatar
-                title={userProfile?.avatar.title}
-                titleStyle={theme.styles.avatarTitleSmall}
-                containerStyle={[
-                  s.avatar,
-                  { backgroundColor: userProfile?.avatar.color },
-                ]}
-              />
-            )
+            <ChatAvatar userProfile={userProfile} avatarStyle={s.avatar} />
           }
           position={['first', 'last']}
           onPress={() => navigation.navigate('UserProfile')}
@@ -131,9 +116,8 @@ const MoreScreen = ({ navigation, route }: Props) => {
   );
 };
 
-const useStyles = makeStyles((_theme, theme: AppTheme) => ({
+const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
   avatar: {
-    ...theme.styles.avatarSmall,
     left: -3,
     top: 1,
   },

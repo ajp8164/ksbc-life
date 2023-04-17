@@ -10,15 +10,19 @@ import { useSelector } from 'react-redux';
 import { useTheme } from 'theme';
 
 interface ChatAvatarInterface {
+  anonymous?: boolean;
   avatarStyle?: ViewStyle;
   group?: Group;
+  size?: 'small' | 'medium' | 'large' | 'giant';
   titleStyle?: TextStyle;
   userProfile?: UserProfile;
 }
 
 export const ChatAvatar = ({
+  anonymous,
   avatarStyle,
   group,
+  size = 'small',
   titleStyle,
   userProfile,
 }: ChatAvatarInterface) => {
@@ -27,22 +31,40 @@ export const ChatAvatar = ({
   const me = useSelector(selectUserProfile);
   const userProfiles = useSelector(selectUserProfilesCache);
 
+  const _avatarStyle =
+    size === 'small'
+      ? theme.styles.avatarSmall
+      : size === 'medium'
+      ? theme.styles.avatarMedium
+      : size === 'large'
+      ? theme.styles.avatarLarge
+      : theme.styles.avatarGiant;
+
+  const _titleStyle =
+    size === 'small'
+      ? theme.styles.avatarTitleSmall
+      : size === 'medium'
+      ? theme.styles.avatarTitleMedium
+      : size === 'large'
+      ? theme.styles.avatarTitleLarge
+      : theme.styles.avatarTitleGiant;
+
   const renderUserAvatar = (userProfile?: UserProfile) => {
     if (userProfile?.photoUrl.length) {
       return (
         <Avatar
           source={{ uri: userProfile.photoUrl }}
           imageProps={{ resizeMode: 'contain' }}
-          containerStyle={[theme.styles.avatarMedium, avatarStyle]}
+          containerStyle={[_avatarStyle, avatarStyle]}
         />
       );
     } else {
       return (
         <Avatar
           title={userProfile?.avatar.title}
-          titleStyle={[theme.styles.avatarTitleMedium, titleStyle]}
+          titleStyle={[_titleStyle, titleStyle]}
           containerStyle={{
-            ...theme.styles.avatarMedium,
+            ..._avatarStyle,
             backgroundColor:
               userProfile?.avatar.color || theme.colors.subtleGray,
             ...avatarStyle,
@@ -53,6 +75,21 @@ export const ChatAvatar = ({
   };
 
   // Request is for single user (no group)
+
+  if (anonymous) {
+    return (
+      <Avatar
+        icon={{
+          name: 'account-circle',
+          type: 'material-community',
+          color: theme.colors.brandSecondary,
+          size:
+            (avatarStyle?.width as number) || (_avatarStyle.width as number),
+        }}
+        containerStyle={{ ..._avatarStyle, ...avatarStyle }}
+      />
+    );
+  }
 
   if (!group) {
     return renderUserAvatar(userProfile);
@@ -65,7 +102,7 @@ export const ChatAvatar = ({
       <Avatar
         source={{ uri: group.photoUrl }}
         imageProps={{ resizeMode: 'cover' }}
-        containerStyle={[theme.styles.avatarSmall, avatarStyle]}
+        containerStyle={[_avatarStyle, avatarStyle]}
       />
     );
   }
@@ -73,9 +110,9 @@ export const ChatAvatar = ({
   if (group.members.length > 2) {
     <Avatar
       title={group?.avatar.title}
-      titleStyle={[theme.styles.avatarTitleMedium, titleStyle]}
+      titleStyle={[_titleStyle, titleStyle]}
       containerStyle={{
-        ...theme.styles.avatarSmall,
+        ..._avatarStyle,
         backgroundColor: group?.avatar.color,
         ...avatarStyle,
       }}
