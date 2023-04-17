@@ -57,8 +57,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
   const tabBarHeight = useBottomTabBarHeight();
   const [group, setGroup] = useState(route.params.group);
   const userProfile = useSelector(selectUserProfile);
-  const isInitializing = useRef(true);
-  const [isLoading, setIsLoading] = useState(true);
+  const initialized = useRef(false);
   const isTyping = useRef(false);
   const typingNames = useRef<string | undefined>();
   const iAmTyping = useRef(false);
@@ -75,10 +74,9 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
   const userPickerModalRef = useRef<UserPickerModal>(null);
 
   useEffect(() => {
-    if (!group || !group.id) return;
-
+    if (!group?.id) return;
     const subscription = chatMessagesCollectionChangeListener(
-      group.id,
+      group?.id,
       snapshot => {
         if (snapshot.metadata.hasPendingWrites || snapshot.empty) return;
 
@@ -111,32 +109,34 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
           } else if (messages[0].status !== 'seen') {
             messages[0].status = 'seen';
 
-            updateChatMessage(
-              { status: messages[0].status },
-              messages[0].id,
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              group.id!,
-            );
+            group?.id &&
+              updateChatMessage(
+                { status: messages[0].status },
+                messages[0].id,
+                group.id,
+              );
           }
 
           setChatMessages(messages);
-          isLoading && setIsLoading(false);
+          initialized.current = true;
         }
       },
     );
-    return () => {
-      subscription();
-    };
+    return subscription;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [group]);
+  }, [group?.id]);
 
   useEffect(() => {
-    if (!group || !group.id) return;
+    if (!group?.id) return;
 
     const subscription = groupsDocumentChangeListener(group.id, snapshot => {
       if (snapshot.metadata.hasPendingWrites || !snapshot.exists) return;
 
-      const doc = snapshot.data() as Group;
+      const doc = {
+        ...snapshot.data(),
+        id: snapshot.id,
+      } as Group;
+
       const typingState = (doc.isTyping as { [key in string]: string }[]) || [];
 
       // Set typing state on our ui.
@@ -169,7 +169,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [group?.id]);
 
   useEffect(() => {
     if (group) {
@@ -314,16 +314,12 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
     message: MessageType.Text;
     previewData: PreviewData;
   }) => {
-    if (!group || !group.id) return;
+    if (!group?.id) return;
     updateChatMessage({ previewData }, message.id, group.id);
   };
 
   const onInputTextChanged = (text: string) => {
     setTypingState(text);
-    // The first time text is entered we declare that initial message loading is complete.
-    if (text.length > 0) {
-      isInitializing.current = false;
-    }
   };
 
   const setTypingState = (text: string) => {
@@ -443,7 +439,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
           />
         </View>
       )}
-      {(!isLoading || !group) && userProfile?.id && (
+      {userProfile?.id && (
         <Chat
           messages={chatMessages}
           user={{
@@ -463,6 +459,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
           showUserAvatars={true} // Only if group
           showUserNames={'outside'}
           disableSend={!group && !addedUsers.length}
+          sendButtonVisibilityMode={'always'}
           theme={chatTheme(theme, { tabBarHeight })}
           emptyState={renderListEmptyComponent}
         />
