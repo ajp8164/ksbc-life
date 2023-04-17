@@ -19,7 +19,7 @@ import {
   sendTextMessage,
   useSendAttachment,
 } from 'lib/chat';
-import { createGroupName, getGroupAvatarColor } from 'lib/group';
+import { getGroupAvatarColor, getGroupMembersStr } from 'lib/group';
 import { getUsers, updateUser } from 'firebase/firestore/users';
 
 import { ChatHeader } from 'components/molecules/ChatHeader';
@@ -226,11 +226,11 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
     const memberIds = members.map(u => {
       return u.id;
     }) as string[];
-    const groupName = createGroupName(members);
+    const groupName = getGroupMembersStr(memberIds); // Exclude me.
 
     const newGroup = {
       createdBy: userProfile?.id,
-      name: '',
+      name: '', // A custom name other than a list of members.
       type: 'private',
       members: memberIds,
       leaders: [userProfile?.id],
