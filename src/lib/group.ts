@@ -30,16 +30,17 @@ export const getGroupName = (group: Group) => {
   if (group.name.length > 0) {
     return group.name;
   }
-  return getGroupMembers(group);
+  return getGroupMembersStr(group);
 };
 
 // Returns a string of group member names.
-export const getGroupMembers = (group: Group) => {
+export const getGroupMembersStr = (group: Group) => {
+  const me = store.getState().user.profile;
   let userProfiles = store.getState().cache.userProfiles;
   userProfiles = userProfiles
     .filter(u => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return group.members.includes(u.id!);
+      return group.members.includes(u.id!) && u.id !== me?.id;
     })
     .sort((a, b) => {
       return a.firstName < b.firstName ? -1 : 1;
