@@ -1,11 +1,12 @@
 import { AppTheme, useTheme } from 'theme';
-import { Avatar, Button, Icon } from '@rneui/base';
+import { Button, Icon } from '@rneui/base';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import { FlatList, ListRenderItem, ScrollView, View } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
-import { getGroupMembers, getGroupName } from 'lib/group';
+import { getGroupMembersStr, getGroupName } from 'lib/group';
 
 import { AuthContext } from 'lib/auth';
+import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { ChatNavigatorParamList } from 'types/navigation';
 import { Group } from 'types/group';
 import InfoMessage from 'components/atoms/InfoMessage';
@@ -71,25 +72,8 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
     return (
       <ListItem
         title={group.name || getGroupName(group)}
-        subtitle={group.name.length > 0 ? getGroupMembers(group) : undefined}
-        leftImage={
-          group.photoUrl.length ? (
-            <Avatar
-              source={{ uri: group.photoUrl }}
-              imageProps={{ resizeMode: 'cover' }}
-              containerStyle={theme.styles.avatar}
-            />
-          ) : (
-            <Avatar
-              title={group?.avatar.title}
-              titleStyle={[theme.styles.avatarTitle]}
-              containerStyle={{
-                ...theme.styles.avatar,
-                backgroundColor: group?.avatar.color,
-              }}
-            />
-          )
-        }
+        subtitle={group.name.length > 0 ? getGroupMembersStr(group) : undefined}
+        leftImage={<ChatAvatar group={group} />}
         position={[
           index === 0 ? 'first' : undefined,
           index === groups.length - 1 ? 'last' : undefined,

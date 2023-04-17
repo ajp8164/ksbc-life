@@ -1,8 +1,9 @@
 import { AppTheme, useTheme } from 'theme';
-import { Avatar, Button, Icon } from '@rneui/base';
+import { Button, Icon } from '@rneui/base';
 import { Header, HeaderBackButton } from '@react-navigation/elements';
 import { Text, TouchableWithoutFeedback, View } from 'react-native';
 
+import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { EditGroupModal } from 'components/modals/EditGroupModal';
 import { Group } from 'types/group';
 import { fontSizes } from '@react-native-ajp-elements/ui';
@@ -16,7 +17,7 @@ interface ChatHeaderInterface {
   buttonIconColor?: string;
   buttonIconSize?: number;
   buttonIconType?: string;
-  group?: Group;
+  group: Group;
   onPressButton?: () => void;
 }
 
@@ -71,23 +72,7 @@ export const ChatHeader = ({
     return (
       <TouchableWithoutFeedback onPress={editGroupModalRef.current?.present}>
         <View style={s.container}>
-          {group?.photoUrl.length ? (
-            <Avatar
-              source={{ uri: group.photoUrl }}
-              imageProps={{ resizeMode: 'cover' }}
-              containerStyle={[theme.styles.avatar, s.avatar]}
-            />
-          ) : group ? (
-            <Avatar
-              title={group?.avatar.title}
-              titleStyle={[theme.styles.avatarTitle, s.avatarTitle]}
-              containerStyle={[
-                theme.styles.avatar,
-                s.avatar,
-                { backgroundColor: group?.avatar.color },
-              ]}
-            />
-          ) : null}
+          <ChatAvatar group={group} />
           <Text style={s.title}>{group && `${getGroupName(group)} >`}</Text>
         </View>
       </TouchableWithoutFeedback>
