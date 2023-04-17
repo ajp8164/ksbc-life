@@ -10,7 +10,6 @@ import React, { useContext, useEffect, useState } from 'react';
 import { TabBar, TabView } from 'react-native-tab-view';
 
 import { AuthContext } from 'lib/auth';
-import { Button } from '@rneui/base';
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { CompositeScreenProps } from '@react-navigation/core';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -62,12 +61,16 @@ const HomeScreen = ({ navigation }: Props) => {
   ]);
 
   useEffect(() => {
-    setAvatar();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    setAvatar();
+    navigation.setOptions({
+      // eslint-disable-next-line react/no-unstable-nested-components
+      headerRight: () => (
+        <ChatAvatar
+          userProfile={userProfile}
+          anonymous={userProfile?.role === UserRole.Anonymous}
+          onPress={doAccountAction}
+        />
+      ),
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userProfile]);
 
@@ -96,26 +99,6 @@ const HomeScreen = ({ navigation }: Props) => {
   const sortContentItems = (items: PageContentItem[]) => {
     return items.sort((a, b) => {
       return a.ordinal - b.ordinal;
-    });
-  };
-
-  const setAvatar = () => {
-    navigation.setOptions({
-      // eslint-disable-next-line react/no-unstable-nested-components
-      headerRight: () => (
-        <>
-          <Button
-            type={'clear'}
-            icon={
-              <ChatAvatar
-                userProfile={userProfile}
-                anonymous={userProfile?.role === UserRole.Anonymous}
-              />
-            }
-            onPress={doAccountAction}
-          />
-        </>
-      ),
     });
   };
 

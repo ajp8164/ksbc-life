@@ -1,6 +1,6 @@
+import { Avatar, Icon } from '@rneui/base';
 import { TextStyle, ViewStyle } from 'react-native';
 
-import { Avatar } from '@rneui/base';
 import { Group } from 'types/group';
 import { UserProfile } from 'types/user';
 import lodash from 'lodash';
@@ -13,6 +13,7 @@ interface ChatAvatarInterface {
   anonymous?: boolean;
   avatarStyle?: ViewStyle;
   group?: Group;
+  onPress?: () => void;
   size?: 'small' | 'medium' | 'large' | 'giant';
   titleStyle?: TextStyle;
   userProfile?: UserProfile;
@@ -22,6 +23,7 @@ export const ChatAvatar = ({
   anonymous,
   avatarStyle,
   group,
+  onPress,
   size = 'small',
   titleStyle,
   userProfile,
@@ -56,6 +58,7 @@ export const ChatAvatar = ({
           source={{ uri: userProfile.photoUrl }}
           imageProps={{ resizeMode: 'contain' }}
           containerStyle={[_avatarStyle, avatarStyle]}
+          onPress={onPress}
         />
       );
     } else {
@@ -69,6 +72,7 @@ export const ChatAvatar = ({
               userProfile?.avatar.color || theme.colors.subtleGray,
             ...avatarStyle,
           }}
+          onPress={onPress}
         />
       );
     }
@@ -77,19 +81,19 @@ export const ChatAvatar = ({
   // Request is for single user (no group)
 
   if (anonymous) {
+    // Seems to be a bug which allows the previous avatar image to remain
+    // displayed. Use an icon to avoid.
     return (
-      <Avatar
-        icon={{
-          name: 'account-circle',
-          type: 'material-community',
-          color: theme.colors.brandSecondary,
-          size:
-            (avatarStyle?.width as number) || (_avatarStyle.width as number),
-        }}
-        containerStyle={{ ..._avatarStyle, ...avatarStyle }}
+      <Icon
+        name={'account-circle'}
+        type={'material-community'}
+        color={theme.colors.brandSecondary}
+        size={(avatarStyle?.width as number) || (_avatarStyle.width as number)}
+        onPress={onPress}
       />
     );
   }
+  console.log('HERE', onPress);
 
   if (!group) {
     return renderUserAvatar(userProfile);
@@ -103,6 +107,7 @@ export const ChatAvatar = ({
         source={{ uri: group.photoUrl }}
         imageProps={{ resizeMode: 'cover' }}
         containerStyle={[_avatarStyle, avatarStyle]}
+        onPress={onPress}
       />
     );
   }
@@ -116,6 +121,7 @@ export const ChatAvatar = ({
         backgroundColor: group?.avatar.color,
         ...avatarStyle,
       }}
+      onPress={onPress}
     />;
   }
 
