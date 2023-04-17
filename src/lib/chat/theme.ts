@@ -1,15 +1,12 @@
-import { Theme, defaultTheme } from '@flyerhq/react-native-chat-ui';
-
 import { AppTheme } from 'theme';
+import { Theme } from '@flyerhq/react-native-chat-ui';
 
 export const chatTheme = (
   theme: AppTheme,
   extra: { tabBarHeight: number },
 ): Theme => {
   return {
-    ...defaultTheme,
     avatar: {
-      ...defaultTheme.avatar,
       text: {
         ...theme.styles.textSmall,
         ...theme.styles.textBold,
@@ -17,24 +14,19 @@ export const chatTheme = (
       },
     },
     bubble: {
-      ...defaultTheme.bubble,
       captionTextLeft: {
-        ...defaultTheme.bubble.captionTextLeft,
         ...theme.styles.textSmall,
         color: theme.colors.blackTransparentMid,
       },
       captionTextRight: {
-        ...defaultTheme.bubble.captionTextRight,
         ...theme.styles.textSmall,
         color: theme.colors.whiteTransparentMid,
       },
       contentLeftContainer: {
-        ...defaultTheme.bubble.contentLeftContainer,
         backgroundColor: theme.colors.brandSecondary,
         borderRadius: 20,
       },
       contentRightContainer: {
-        ...defaultTheme.bubble.contentRightContainer,
         backgroundColor: theme.colors.brandPrimary,
         borderRadius: 20,
       },
@@ -48,50 +40,39 @@ export const chatTheme = (
         color: theme.colors.textInv,
       },
       headerText: {
-        ...defaultTheme.bubble.headerText,
         ...theme.styles.textTiny,
       },
       textLeftContainer: {
-        ...defaultTheme.bubble.textLeftContainer,
         marginHorizontal: 15,
         marginVertical: 8,
       },
       textRightContainer: {
-        ...defaultTheme.bubble.textRightContainer,
         marginHorizontal: 15,
         marginVertical: 8,
       },
     },
-    colors: {
-      ...defaultTheme.colors,
-    },
+    colors: {},
     composer: {
-      ...defaultTheme.composer,
       activityIndicator: {
-        ...defaultTheme.composer.activityIndicator,
         color: theme.colors.brandPrimary,
       },
       attachmentIcon: {
-        ...defaultTheme.composer.attachmentIcon,
         tintColor: theme.colors.brandPrimary,
       },
       contentOffsetKeyboardOpened: 11,
       container: {
-        ...defaultTheme.composer.container,
         backgroundColor: theme.colors.subtleGray,
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
         paddingVertical: 10,
       },
       inputStyle: {
-        ...defaultTheme.composer.inputStyle,
         ...theme.styles.textNormal,
         backgroundColor: theme.colors.white,
         color: theme.colors.text,
         borderRadius: 5,
       },
       sendIcon: {
-        ...defaultTheme.composer.attachmentIcon,
         tintColor: theme.colors.brandPrimary,
       },
       tabBarHeight: extra.tabBarHeight,
@@ -103,13 +84,10 @@ export const chatTheme = (
       },
     },
     list: {
-      ...defaultTheme.list,
       activityIndicator: {
-        ...defaultTheme.list.activityIndicator,
         color: theme.colors.brandPrimary,
       },
       container: {
-        ...defaultTheme.list.container,
         backgroundColor: theme.colors.white,
       },
       contentContainer: {
@@ -117,9 +95,7 @@ export const chatTheme = (
       },
     },
     statusIcon: {
-      ...defaultTheme.statusIcon,
       activityIndicator: {
-        ...defaultTheme.statusIcon.activityIndicator,
         color: theme.colors.brandPrimary,
       },
       image: {
