@@ -1,6 +1,7 @@
 import { Linking } from 'react-native';
+import { MessageType } from '@flyerhq/react-native-chat-ui';
+
 // import FileViewer from 'react-native-file-viewer';
-import { MessageType } from '../../../react-native-chat-ui';
 
 export const handleMessagePress = async (message: MessageType.Any) => {
   if (message.type === 'file') {

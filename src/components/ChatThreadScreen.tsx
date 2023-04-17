@@ -1,6 +1,6 @@
 import { AppTheme, useTheme } from 'theme';
 import { Avatar, Button, Icon } from '@rneui/base';
-import { Chat, MessageType } from '../react-native-chat-ui';
+import { Chat, MessageType } from '@flyerhq/react-native-chat-ui';
 import {
   ChatHeader,
   chatTheme,

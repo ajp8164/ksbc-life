@@ -1,4 +1,4 @@
-import { Theme, defaultTheme } from '../../../react-native-chat-ui';
+import { Theme, defaultTheme } from '@flyerhq/react-native-chat-ui';
 
 import { AppTheme } from 'theme';
 

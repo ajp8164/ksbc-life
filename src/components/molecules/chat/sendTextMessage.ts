@@ -1,5 +1,5 @@
 import { Group } from 'types/group';
-import { MessageType } from '../../../react-native-chat-ui';
+import { MessageType } from '/react-native-chat-ui';
 import { UserProfile } from 'types/user';
 import { addChatMessage } from 'firebase/firestore/chatMessages';
 import { createAuthor } from './createAuthor';

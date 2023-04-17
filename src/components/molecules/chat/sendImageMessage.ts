@@ -1,5 +1,5 @@
 import { Asset } from 'react-native-image-picker';
-import { MessageType } from '../../../react-native-chat-ui';
+import { MessageType } from '@flyerhq/react-native-chat-ui';
 import { UserProfile } from 'types/user';
 import { addChatMessage } from 'firebase/firestore/chatMessages';
 import { appConfig } from 'config';

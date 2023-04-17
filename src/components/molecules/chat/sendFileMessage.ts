@@ -3,7 +3,7 @@ import DocumentPicker, {
 } from 'react-native-document-picker';
 
 import { Alert } from 'react-native';
-import { MessageType } from '../../../react-native-chat-ui';
+import { MessageType } from '@flyerhq/react-native-chat-ui';
 import { UserProfile } from 'types/user';
 import { addChatMessage } from 'firebase/firestore/chatMessages';
 import { appConfig } from 'config';
