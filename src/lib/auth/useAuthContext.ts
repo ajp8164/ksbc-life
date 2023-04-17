@@ -6,11 +6,13 @@ import { signInAnonymously, useAuthorizeUser, useUnauthorizeUser } from '.';
 import { Alert } from 'react-native';
 import { DateTime } from 'luxon';
 import { SignInModalMethods } from 'components/modals/SignInModal';
+import { StoreState } from 'store/initialStoreState';
 import { appConfig } from 'config';
 import { cacheUsers } from 'firebase/firestore/cache';
 import { deleteUser } from 'firebase/firestore/users';
 import lodash from 'lodash';
 import { selectUser } from 'store/selectors/userSelectors';
+import { store } from 'store';
 import { useSelector } from 'react-redux';
 
 type AuthContext = {
@@ -42,16 +44,11 @@ export const useAuthContext = (
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(credentials => {
-      // Delete the anonymous user profile.
-      if (
-        credentials &&
-        user.profile?.role === UserRole.Anonymous &&
-        user.profile.id
-      ) {
-        deleteUser(user.profile.id);
+      if (credentials) {
+        deleteCurrentProfileIfAnonymous();
       }
 
-      // This handler is called multiple times. Avoid more than one authoization.
+      // This handler is called multiple times. Avoid more than one authorization.
       // See https://stackoverflow.com/a/40436769
       if (isReAuthenticationRequired(user.credentials)) {
         unauthorizeUserDebounced.current();
@@ -127,6 +124,16 @@ export const useAuthContext = (
     presentSignInModal: present,
     userIsAuthenticated: !lodash.isEmpty(user.credentials),
   };
+};
+
+const deleteCurrentProfileIfAnonymous = () => {
+  // Delete the anonymous user profile.
+  const state: StoreState = store.getState();
+  const currentProfile = state.user.profile;
+
+  if (currentProfile?.role === UserRole.Anonymous && currentProfile.id) {
+    deleteUser(currentProfile.id);
+  }
 };
 
 const isReAuthenticationRequired = (
