@@ -56,17 +56,20 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
   }, []);
 
   useEffect(() => {
-    const subscription = groupsCollectionChangeListener(snapshot => {
-      const updated: Group[] = [];
-      snapshot.docs.forEach(d => {
-        updated.push({ ...d.data(), id: d.id } as Group);
-      });
-      setGroups(updated);
-      isLoading ? setIsLoading(false) : null;
-    });
+    const subscription = groupsCollectionChangeListener(
+      snapshot => {
+        const updated: Group[] = [];
+        snapshot.docs.forEach(d => {
+          updated.push({ ...d.data(), id: d.id } as Group);
+        });
+        setGroups(updated);
+        isLoading ? setIsLoading(false) : null;
+      },
+      { auth: { userRole: userProfile?.role } },
+    );
     return subscription;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [userProfile?.role]);
 
   const renderGroup: ListRenderItem<Group> = ({ item: group, index }) => {
     return (

@@ -18,7 +18,7 @@ export const useAuthorizeUser = () => {
   return (
     credentials: FirebaseAuthTypes.User | null,
     result?: {
-      onAuthorized?: () => void;
+      onAuthorized?: (userProfile: UserProfile) => void;
       onUnauthorized?: (alertUser?: boolean) => void;
       onError?: (msg: string) => void;
     },
@@ -44,7 +44,7 @@ export const useAuthorizeUser = () => {
               .then(() => {
                 log.debug(`User profile created: ${JSON.stringify(profile)}`);
                 const user = setUser(credentials, profile);
-                result?.onAuthorized && result.onAuthorized();
+                result?.onAuthorized && result.onAuthorized(user.profile);
                 log.debug(
                   `User sign in complete: ${JSON.stringify(user.profile)}`,
                 );
@@ -76,7 +76,7 @@ export const useAuthorizeUser = () => {
                       `User profile updated: ${JSON.stringify(updatedProfile)}`,
                     );
                     const user = setUser(credentials, updatedProfile);
-                    result?.onAuthorized && result.onAuthorized();
+                    result?.onAuthorized && result.onAuthorized(user.profile);
                     log.debug(
                       `User sign in complete: ${JSON.stringify(user.profile)}`,
                     );
@@ -88,7 +88,7 @@ export const useAuthorizeUser = () => {
                   });
               } else {
                 const user = setUser(credentials, profile);
-                result?.onAuthorized && result.onAuthorized();
+                result?.onAuthorized && result.onAuthorized(user.profile);
                 log.debug(
                   `User sign in complete: ${JSON.stringify(user.profile)}`,
                 );

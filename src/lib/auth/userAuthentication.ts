@@ -4,6 +4,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { NativeModules } from 'react-native';
 import { appleAuth } from '@invertase/react-native-apple-authentication';
 import auth from '@react-native-firebase/auth';
+import { cancelAllFirestoreSubscriptions } from 'firebase/firestore/subscriptions';
 import { log } from '@react-native-ajp-elements/core';
 
 const { RNTwitterSignIn } = NativeModules;
@@ -150,8 +151,11 @@ export const signInwithEmailAndPassword = async (
 
 export const signOut = async () => {
   try {
+    // Cancel firestore data listener subscriptions before sign out.
+    cancelAllFirestoreSubscriptions();
+
     LoginManager.logOut();
-    return await auth().signOut();
+    await auth().signOut();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {

@@ -2,12 +2,20 @@ import { log } from '@react-native-ajp-elements/core';
 import firestore, {
   FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';
+import { addFirestoreSubscription } from './subscriptions';
+import { UserRole } from 'types/user';
+
+export type ListenerAuth = {
+  allowedRoles?: UserRole[];
+  userRole?: UserRole;
+};
 
 export type QueryResult<T> = {
   allLoaded: boolean;
   lastDocument: FirebaseFirestoreTypes.DocumentData;
   result: T[];
 };
+
 export type QueryOrderBy = {
   fieldPath: string | number | FirebaseFirestoreTypes.FieldPath;
   directionStr?: 'asc' | 'desc' | undefined;
@@ -18,6 +26,18 @@ export type QueryWhere = {
   opStr: FirebaseFirestoreTypes.WhereFilterOp;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any;
+};
+
+export type CollectionChangeListenerOptions = {
+  lastDocument?: FirebaseFirestoreTypes.DocumentData;
+  limit?: number;
+  orderBy?: QueryOrderBy;
+  where?: QueryWhere[];
+  subCollection?: {
+    documentPath: string;
+    name: string;
+  };
+  auth?: ListenerAuth;
 };
 
 export const getDocument = <T>(
@@ -135,18 +155,24 @@ export const collectionChangeListener = (
   handler: (
     snapshot: FirebaseFirestoreTypes.QuerySnapshot<FirebaseFirestoreTypes.DocumentData>,
   ) => void,
-  opts?: {
-    lastDocument?: FirebaseFirestoreTypes.DocumentData;
-    limit?: number;
-    orderBy?: QueryOrderBy;
-    where?: QueryWhere[];
-    subCollection?: {
-      documentPath: string;
-      name: string;
-    };
-  },
+  opts?: CollectionChangeListenerOptions,
 ): (() => void) => {
-  const { lastDocument, limit, orderBy, where, subCollection } = opts || {};
+  const { lastDocument, limit, orderBy, where, subCollection, auth } =
+    opts || {};
+
+  // If not allowed then just return an empty (subscription) function.
+  if (auth) {
+    auth.allowedRoles = auth.allowedRoles || [
+      UserRole.Admin,
+      UserRole.Owner,
+      UserRole.User,
+    ];
+    if (!auth.userRole || !auth.allowedRoles.includes(auth.userRole)) {
+      return () => {
+        return;
+      };
+    }
+  }
 
   let query = firestore().collection(collectionPath);
 
@@ -185,7 +211,7 @@ export const collectionChangeListener = (
     ) as FirebaseFirestoreTypes.CollectionReference<FirebaseFirestoreTypes.DocumentData>;
   }
 
-  return query.onSnapshot(
+  const subscription = query.onSnapshot(
     { includeMetadataChanges: true },
     handler,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -195,6 +221,9 @@ export const collectionChangeListener = (
       );
     },
   );
+
+  addFirestoreSubscription(subscription, collectionPath);
+  return subscription;
 };
 
 export const documentChangeListener = (

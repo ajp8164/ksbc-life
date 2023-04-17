@@ -1,4 +1,5 @@
 import {
+  CollectionChangeListenerOptions,
   QueryOrderBy,
   QueryResult,
   QueryWhere,
@@ -96,25 +97,14 @@ export const groupsCollectionChangeListener = (
   handler: (
     snapshot: FirebaseFirestoreTypes.QuerySnapshot<FirebaseFirestoreTypes.DocumentData>,
   ) => void,
-  opts?: {
-    lastDocument?: FirebaseFirestoreTypes.DocumentData;
-    limit?: number;
-    orderBy?: QueryOrderBy;
-    where?: QueryWhere[];
-  },
+  opts?: Omit<CollectionChangeListenerOptions, 'subCollection'>,
 ): (() => void) => {
-  const {
-    lastDocument,
-    limit,
-    orderBy = { fieldPath: 'name', directionStr: 'asc' },
-    where,
-  } = opts || {};
-  return collectionChangeListener('Groups', handler, {
-    lastDocument,
-    limit,
-    orderBy,
-    where,
-  });
+  opts = {
+    orderBy: { fieldPath: 'name', directionStr: 'asc' },
+    ...opts,
+  } as CollectionChangeListenerOptions;
+
+  return collectionChangeListener('Groups', handler, opts);
 };
 
 export const groupsDocumentChangeListener = (

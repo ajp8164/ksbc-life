@@ -1,3 +1,4 @@
+import { UserProfile, UserRole } from 'types/user';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { createContext, useEffect, useRef } from 'react';
 import { signInAnonymously, useAuthorizeUser, useUnauthorizeUser } from '.';
@@ -5,7 +6,6 @@ import { signInAnonymously, useAuthorizeUser, useUnauthorizeUser } from '.';
 import { Alert } from 'react-native';
 import { DateTime } from 'luxon';
 import { SignInModalMethods } from 'components/modals/SignInModal';
-import { UserRole } from 'types/user';
 import { appConfig } from 'config';
 import { cacheUsers } from 'firebase/firestore/cache';
 import { deleteUser } from 'firebase/firestore/users';
@@ -62,8 +62,8 @@ export const useAuthContext = (
 
       authorizeUserDebounced.current(credentials, {
         onError: onAuthError,
-        onAuthorized: onAuthorized,
-        onUnauthorized: onNotAuthorized,
+        onAuthorized,
+        onUnauthorized,
       });
     });
     return unsubscribe;
@@ -96,15 +96,18 @@ export const useAuthContext = (
     }
   };
 
-  const onAuthorized = () => {
+  const onAuthorized = (userProfile: UserProfile) => {
     dismiss();
 
-    // Cache data from firestore.
-    cacheUsers();
+    if (userProfile.role !== UserRole.Anonymous) {
+      // Cache data from firestore.
+      cacheUsers();
+    }
   };
 
-  const onNotAuthorized = (accountNotActive?: boolean) => {
+  const onUnauthorized = (accountNotActive?: boolean) => {
     dismiss();
+
     if (accountNotActive) {
       Alert.alert(
         'Account Disabled',

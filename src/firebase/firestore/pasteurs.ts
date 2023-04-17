@@ -1,4 +1,5 @@
 import {
+  CollectionChangeListenerOptions,
   QueryOrderBy,
   QueryResult,
   QueryWhere,
@@ -98,25 +99,13 @@ export const pasteursCollectionChangeListener = (
   handler: (
     snapshot: FirebaseFirestoreTypes.QuerySnapshot<FirebaseFirestoreTypes.DocumentData>,
   ) => void,
-  opts?: {
-    lastDocument?: FirebaseFirestoreTypes.DocumentData;
-    limit?: number;
-    orderBy?: QueryOrderBy;
-    where?: QueryWhere[];
-  },
+  opts?: Omit<CollectionChangeListenerOptions, 'subCollection'>,
 ): (() => void) => {
-  const {
-    lastDocument,
-    limit,
-    orderBy = { fieldPath: 'firstName', directionStr: 'asc' },
-    where,
-  } = opts || {};
-  return collectionChangeListener('Pasteurs', handler, {
-    lastDocument,
-    limit,
-    orderBy,
-    where,
-  });
+  opts = {
+    orderBy: { fieldPath: 'firstName', directionStr: 'asc' },
+    ...opts,
+  } as CollectionChangeListenerOptions;
+  return collectionChangeListener('Pasteurs', handler, opts);
 };
 
 export const pasteursDocumentChangeListener = (

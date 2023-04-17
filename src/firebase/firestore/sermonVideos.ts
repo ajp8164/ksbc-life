@@ -1,4 +1,5 @@
 import {
+  CollectionChangeListenerOptions,
   QueryOrderBy,
   QueryResult,
   QueryWhere,
@@ -54,25 +55,13 @@ export const sermonVideosCollectionChangeListener = (
   handler: (
     snapshot: FirebaseFirestoreTypes.QuerySnapshot<FirebaseFirestoreTypes.DocumentData>,
   ) => void,
-  opts?: {
-    lastDocument?: FirebaseFirestoreTypes.DocumentData;
-    limit?: number;
-    orderBy?: QueryOrderBy;
-    where?: QueryWhere[];
-  },
+  opts?: Omit<CollectionChangeListenerOptions, 'subCollection'>,
 ): (() => void) => {
-  const {
-    lastDocument,
-    limit,
-    orderBy = { fieldPath: 'snippet.publishedAt', directionStr: 'desc' },
-    where,
-  } = opts || {};
-  return collectionChangeListener('SermonVideos', handler, {
-    lastDocument,
-    limit,
-    orderBy,
-    where,
-  });
+  opts = {
+    orderBy: { fieldPath: 'snippet.publishedAt', directionStr: 'desc' },
+    ...opts,
+  } as CollectionChangeListenerOptions;
+  return collectionChangeListener('SermonVideos', handler, opts);
 };
 
 export const sermonVideosDocumentChangeListener = (

@@ -1,6 +1,5 @@
 import {
-  QueryOrderBy,
-  QueryWhere,
+  CollectionChangeListenerOptions,
   collectionChangeListener,
   documentChangeListener,
 } from 'firebase/firestore/utils';
@@ -92,29 +91,15 @@ export const chatMessagesCollectionChangeListener = (
   handler: (
     snapshot: FirebaseFirestoreTypes.QuerySnapshot<FirebaseFirestoreTypes.DocumentData>,
   ) => void,
-  opts?: {
-    lastDocument?: FirebaseFirestoreTypes.DocumentData;
-    limit?: number;
-    orderBy?: QueryOrderBy;
-    where?: QueryWhere[];
-  },
+  opts?: Omit<CollectionChangeListenerOptions, 'subCollection'>,
 ): (() => void) => {
-  const {
-    lastDocument,
-    limit,
-    orderBy = { fieldPath: 'createdAt', directionStr: 'desc' },
-    where,
-  } = opts || {};
-  return collectionChangeListener('ChatMessages', handler, {
-    lastDocument,
-    limit,
-    orderBy,
-    where,
-    subCollection: {
-      documentPath: groupId,
-      name: 'Messages',
-    },
-  });
+  opts = {
+    orderBy: { fieldPath: 'createdAt', directionStr: 'desc' },
+    subCollection: { documentPath: groupId, name: 'Messages' },
+    ...opts,
+  } as CollectionChangeListenerOptions;
+
+  return collectionChangeListener('ChatMessages', handler, opts);
 };
 
 export const chatMessagesDocumentChangeListener = (
