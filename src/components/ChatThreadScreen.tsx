@@ -348,14 +348,14 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
             <Avatar
               source={{ uri: item.photoUrl }}
               imageProps={{ resizeMode: 'contain' }}
-              containerStyle={theme.styles.avatar}
+              containerStyle={theme.styles.avatarMedium}
             />
           ) : (
             <Avatar
               title={item.avatar.title}
-              titleStyle={[theme.styles.avatarTitle]}
+              titleStyle={[theme.styles.avatarTitleMedium]}
               containerStyle={{
-                ...theme.styles.avatar,
+                ...theme.styles.avatarMedium,
                 backgroundColor: item.avatar.color,
               }}
             />

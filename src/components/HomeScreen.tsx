@@ -1,5 +1,4 @@
-import { AppTheme, useTheme } from 'theme';
-import { Avatar, Button, Icon, Image } from '@rneui/base';
+import { Avatar, Button, Icon } from '@rneui/base';
 import {
   HomeNavigatorParamList,
   TabNavigatorParamList,
@@ -19,10 +18,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
 import { Text } from 'react-native';
 import { UserRole } from 'types/user';
-import { makeStyles } from '@rneui/themed';
 import { pageContentItemCollectionChangeListener } from 'firebase/firestore/pageContentItems';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { useSelector } from 'react-redux';
+import { useTheme } from 'theme';
 import { viewport } from '@react-native-ajp-elements/ui';
 
 type Props = CompositeScreenProps<
@@ -32,7 +31,6 @@ type Props = CompositeScreenProps<
 
 const HomeScreen = ({ navigation }: Props) => {
   const theme = useTheme();
-  const s = useStyles(theme);
 
   const auth = useContext(AuthContext);
   const userProfile = useSelector(selectUserProfile);
@@ -109,9 +107,10 @@ const HomeScreen = ({ navigation }: Props) => {
             type={'clear'}
             icon={
               userProfile && userProfile.photoUrl?.length ? (
-                <Image
+                <Avatar
                   source={{ uri: userProfile.photoUrl }}
-                  containerStyle={s.avatar}
+                  imageProps={{ resizeMode: 'contain' }}
+                  containerStyle={theme.styles.avatarSmall}
                 />
               ) : userProfile?.role === UserRole.Anonymous ? (
                 <Icon
@@ -123,9 +122,9 @@ const HomeScreen = ({ navigation }: Props) => {
               ) : (
                 <Avatar
                   title={userProfile?.avatar.title}
-                  titleStyle={theme.styles.avatarTitle}
+                  titleStyle={theme.styles.avatarTitleSmall}
                   containerStyle={{
-                    ...theme.styles.avatar,
+                    ...theme.styles.avatarSmall,
                     backgroundColor: userProfile?.avatar.color,
                   }}
                 />
@@ -196,14 +195,5 @@ const HomeScreen = ({ navigation }: Props) => {
     </SafeAreaView>
   );
 };
-
-const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
-  avatar: {
-    width: 30,
-    height: 30,
-    borderRadius: 30,
-    top: -5,
-  },
-}));
 
 export default HomeScreen;

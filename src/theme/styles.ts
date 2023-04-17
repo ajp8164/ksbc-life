@@ -8,26 +8,55 @@ import { makeStyles } from '@rneui/themed';
 
 export const fontSizes = {
   ...defaultFontSizes,
-  giant: 64,
+  giant: 54,
   micro: 10,
 };
 
 export const useStyles = makeStyles(
   (theme): Styles => ({
-    avatar: {
-      width: 28,
-      height: 28,
-      borderRadius: 28,
+    avatarGiant: {
+      width: 100,
+      height: 100,
+      borderRadius: 100,
       overflow: 'hidden',
     },
-    avatarForListItem: {
-      width: 28,
-      height: 28,
-      borderRadius: 28,
-      left: -3,
-      top: 1,
+    avatarLarge: {
+      width: 55,
+      height: 55,
+      borderRadius: 55,
+      overflow: 'hidden',
     },
-    avatarTitle: {
+    avatarMedium: {
+      width: 42,
+      height: 42,
+      borderRadius: 42,
+      overflow: 'hidden',
+    },
+    avatarSmall: {
+      width: 30,
+      height: 30,
+      borderRadius: 30,
+      overflow: 'hidden',
+    },
+    avatarTitleGiant: {
+      color: theme.colors.stickyWhite,
+      fontSize: fontSizes.giant,
+      fontFamily,
+      fontWeight: 'normal',
+    },
+    avatarTitleLarge: {
+      color: theme.colors.stickyWhite,
+      fontSize: fontSizes.xl,
+      fontFamily,
+      fontWeight: 'normal',
+    },
+    avatarTitleMedium: {
+      color: theme.colors.stickyWhite,
+      fontSize: fontSizes.large,
+      fontFamily,
+      fontWeight: 'normal',
+    },
+    avatarTitleSmall: {
       color: theme.colors.stickyWhite,
       fontSize: fontSizes.normal,
       fontFamily,

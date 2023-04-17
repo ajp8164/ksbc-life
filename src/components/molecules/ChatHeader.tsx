@@ -72,7 +72,11 @@ export const ChatHeader = ({
     return (
       <TouchableWithoutFeedback onPress={editGroupModalRef.current?.present}>
         <View style={s.container}>
-          <ChatAvatar group={group} />
+          <ChatAvatar
+            group={group}
+            avatarStyle={theme.styles.avatarLarge}
+            titleStyle={theme.styles.avatarTitleLarge}
+          />
           <Text style={s.title}>{group && `${getGroupName(group)} >`}</Text>
         </View>
       </TouchableWithoutFeedback>
@@ -83,7 +87,7 @@ export const ChatHeader = ({
     <>
       <Header
         title={'Chat'}
-        headerStyle={{ height: 118 }}
+        headerStyle={{ height: 140 }}
         headerShadowVisible={true}
         headerLeft={() => renderBackButton()}
         headerRight={() => renderRightButton()}

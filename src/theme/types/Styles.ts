@@ -1,9 +1,14 @@
 import { TextStyle, ViewStyle } from 'react-native';
 
 export type Styles = {
-  avatar: ViewStyle;
-  avatarForListItem: ViewStyle;
-  avatarTitle: TextStyle;
+  avatarGiant: ViewStyle;
+  avatarLarge: ViewStyle;
+  avatarMedium: ViewStyle;
+  avatarSmall: ViewStyle;
+  avatarTitleGiant: TextStyle;
+  avatarTitleLarge: TextStyle;
+  avatarTitleMedium: TextStyle;
+  avatarTitleSmall: TextStyle;
   navigationBarTitle: TextStyle;
   pageContentCardDefaultStyle: ViewStyle;
   pageContentCardTransparentStyle: ViewStyle;

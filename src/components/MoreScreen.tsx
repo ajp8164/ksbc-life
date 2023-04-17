@@ -1,3 +1,4 @@
+import { AppTheme, useTheme } from 'theme';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import {
   MoreNavigatorParamList,
@@ -13,9 +14,9 @@ import { CompositeScreenProps } from '@react-navigation/core';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ScrollView } from 'react-native';
 import { appConfig } from 'config';
+import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { updateUserProfile } from 'store/slices/user';
-import { useTheme } from 'theme';
 import { usersDocumentChangeListener } from 'firebase/firestore/users';
 
 export type Props = CompositeScreenProps<
@@ -25,6 +26,8 @@ export type Props = CompositeScreenProps<
 
 const MoreScreen = ({ navigation, route }: Props) => {
   const theme = useTheme();
+  const s = useStyles(theme);
+
   const dispatch = useDispatch();
 
   const auth = useContext(AuthContext);
@@ -71,16 +74,16 @@ const MoreScreen = ({ navigation, route }: Props) => {
               <Avatar
                 source={{ uri: userProfile.photoUrl }}
                 imageProps={{ resizeMode: 'contain' }}
-                containerStyle={theme.styles.avatar}
+                containerStyle={s.avatar}
               />
             ) : (
               <Avatar
                 title={userProfile?.avatar.title}
-                titleStyle={theme.styles.avatarTitle}
-                containerStyle={{
-                  ...theme.styles.avatar,
-                  backgroundColor: userProfile?.avatar.color,
-                }}
+                titleStyle={theme.styles.avatarTitleSmall}
+                containerStyle={[
+                  s.avatar,
+                  { backgroundColor: userProfile?.avatar.color },
+                ]}
               />
             )
           }
@@ -127,5 +130,14 @@ const MoreScreen = ({ navigation, route }: Props) => {
     </ScrollView>
   );
 };
+
+const useStyles = makeStyles((_theme, theme: AppTheme) => ({
+  avatar: {
+    ...theme.styles.avatarSmall,
+    left: -3,
+    top: 1,
+  },
+  emptyListContainer: {},
+}));
 
 export default MoreScreen;

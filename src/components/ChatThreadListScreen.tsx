@@ -72,6 +72,7 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
     return (
       <ListItem
         title={group.name || getGroupName(group)}
+        titleStyle={{ left: 20 }}
         subtitle={
           group.name.length > 0 ? getGroupMembersStr(group.members) : undefined
         }

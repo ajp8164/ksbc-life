@@ -8,9 +8,8 @@ export const chatTheme = (
   return {
     avatar: {
       text: {
-        ...theme.styles.textSmall,
-        ...theme.styles.textBold,
-        color: theme.colors.textInv,
+        ...theme.styles.avatarTitleSmall,
+        top: 1.5,
       },
     },
     bubble: {

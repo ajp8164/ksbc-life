@@ -3,7 +3,7 @@ import { ListRenderItem, View } from 'react-native';
 import React, { useImperativeHandle, useState } from 'react';
 import { UsersViewMethods, UsersViewProps } from './types';
 
-import { Avatar } from '@rneui/base';
+import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { BottomSheetFlatList as FlatList } from '@gorhom/bottom-sheet';
 import { ListItemCheckbox } from '@react-native-ajp-elements/ui';
 import NoItems from 'components/atoms/NoItems';
@@ -34,24 +34,8 @@ const UsersView = React.forwardRef<UsersView, UsersViewProps>((props, ref) => {
     return (
       <ListItemCheckbox
         title={userProfile.name || userProfile.email}
-        leftImage={
-          userProfile.photoUrl.length ? (
-            <Avatar
-              source={{ uri: userProfile.photoUrl }}
-              imageProps={{ resizeMode: 'contain' }}
-              containerStyle={theme.styles.avatar}
-            />
-          ) : (
-            <Avatar
-              title={userProfile.avatar.title}
-              titleStyle={[theme.styles.avatarTitle]}
-              containerStyle={{
-                ...theme.styles.avatar,
-                backgroundColor: userProfile.avatar.color,
-              }}
-            />
-          )
-        }
+        titleStyle={{ left: 20 }}
+        leftImage={<ChatAvatar userProfile={userProfile} />}
         checkedIcon={'check'}
         checkIconType={'material-community'}
         uncheckedIcon={'checkbox-blank-outline'}

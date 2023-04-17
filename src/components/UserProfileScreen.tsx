@@ -8,7 +8,7 @@ import {
 import React, { useEffect } from 'react';
 import { signOut, useUnauthorizeUser } from 'lib/auth';
 
-import { Avatar } from '@rneui/base';
+import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { CompositeScreenProps } from '@react-navigation/core';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { biometricAuthentication } from 'lib/biometricAuthentication';
@@ -71,22 +71,11 @@ const UserProfileScreen = ({ navigation }: Props) => {
         style={theme.styles.view}
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior={'automatic'}>
-        {userProfile?.photoUrl.length ? (
-          <Avatar
-            source={{ uri: userProfile?.photoUrl }}
-            imageProps={{ resizeMode: 'contain' }}
-            containerStyle={s.avatar}
-          />
-        ) : (
-          <Avatar
-            title={userProfile?.avatar.title}
-            titleStyle={s.avatarTitle}
-            containerStyle={{
-              ...s.avatar,
-              backgroundColor: userProfile?.avatar.color,
-            }}
-          />
-        )}
+        <ChatAvatar
+          userProfile={userProfile}
+          avatarStyle={{ ...theme.styles.avatarGiant, ...s.avatar }}
+          titleStyle={theme.styles.avatarTitleGiant}
+        />
         {userProfile?.name && (
           <Text style={s.profileName}>{userProfile.name}</Text>
         )}
@@ -108,17 +97,10 @@ const UserProfileScreen = ({ navigation }: Props) => {
 
 const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 100,
     alignSelf: 'center',
     marginTop: 15,
     marginBottom: 15,
     overflow: 'hidden',
-  },
-  avatarTitle: {
-    ...theme.styles.textGiant,
-    color: theme.colors.stickyWhite,
   },
   profileName: {
     ...theme.styles.textNormal,
