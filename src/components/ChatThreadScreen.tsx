@@ -1,13 +1,6 @@
 import { AppTheme, useTheme } from 'theme';
 import { Avatar, Button, Icon } from '@rneui/base';
 import { Chat, MessageType } from '@flyerhq/react-native-chat-ui';
-import {
-  ChatHeader,
-  chatTheme,
-  handleMessagePress,
-  sendTextMessage,
-  useSendAttachment,
-} from 'components/molecules/chat';
 import { FirestoreMessageType, SearchCriteria, SearchScope } from 'types/chat';
 import { FlatList, Keyboard, ListRenderItem, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
@@ -20,9 +13,16 @@ import {
   sendTypingState,
   updateChatMessage,
 } from 'firebase/firestore/chatMessages';
+import {
+  chatTheme,
+  handleMessagePress,
+  sendTextMessage,
+  useSendAttachment,
+} from 'lib/chat';
 import { createGroupName, getGroupAvatarColor } from 'lib/group';
 import { getUsers, updateUser } from 'firebase/firestore/users';
 
+import { ChatHeader } from 'components/molecules/ChatHeader';
 import { ChatNavigatorParamList } from 'types/navigation';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { Group } from 'types/group';
