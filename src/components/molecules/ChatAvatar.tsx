@@ -93,15 +93,17 @@ export const ChatAvatar = ({
       />
     );
   }
-  console.log('HERE', onPress);
 
   if (!group) {
     return renderUserAvatar(userProfile);
   }
 
+  // Remove possible duplicates.
+  const members = lodash.uniq(group.members);
+
   // Large group selection
 
-  if (group.members.length > 2 && group.photoUrl.length) {
+  if (members.length > 2 && group.photoUrl.length) {
     return (
       <Avatar
         source={{ uri: group.photoUrl }}
@@ -112,7 +114,7 @@ export const ChatAvatar = ({
     );
   }
 
-  if (group.members.length > 2) {
+  if (members.length > 2) {
     <Avatar
       title={group?.avatar.title}
       titleStyle={[_titleStyle, titleStyle]}
@@ -128,11 +130,13 @@ export const ChatAvatar = ({
   // Group individual selection
 
   let u = me;
-  if (group.members.length === 2) {
+  if (members.length === 2) {
+    // Filter me out
     u = lodash.filter(userProfiles, i => {
       return i.id !== u?.id;
     })[0];
   }
+  // Else it's me only
 
   return renderUserAvatar(u);
 };

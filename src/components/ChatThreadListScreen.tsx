@@ -3,7 +3,6 @@ import { Button, Icon } from '@rneui/base';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import { FlatList, ListRenderItem, ScrollView, View } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
-import { getGroupMembersStr, getGroupName } from 'lib/group';
 
 import { AuthContext } from 'lib/auth';
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
@@ -14,10 +13,13 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import NoItems from 'components/atoms/NoItems';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { UserRole } from 'types/user';
+import { getGroupName } from 'lib/group';
 import { groupsCollectionChangeListener } from 'firebase/firestore/groups';
 import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { useSelector } from 'react-redux';
+
+type ExtendedGroup = Group & { calculatedName: string };
 
 export type Props = NativeStackScreenProps<
   ChatNavigatorParamList,
@@ -32,7 +34,7 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
   const userProfile = useSelector(selectUserProfile);
 
   const [isLoading, setIsLoading] = useState(true);
-  const [groups, setGroups] = useState<Group[]>([]);
+  const [groups, setGroups] = useState<ExtendedGroup[]>([]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -62,23 +64,46 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
         snapshot.docs.forEach(d => {
           updated.push({ ...d.data(), id: d.id } as Group);
         });
-        setGroups(updated);
+        setGroups(prepareGroups(updated));
         isLoading ? setIsLoading(false) : null;
       },
-      { auth: { userRole: userProfile?.role } },
+      {
+        where: [
+          {
+            fieldPath: 'members',
+            opStr: 'array-contains',
+            value: userProfile?.id,
+          },
+        ],
+        auth: { userRole: userProfile?.role },
+      },
     );
     return subscription;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userProfile?.role]);
 
-  const renderGroup: ListRenderItem<Group> = ({ item: group, index }) => {
+  const prepareGroups = (groups: Group[]): ExtendedGroup[] => {
+    return (groups as ExtendedGroup[])
+      .map(g => {
+        return {
+          ...g,
+          calculatedName: getGroupName(g),
+        };
+      })
+      .sort((a, b) => {
+        return a.calculatedName < b.calculatedName ? -1 : 1;
+      });
+  };
+
+  const renderGroup: ListRenderItem<ExtendedGroup> = ({
+    item: group,
+    index,
+  }) => {
     return (
       <ListItem
-        title={group.name || getGroupName(group)}
+        title={group.calculatedName}
         titleStyle={{ left: 20 }}
-        subtitle={
-          group.name.length > 0 ? getGroupMembersStr(group.members) : undefined
-        }
+        subtitle={group.name.length > 0 ? group.calculatedName : undefined}
         leftImage={<ChatAvatar group={group} size={'medium'} />}
         position={[
           index === 0 ? 'first' : undefined,

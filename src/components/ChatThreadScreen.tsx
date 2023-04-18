@@ -222,12 +222,13 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
   };
 
   const createGroup = async (): Promise<Group> => {
+    // Uniq  allows for a group  of one; chat with myself.
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const members = [userProfile!].concat(addedUsers);
     const memberIds = members.map(u => {
       return u.id;
     }) as string[];
-    const groupName = getGroupMembersStr(memberIds); // Exclude me.
+    const groupName = getGroupMembersStr(memberIds);
 
     const newGroup = {
       createdBy: userProfile?.id,

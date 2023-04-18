@@ -16,16 +16,24 @@ export const getGroupName = (group: Group) => {
 
 // Returns a string of group member names.
 export const getGroupMembersStr = (members: string[]) => {
+  members = lodash.uniq(members);
   const me = store.getState().user.profile;
   let userProfiles = store.getState().cache.userProfiles;
-  userProfiles = userProfiles
-    .filter(u => {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return members.includes(u.id!) && u.id !== me?.id;
-    })
-    .sort((a, b) => {
-      return a.firstName < b.firstName ? -1 : 1;
-    });
+
+  if (members.length > 1) {
+    userProfiles = userProfiles
+      .filter(u => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        return members.includes(u.id!) && u.id !== me?.id;
+      })
+      .sort((a, b) => {
+        return a.firstName < b.firstName ? -1 : 1;
+      });
+  } else {
+    // I am the only member of the group.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    userProfiles = [me!];
+  }
 
   return lodash.reduce(
     userProfiles,
