@@ -447,6 +447,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
           }
           dateFormat={'ddd, MMM D'}
           timeFormat={'h:mm A'}
+          l10nOverride={{ inputPlaceholder: 'Type message' }}
           disableSend={!group && !addedUsers.length}
           sendButtonVisibilityMode={'always'}
           theme={chatTheme(theme, { tabBarHeight })}

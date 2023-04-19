@@ -1,4 +1,6 @@
 import { AppTheme } from 'theme';
+import { Icon } from '@rneui/base';
+import React from 'react';
 import { Theme } from '@flyerhq/react-native-chat-ui';
 
 export const chatTheme = (
@@ -57,24 +59,30 @@ export const chatTheme = (
       activityIndicator: {
         color: theme.colors.brandPrimary,
       },
-      attachmentIcon: {
-        tintColor: theme.colors.brandPrimary,
-      },
       contentOffsetKeyboardOpened: 11,
       container: {
-        backgroundColor: theme.colors.subtleGray,
+        backgroundColor: theme.colors.white,
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
-        paddingVertical: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
       },
       inputStyle: {
         ...theme.styles.textNormal,
         backgroundColor: theme.colors.white,
         color: theme.colors.text,
-        borderRadius: 5,
+        borderRadius: 20,
+        borderWidth: 0.5,
+        borderColor: theme.colors.black,
+        minHeight: 35,
+        lineHeight: 20.5,
+        paddingTop: 5,
+        paddingBottom: 5,
+        marginLeft: 7,
       },
-      sendIcon: {
-        tintColor: theme.colors.brandPrimary,
+      placeholderTextColor: theme.colors.textPlaceholder,
+      sendButton: {
+        marginLeft: 10,
       },
       tabBarHeight: extra.tabBarHeight,
     },
@@ -82,6 +90,28 @@ export const chatTheme = (
       text: {
         ...theme.styles.textTiny,
         color: theme.colors.textLight,
+      },
+    },
+    icons: {
+      attachmentButtonIcon: () => {
+        return React.createElement(Icon, {
+          name: 'paperclip',
+          type: 'material-community',
+          color: theme.colors.brandSecondary,
+          size: 32,
+        });
+      },
+      sendButtonIcon: () => {
+        return React.createElement(Icon, {
+          name: 'send-circle',
+          type: 'material-community',
+          color: theme.colors.brandSecondary,
+          size: 38,
+          style: {
+            marginRight: 5,
+            transform: [{ rotateZ: '-45deg' }],
+          },
+        });
       },
     },
     list: {
