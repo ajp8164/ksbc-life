@@ -79,7 +79,7 @@ export const chatTheme = (
     date: {
       text: {
         ...theme.styles.textTiny,
-        ...theme.styles.textBold,
+        color: theme.colors.textLight,
       },
     },
     list: {
