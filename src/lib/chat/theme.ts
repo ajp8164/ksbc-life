@@ -2,12 +2,13 @@ import { AppTheme } from 'theme';
 import { Icon } from '@rneui/base';
 import React from 'react';
 import { Theme } from '@flyerhq/react-native-chat-ui';
+import { defaultTheme } from '@flyerhq/react-native-chat-ui';
 
 export const chatTheme = (
   theme: AppTheme,
   extra: { tabBarHeight: number },
 ): Theme => {
-  return {
+  return Object.assign(defaultTheme, {
     avatar: {
       text: {
         ...theme.styles.avatarTitleSmall,
@@ -42,9 +43,7 @@ export const chatTheme = (
         ...theme.styles.textNormal,
         color: theme.colors.textInv,
       },
-      headerText: {
-        ...theme.styles.textTiny,
-      },
+      headerText: {},
       textLeftContainer: {
         marginHorizontal: 15,
         marginVertical: 8,
@@ -53,13 +52,18 @@ export const chatTheme = (
         marginHorizontal: 15,
         marginVertical: 8,
       },
+      username: {
+        ...theme.styles.textTiny,
+        ...theme.styles.textBold,
+        color: theme.colors.brandSecondary,
+      },
     },
     colors: {},
     composer: {
       activityIndicator: {
         color: theme.colors.brandPrimary,
       },
-      contentOffsetKeyboardOpened: 11,
+      contentOffsetKeyboardOpened: 59, // This values should be adjusted if the design height of the composer changes.
       container: {
         backgroundColor: theme.colors.white,
         borderTopLeftRadius: 0,
@@ -75,6 +79,7 @@ export const chatTheme = (
         borderWidth: 0.5,
         borderColor: theme.colors.black,
         minHeight: 35,
+        maxHeight: 200,
         lineHeight: 20.5,
         paddingTop: 5,
         paddingBottom: 5,
@@ -120,6 +125,7 @@ export const chatTheme = (
       },
       container: {
         backgroundColor: theme.colors.white,
+        paddingHorizontal: 5,
       },
       contentContainer: {
         backgroundColor: theme.colors.white,
@@ -139,5 +145,5 @@ export const chatTheme = (
     typingIndicator: {
       dotColor: theme.colors.blackTransparentLight,
     },
-  };
+  });
 };
