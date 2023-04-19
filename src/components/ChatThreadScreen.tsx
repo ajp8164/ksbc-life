@@ -441,8 +441,10 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
           onInputTextChanged={onInputTextChanged}
           onMessagePress={handleMessagePress}
           onPreviewDataFetched={handlePreviewDataFetched}
-          showUserAvatars={true} // Only if group
-          showUserNames={'outside'}
+          showUserAvatars={group && group?.members.length > 2}
+          showUserNames={
+            group && group?.members.length <= 2 ? 'none' : 'outside'
+          }
           disableSend={!group && !addedUsers.length}
           sendButtonVisibilityMode={'always'}
           theme={chatTheme(theme, { tabBarHeight })}
