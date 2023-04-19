@@ -11,10 +11,10 @@ export enum StartupScreen {
 }
 
 export type ChatNavigatorParamList = {
-  ChatThread: {
+  ChatGroup: {
     group?: Group;
   };
-  ChatThreadList: undefined;
+  ChatGroupList: undefined;
 };
 
 export type GivingNavigatorParamList = {

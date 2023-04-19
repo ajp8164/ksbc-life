@@ -1,6 +1,6 @@
+import ChatGroupListScreen from 'components/ChatGroupListScreen';
+import ChatGroupScreen from 'components/ChatGroupScreen';
 import { ChatNavigatorParamList } from 'types/navigation';
-import ChatThreadListScreen from 'components/ChatThreadListScreen';
-import ChatThreadScreen from 'components/ChatThreadScreen';
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from 'theme';
@@ -12,7 +12,7 @@ const ChatNavigator = () => {
 
   return (
     <ChatStack.Navigator
-      initialRouteName="ChatThreadList"
+      initialRouteName="ChatGroupList"
       screenOptions={{
         headerStyle: {
           backgroundColor: theme.colors.screenHeaderBackground,
@@ -23,8 +23,8 @@ const ChatNavigator = () => {
         headerTintColor: theme.colors.screenHeaderBackButton,
       }}>
       <ChatStack.Screen
-        name="ChatThreadList"
-        component={ChatThreadListScreen}
+        name="ChatGroupList"
+        component={ChatGroupListScreen}
         options={{
           title: 'Chat',
           headerLeft: () => null,
@@ -32,8 +32,8 @@ const ChatNavigator = () => {
         }}
       />
       <ChatStack.Screen
-        name="ChatThread"
-        component={ChatThreadScreen}
+        name="ChatGroup"
+        component={ChatGroupScreen}
         options={{
           title: 'Chat',
         }}

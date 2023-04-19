@@ -44,12 +44,9 @@ import { useSelector } from 'react-redux';
 const initialSearchCriteria = { text: '', scope: SearchScope.Username };
 const minimumRequiredCharsForSearch = 2;
 
-export type Props = NativeStackScreenProps<
-  ChatNavigatorParamList,
-  'ChatThread'
->;
+export type Props = NativeStackScreenProps<ChatNavigatorParamList, 'ChatGroup'>;
 
-const ChatThreadScreen = ({ navigation, route }: Props) => {
+const ChatGroupScreen = ({ navigation, route }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
@@ -500,4 +497,4 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   },
 }));
 
-export default ChatThreadScreen;
+export default ChatGroupScreen;

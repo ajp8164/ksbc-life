@@ -125,7 +125,7 @@ export const chatTheme = (
       },
       container: {
         backgroundColor: theme.colors.white,
-        paddingHorizontal: 5,
+        paddingHorizontal: 12,
       },
       contentContainer: {
         backgroundColor: theme.colors.white,

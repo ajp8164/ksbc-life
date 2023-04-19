@@ -14,7 +14,7 @@ import { uuidv4 } from 'lib/uuid';
 
 export const sendFileMessage = async (
   userProfile: UserProfile,
-  threadId: string,
+  groupId: string,
 ) => {
   const file = await DocumentPicker.pickSingle({
     type: [DocumentPicker.types.allFiles],
@@ -36,7 +36,7 @@ export const sendFileMessage = async (
     await saveFile({
       file,
       storagePath: appConfig.storageFileChat,
-      onSuccess: url => send(file, url, userProfile, threadId),
+      onSuccess: url => send(file, url, userProfile, groupId),
       onError: () => {
         return;
       },
@@ -48,7 +48,7 @@ const send = (
   file: DocumentPickerResponse,
   url: string,
   userProfile: UserProfile,
-  threadId: string,
+  groupId: string,
 ) => {
   const fileMessage: MessageType.File = {
     id: uuidv4(),
@@ -60,5 +60,5 @@ const send = (
     type: 'file',
     uri: url,
   };
-  addChatMessage(fileMessage, threadId);
+  addChatMessage(fileMessage, groupId);
 };

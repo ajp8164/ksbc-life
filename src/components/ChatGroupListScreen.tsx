@@ -23,10 +23,10 @@ type ExtendedGroup = Group & { calculatedName: string };
 
 export type Props = NativeStackScreenProps<
   ChatNavigatorParamList,
-  'ChatThreadList'
+  'ChatGroupList'
 >;
 
-const ChatThreadListScreen = ({ navigation }: Props) => {
+const ChatGroupListScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
@@ -50,7 +50,7 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
               size={28}
             />
           }
-          onPress={() => navigation.navigate('ChatThread', {})}
+          onPress={() => navigation.navigate('ChatGroup', {})}
         />
       ),
     });
@@ -110,7 +110,7 @@ const ChatThreadListScreen = ({ navigation }: Props) => {
           index === groups.length - 1 ? 'last' : undefined,
         ]}
         onPress={() =>
-          navigation.navigate('ChatThread', {
+          navigation.navigate('ChatGroup', {
             group,
           })
         }
@@ -167,4 +167,4 @@ const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
   emptyListContainer: {},
 }));
 
-export default ChatThreadListScreen;
+export default ChatGroupListScreen;

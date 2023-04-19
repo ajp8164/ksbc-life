@@ -10,7 +10,7 @@ import { uuidv4 } from 'lib/uuid';
 
 export const sendImageMessage = (
   userProfile: UserProfile,
-  threadId: string,
+  groupId: string,
 ) => {
   selectImage({
     onSuccess: async imageAssets => {
@@ -19,7 +19,7 @@ export const sendImageMessage = (
         await saveImage({
           imageAsset,
           storagePath: appConfig.storageImageChat,
-          onSuccess: url => send(imageAsset, url, userProfile, threadId),
+          onSuccess: url => send(imageAsset, url, userProfile, groupId),
           onError: () => {
             return;
           },
@@ -33,7 +33,7 @@ const send = (
   imageAsset: Asset,
   url: string,
   userProfile: UserProfile,
-  threadId: string,
+  groupId: string,
 ) => {
   const imageMessage: MessageType.Image = {
     id: uuidv4(),
@@ -46,5 +46,5 @@ const send = (
     uri: url,
     width: imageAsset.width,
   };
-  threadId && addChatMessage(imageMessage, threadId);
+  groupId && addChatMessage(imageMessage, groupId);
 };
