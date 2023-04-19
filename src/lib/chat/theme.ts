@@ -22,7 +22,9 @@ export const chatTheme = (
         color: theme.colors.whiteTransparentMid,
       },
       contentLeftContainer: {
-        backgroundColor: theme.colors.brandSecondary,
+        backgroundColor: theme.colors.transparent,
+        borderWidth: 0.5,
+        borderColor: theme.colors.black,
         borderRadius: 20,
       },
       contentRightContainer: {
