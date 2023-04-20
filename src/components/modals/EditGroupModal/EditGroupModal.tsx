@@ -36,17 +36,10 @@ const EditGroupModal = React.forwardRef<EditGroupModal, EditGroupModalProps>(
     return (
       <Modal ref={innerRef} snapPoints={snapPoints}>
         <ModalHeader
-          title={'Edit Group'}
-          rightButtonText={'Save'}
-          rightButtonDisabled={!editorState.changed}
-          onRightButtonPress={() =>
-            groupEditorViewRef.current
-              ?.saveGroup()
-              .then(dismiss)
-              .catch(() => {
-                // Nothing to do. Prevent unhandled promise.
-              })
-          }
+          size={'small'}
+          rightButtonText={'Done'}
+          rightButtonBusy={editorState.isSubmitting}
+          onRightButtonPress={dismiss}
         />
         <GroupEditorView
           ref={groupEditorViewRef}

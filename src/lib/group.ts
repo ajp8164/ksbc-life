@@ -20,7 +20,7 @@ export const getGroupMembersStr = (members: string[]) => {
   const me = store.getState().user.profile;
   let userProfiles = store.getState().cache.userProfiles;
 
-  if (members.length > 1) {
+  if (members.length > 2) {
     userProfiles = userProfiles
       .filter(u => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -29,21 +29,26 @@ export const getGroupMembersStr = (members: string[]) => {
       .sort((a, b) => {
         return a.firstName < b.firstName ? -1 : 1;
       });
+
+    return lodash.reduce(
+      userProfiles,
+      (name, u) => {
+        if (name.length > 0) {
+          return `${name}, ${u.firstName || u.email}`;
+        } else {
+          return `${u.firstName || u.email}`;
+        }
+      },
+      '',
+    );
+  } else if (members.length === 2) {
+    userProfiles = userProfiles.filter(u => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return members.includes(u.id!) && u.id !== me?.id;
+    });
+    return userProfiles[0]?.name || userProfiles[0]?.email || 'No Name';
   } else {
     // I am the only member of the group.
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    userProfiles = [me!];
+    return me?.name || me?.email || 'No Name';
   }
-
-  return lodash.reduce(
-    userProfiles,
-    (name, u) => {
-      if (name.length > 0) {
-        return `${name}, ${u.firstName}`;
-      } else {
-        return `${u.firstName}`;
-      }
-    },
-    '',
-  );
 };

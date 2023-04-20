@@ -10,17 +10,13 @@ declare const GroupEditorView: React.MemoExoticComponent<
 >;
 
 export interface GroupEditorViewProps {
-  onEditorStateChange?: (editorState: EditorState) => void;
   group: Group;
+  onEditorStateChange?: (editorState: EditorState) => void;
 }
 
-export interface GroupEditorViewMethods {
-  saveGroup: () => Promise<void>;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface GroupEditorViewMethods {}
 
 export interface EditorState {
-  fieldCount: number;
-  focusedField?: number;
   isSubmitting: boolean;
-  changed: boolean;
 }
