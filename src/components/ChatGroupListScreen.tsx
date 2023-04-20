@@ -102,8 +102,13 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
     return (
       <ListItem
         title={group.calculatedName}
-        titleStyle={{ left: 20 }}
-        subtitle={group.name.length > 0 ? group.calculatedName : undefined}
+        titleStyle={s.title}
+        subtitle={
+          group.members.length > 2 && group.name.length > 0
+            ? group.calculatedName
+            : undefined
+        }
+        subtitleStyle={s.subtitle}
         leftImage={<ChatAvatar group={group} size={'medium'} />}
         position={[
           index === 0 ? 'first' : undefined,
@@ -165,6 +170,12 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
 
 const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
   emptyListContainer: {},
+  title: {
+    left: 20,
+  },
+  subtitle: {
+    left: 20,
+  },
 }));
 
 export default ChatGroupListScreen;
