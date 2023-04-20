@@ -122,8 +122,7 @@ const createProfile = (
   credentials: FirebaseAuthTypes.User,
   colors: string[],
 ): UserProfile => {
-  const firstName =
-    credentials.displayName?.split(' ')[0] || credentials.email || '';
+  const firstName = credentials.displayName?.split(' ')[0] || '';
   const lastName = credentials.displayName?.split(' ')[1] || '';
   return {
     name: credentials.displayName || '',
