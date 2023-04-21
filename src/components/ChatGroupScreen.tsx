@@ -56,7 +56,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
 
   const tabBarHeight = useBottomTabBarHeight();
   const [group, setGroup] = useState(route.params.group);
-  const composingGroup = useRef(route.params.group === undefined);
+  const composingGroup = useRef(lodash.isEmpty(route.params.group));
   const userProfile = useSelector(selectUserProfile);
   const initialized = useRef(false);
   const isTyping = useRef(false);
@@ -217,13 +217,14 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
   useEffect(() => {
     if (!composingGroup.current) return;
 
-    const members = addedUsers
-      .map(u => {
-        return u.id;
-      })
-      .concat(userProfile?.id);
+    const added = addedUsers.map(u => {
+      return u.id;
+    });
 
-    if (members) {
+    if (added.length) {
+      // All members of the group include me.
+      const members = added.concat(userProfile?.id);
+      added.concat(userProfile?.id);
       const groupsCache = store.getState().cache.groups;
       const group = groupsCache.find(g => {
         return lodash.difference(g.members, members).length === 0;
@@ -474,7 +475,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
   return (
     <SafeAreaView edges={['left', 'right']} style={{ flex: 1 }}>
       {composingGroup.current && (
-        <View style={{}}>
+        <View>
           <Incubator.ChipsInput
             style={s.chipInputText}
             fieldStyle={s.chipInput}
