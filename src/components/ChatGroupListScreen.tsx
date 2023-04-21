@@ -1,6 +1,6 @@
 import { AppTheme, useTheme } from 'theme';
 import { Button, Icon } from '@rneui/base';
-import { Divider } from '@react-native-ajp-elements/ui';
+import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import { FlatList, ListRenderItem, ScrollView, View } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
 
@@ -19,7 +19,6 @@ import { groupsCollectionChangeListener } from 'firebase/firestore/groups';
 import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { useSelector } from 'react-redux';
-import { ListItem } from 'components/atoms/ListItem';
 
 type ExtendedGroup = Group & { calculatedName: string };
 
