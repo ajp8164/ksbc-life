@@ -13,4 +13,12 @@ export type Group = {
     title: string;
   };
   isTyping?: { [key in string]: string }[];
+  latestMessageSnippet?: {
+    createdBy: string;
+    createdAt: string;
+    text: string;
+    type: string;
+    //List of group member ids that have read this message
+    readBy: string[];
+  };
 };

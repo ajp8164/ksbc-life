@@ -7,6 +7,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   addGroup,
   groupsDocumentChangeListener,
+  updateGroup,
 } from 'firebase/firestore/groups';
 import {
   chatMessagesCollectionChangeListener,
@@ -25,6 +26,7 @@ import { getUsers, updateUser } from 'firebase/firestore/users';
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { ChatHeader } from 'components/molecules/ChatHeader';
 import { ChatNavigatorParamList } from 'types/navigation';
+import { DateTime } from 'luxon';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { Group } from 'types/group';
 import { Incubator } from 'react-native-ui-lib';
@@ -71,6 +73,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
   const [userSearchSet, setUserSearchSet] = useState<UserProfile[]>([]);
   const userPickerModalRef = useRef<UserPickerModal>(null);
 
+  // Messages listener
   useEffect(() => {
     if (!group?.id) return;
     const subscription = chatMessagesCollectionChangeListener(
@@ -116,6 +119,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
           }
 
           setChatMessages(messages);
+          setLatestMessageAsReadByMe();
           initialized.current = true;
         }
       },
@@ -124,6 +128,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [group?.id]);
 
+  // Typing indicator
   useEffect(() => {
     if (!group?.id) return;
 
@@ -302,8 +307,48 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
     if (!group) {
       newGroup = await createGroup();
     }
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    sendTextMessage(message, userProfile, group || newGroup!);
+
+    // Store this message as the latest message posted to this group.
+    const updatedGroup = setGroupLatestMessageSnippet(
+      message,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      group || newGroup!,
+    );
+
+    sendTextMessage(message, userProfile, updatedGroup);
+    updateGroup(updatedGroup);
+  };
+
+  const setGroupLatestMessageSnippet = (
+    message: MessageType.PartialText,
+    group: Group,
+  ): Group => {
+    if (!userProfile?.id) return group;
+
+    // This snippet overwrites any previous snippet created by any other group
+    // member. We only track the last message sent by anyone.
+    group.latestMessageSnippet = {
+      createdBy: userProfile.id,
+      createdAt: DateTime.now().toISO() || '', // We don't need server time here
+      text: message.text,
+      type: message.type,
+      readBy: [userProfile.id], // I've always read my own message
+    };
+    return group;
+  };
+
+  const setLatestMessageAsReadByMe = () => {
+    if (!userProfile?.id || !group) return;
+
+    // This snippet overwrites any previous snippet created by any other group
+    // member. We only track the last message sent by anyone.
+    if (
+      group.latestMessageSnippet &&
+      !group.latestMessageSnippet.readBy.includes(userProfile.id)
+    ) {
+      group.latestMessageSnippet.readBy.push(userProfile.id);
+      updateGroup(group);
+    }
   };
 
   const handlePreviewDataFetched = ({

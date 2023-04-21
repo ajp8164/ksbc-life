@@ -1,12 +1,13 @@
 import { AppTheme, useTheme } from 'theme';
 import { Button, Icon } from '@rneui/base';
-import { Divider, ListItem } from '@react-native-ajp-elements/ui';
+import { Divider } from '@react-native-ajp-elements/ui';
 import { FlatList, ListRenderItem, ScrollView, View } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
 
 import { AuthContext } from 'lib/auth';
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { ChatNavigatorParamList } from 'types/navigation';
+import { DateTime } from 'luxon';
 import { Group } from 'types/group';
 import InfoMessage from 'components/atoms/InfoMessage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -18,6 +19,7 @@ import { groupsCollectionChangeListener } from 'firebase/firestore/groups';
 import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { useSelector } from 'react-redux';
+import { ListItem } from 'components/atoms/ListItem';
 
 type ExtendedGroup = Group & { calculatedName: string };
 
@@ -60,6 +62,8 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
   useEffect(() => {
     const subscription = groupsCollectionChangeListener(
       snapshot => {
+        if (snapshot.docChanges().length === 0) return;
+
         const updated: Group[] = [];
         snapshot.docs.forEach(d => {
           updated.push({ ...d.data(), id: d.id } as Group);
@@ -83,16 +87,29 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
   }, [userProfile?.role]);
 
   const prepareGroups = (groups: Group[]): ExtendedGroup[] => {
-    return (groups as ExtendedGroup[])
-      .map(g => {
-        return {
-          ...g,
-          calculatedName: getGroupName(g),
-        };
-      })
-      .sort((a, b) => {
-        return a.calculatedName < b.calculatedName ? -1 : 1;
-      });
+    return (
+      (groups as ExtendedGroup[])
+        .map(g => {
+          return {
+            ...g,
+            calculatedName: getGroupName(g),
+          };
+        })
+        // Sort groups alphabetically.
+        .sort((a, b) => {
+          return a.calculatedName.toLowerCase() < b.calculatedName.toLowerCase()
+            ? -1
+            : 1;
+        })
+        // Sort unread groups to the top.
+        .sort((a, b) => {
+          return b.latestMessageSnippet?.readBy.includes(
+            userProfile?.id || '',
+          ) && !a.latestMessageSnippet?.readBy.includes(userProfile?.id || '')
+            ? -1
+            : 1;
+        })
+    );
   };
 
   const renderGroup: ListRenderItem<ExtendedGroup> = ({
@@ -103,13 +120,32 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
       <ListItem
         title={group.calculatedName}
         titleStyle={s.title}
-        subtitle={
-          group.members.length > 2 && group.name.length > 0
-            ? group.calculatedName
-            : undefined
-        }
+        subtitle={group.latestMessageSnippet?.text}
         subtitleStyle={s.subtitle}
-        leftImage={<ChatAvatar group={group} size={'medium'} />}
+        numberOfLines={2}
+        value={
+          group.latestMessageSnippet?.createdAt &&
+          DateTime.fromISO(group.latestMessageSnippet?.createdAt).toFormat(
+            'M/d/yy',
+          )
+        }
+        valueStyle={[theme.styles.textSmall, theme.styles.textDim]}
+        alignContent={'top'}
+        leftImage={
+          <View style={{ flexDirection: 'row' }}>
+            <ChatAvatar group={group} size={'medium'} />
+            {userProfile?.id &&
+              !group.latestMessageSnippet?.readBy.includes(userProfile.id) && (
+                <Icon
+                  name={'circle'}
+                  type={'material-community'}
+                  color={theme.colors.assertive}
+                  size={16}
+                  containerStyle={{ position: 'absolute', right: 0, bottom: 0 }}
+                />
+              )}
+          </View>
+        }
         position={[
           index === 0 ? 'first' : undefined,
           index === groups.length - 1 ? 'last' : undefined,
