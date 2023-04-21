@@ -132,7 +132,7 @@ const createProfile = (
     photoUrl: credentials.photoURL !== null ? credentials.photoURL : '',
     avatar: {
       color: getUserAvatarColor(`${firstName}${lastName}`, colors),
-      title: getUserInitials(firstName, lastName),
+      title: getUserInitials(firstName || credentials.email || '', lastName),
     },
     role: credentials.isAnonymous ? UserRole.Anonymous : UserRole.User,
     status: UserStatus.Active,
