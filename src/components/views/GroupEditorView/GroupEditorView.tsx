@@ -2,6 +2,8 @@ import * as ImagePicker from 'react-native-image-picker';
 
 import {
   Alert,
+  FlatList,
+  ListRenderItem,
   ScrollView,
   Text,
   TouchableWithoutFeedback,
@@ -10,21 +12,31 @@ import {
 import { AppTheme, useTheme } from 'theme';
 import { Button, Icon } from '@rneui/base';
 import {
+  Divider,
+  ListItem,
+  ListItemInput,
+  selectImage,
+} from '@react-native-ajp-elements/ui';
+import {
   EditorState,
   GroupEditorViewMethods,
   GroupEditorViewProps,
 } from './types';
-import { ListItemInput, selectImage } from '@react-native-ajp-elements/ui';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { deleteImage, saveImage } from 'firebase/storage';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { Group } from 'types/group';
+import { UserProfile } from 'types/user';
 import { appConfig } from 'config';
 import { saveGroup as commitGroup } from 'firebase/firestore';
 import { getGroupName } from 'lib/group';
 import { makeStyles } from '@rneui/themed';
+import { openComposer } from 'react-native-email-link';
+import { selectUserProfile } from 'store/selectors/userSelectors';
+import { selectUserProfilesCache } from 'store/selectors/cacheSelectors';
+import { useSelector } from 'react-redux';
 import { useSetState } from '@react-native-ajp-elements/core';
 
 type GroupEditorView = GroupEditorViewMethods;
@@ -39,6 +51,10 @@ const GroupEditorView = React.forwardRef<GroupEditorView, GroupEditorViewProps>(
     const groupImageAsset = useRef<ImagePicker.Asset>();
     const groupImageUrl = useRef(group.photoUrl);
     const [groupName, setGroupName] = useState(getGroupName(group) || '');
+
+    const me = useSelector(selectUserProfile);
+    const userProfiles = useSelector(selectUserProfilesCache);
+    const [groupUserProfiles, setGroupUserProfiles] = useState<UserProfile[]>();
 
     const [editorState, setEditorState] = useSetState<EditorState>({
       isSubmitting: false,
@@ -58,6 +74,11 @@ const GroupEditorView = React.forwardRef<GroupEditorView, GroupEditorViewProps>(
       setEditorState({ isSubmitting: false });
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [group]);
+
+    useEffect(() => {
+      setGroupUserProfiles(getGroupUserProfiles());
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const saveGroup = async () => {
       const g: Group = {
@@ -131,6 +152,52 @@ const GroupEditorView = React.forwardRef<GroupEditorView, GroupEditorViewProps>(
       }
     };
 
+    const openEmail = (emailAddress: string) => {
+      openComposer({
+        to: emailAddress,
+      }).catch(() => {
+        //
+      });
+    };
+
+    const getGroupUserProfiles = () => {
+      const u: UserProfile[] = [];
+      group.members.forEach(id => {
+        if (id !== me?.id) {
+          const p = userProfiles.find(u => id === u.id);
+          if (p) {
+            u.push(p);
+          }
+        }
+      });
+      return u;
+    };
+
+    const renderGroup: ListRenderItem<UserProfile> = ({
+      item: userProfile,
+      index,
+    }) => {
+      return (
+        <ListItem
+          title={'Email'}
+          titleStyle={theme.styles.listItemSubtitle}
+          subtitle={userProfile.email}
+          subtitleStyle={theme.styles.listItemTitle}
+          containerStyle={{
+            backgroundColor: theme.colors.listItemBackgroundAlt,
+          }}
+          position={[
+            index === 0 ? 'first' : undefined,
+            index === (groupUserProfiles && groupUserProfiles.length - 1)
+              ? 'last'
+              : undefined,
+          ]}
+          rightImage={false}
+          onPress={() => openEmail(userProfile.email)}
+        />
+      );
+    };
+
     return (
       <>
         <AvoidSoftInputView style={theme.styles.viewAlt}>
@@ -195,6 +262,13 @@ const GroupEditorView = React.forwardRef<GroupEditorView, GroupEditorViewProps>(
                 <Text style={s.groupNameText}>{getGroupName(group)}</Text>
               </View>
             )}
+            <Divider />
+            <FlatList
+              data={groupUserProfiles}
+              renderItem={renderGroup}
+              keyExtractor={item => `${item.id}`}
+              scrollEnabled={false}
+            />
           </ScrollView>
         </AvoidSoftInputView>
       </>
