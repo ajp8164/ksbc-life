@@ -1,6 +1,6 @@
 import { UserProfile, UserRole } from 'types/user';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
-import { cacheUsers, deleteUser } from 'firebase/firestore';
+import { cacheGroups, cacheUsers, deleteUser } from 'firebase/firestore';
 import { createContext, useEffect, useRef } from 'react';
 import { signInAnonymously, useAuthorizeUser, useUnauthorizeUser } from '.';
 
@@ -97,6 +97,7 @@ export const useAuthContext = (
 
     if (userProfile.role !== UserRole.Anonymous) {
       // Cache data from firestore.
+      cacheGroups();
       cacheUsers();
     }
   };
