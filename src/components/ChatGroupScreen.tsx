@@ -53,10 +53,10 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
   const s = useStyles(theme);
 
   const sendAttachmentMessage = useSendAttachment();
-  console.log('route.params.group', route.params.group);
+
   const tabBarHeight = useBottomTabBarHeight();
   const [group, setGroup] = useState(route.params.group);
-  const composingGroup = useRef(!route.params.group);
+  const composingGroup = useRef(route.params.group === undefined);
   const userProfile = useSelector(selectUserProfile);
   const initialized = useRef(false);
   const isTyping = useRef(false);
@@ -177,7 +177,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
 
   // Set the header.
   useEffect(() => {
-    if (composingGroup) {
+    if (composingGroup.current) {
       // Get the list of users for search.
       getUsers().then(users => {
         setUserSearchSet(users.result);
@@ -215,6 +215,8 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
 
   // Select and set a group (shows messages) while adding users during composing a group.
   useEffect(() => {
+    if (!composingGroup.current) return;
+
     const members = addedUsers
       .map(u => {
         return u.id;
@@ -350,6 +352,9 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
 
     sendTextMessage(message, userProfile, updatedGroup);
     updateGroup(updatedGroup);
+
+    // Sending a text while composing exits composing mode.
+    composingGroup.current = false;
   };
 
   const setGroupLatestMessageSnippet = (
@@ -468,7 +473,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
 
   return (
     <SafeAreaView edges={['left', 'right']} style={{ flex: 1 }}>
-      {composingGroup && (
+      {composingGroup.current && (
         <View style={{}}>
           <Incubator.ChipsInput
             style={s.chipInputText}
