@@ -39,6 +39,7 @@ import { UserProfile } from 'types/user';
 import lodash from 'lodash';
 import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
+import { store } from 'store';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useSelector } from 'react-redux';
 
@@ -52,9 +53,10 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
   const s = useStyles(theme);
 
   const sendAttachmentMessage = useSendAttachment();
-
+  console.log('route.params.group', route.params.group);
   const tabBarHeight = useBottomTabBarHeight();
   const [group, setGroup] = useState(route.params.group);
+  const composingGroup = useRef(!route.params.group);
   const userProfile = useSelector(selectUserProfile);
   const initialized = useRef(false);
   const isTyping = useRef(false);
@@ -173,12 +175,9 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [group?.id]);
 
+  // Set the header.
   useEffect(() => {
-    if (group) {
-      navigation.setOptions({
-        header: () => renderHeader(group),
-      });
-    } else {
+    if (composingGroup) {
       // Get the list of users for search.
       getUsers().then(users => {
         setUserSearchSet(users.result);
@@ -205,10 +204,39 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
           />
         ),
       });
+    } else {
+      navigation.setOptions({
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        header: () => renderHeader(group!),
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [group]);
+  }, []);
 
+  // Select and set a group (shows messages) while adding users during composing a group.
+  useEffect(() => {
+    const members = addedUsers
+      .map(u => {
+        return u.id;
+      })
+      .concat(userProfile?.id);
+
+    if (members) {
+      const groupsCache = store.getState().cache.groups;
+      const group = groupsCache.find(g => {
+        return lodash.difference(g.members, members).length === 0;
+      });
+      if (group) {
+        setGroup(group);
+      } else {
+        setGroup(undefined);
+        setChatMessages([]);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addedUsers]);
+
+  // Filter users while typing.
   useEffect(() => {
     // On initial entry to search (user tapped search input)...
     // clear filtered data so only filtered results will display when search text is set.
@@ -263,16 +291,22 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
     if (text.length >= minimumRequiredCharsForSearch) {
       if (scope === SearchScope.Username) {
         //Case insensitive match.
-        const usersFirstName = lodash.filter(userSearchSet, u =>
-          u.firstName.toLowerCase().includes(text.toLowerCase()),
-        );
-        const usersLastName = lodash.filter(userSearchSet, u =>
-          u.lastName.toLowerCase().includes(text.toLowerCase()),
-        );
+        const usersByFirstName =
+          lodash.filter(userSearchSet, u =>
+            u.firstName.toLowerCase().includes(text.toLowerCase()),
+          ) || [];
+        const usersByLastName =
+          lodash.filter(userSearchSet, u =>
+            u.lastName.toLowerCase().includes(text.toLowerCase()),
+          ) || [];
+        const usersByEmail =
+          lodash.filter(userSearchSet, u =>
+            u.email.toLowerCase().includes(text.toLowerCase()),
+          ) || [];
 
         // Ensure no duplicates in the result.
         const searchResult = lodash.uniqBy(
-          usersFirstName.concat(usersLastName ? usersLastName : []),
+          usersByFirstName.concat(usersByLastName).concat(usersByEmail),
           'id',
         );
 
@@ -386,6 +420,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
     return (
       <ListItem
         title={item.name || item.email}
+        titleStyle={s.title}
         leftImage={<ChatAvatar userProfile={item} size={'medium'} />}
         rightImage={false}
         onPress={() => {
@@ -433,7 +468,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
 
   return (
     <SafeAreaView edges={['left', 'right']} style={{ flex: 1 }}>
-      {!group && (
+      {composingGroup && (
         <View style={{}}>
           <Incubator.ChipsInput
             style={s.chipInputText}
@@ -538,6 +573,9 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   toLabelContainer: {
     marginLeft: -10,
     marginRight: -5,
+  },
+  title: {
+    left: 20,
   },
 }));
 
