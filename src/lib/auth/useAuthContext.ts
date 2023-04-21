@@ -1,5 +1,6 @@
 import { UserProfile, UserRole } from 'types/user';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import { cacheUsers, deleteUser } from 'firebase/firestore';
 import { createContext, useEffect, useRef } from 'react';
 import { signInAnonymously, useAuthorizeUser, useUnauthorizeUser } from '.';
 
@@ -8,8 +9,6 @@ import { DateTime } from 'luxon';
 import { SignInModalMethods } from 'components/modals/SignInModal';
 import { StoreState } from 'store/initialStoreState';
 import { appConfig } from 'config';
-import { cacheUsers } from 'firebase/firestore/cache';
-import { deleteUser } from 'firebase/firestore/users';
 import lodash from 'lodash';
 import { selectUser } from 'store/selectors/userSelectors';
 import { store } from 'store';

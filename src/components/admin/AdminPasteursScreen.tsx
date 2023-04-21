@@ -10,7 +10,11 @@ import { AppTheme, useTheme } from 'theme';
 import { Button, Icon } from '@rneui/base';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import React, { useEffect, useRef, useState } from 'react';
-import { deletePasteur, getPasteurs } from 'firebase/firestore/pasteurs';
+import {
+  deletePasteur,
+  getPasteurs,
+  pasteursCollectionChangeListener,
+} from 'firebase/firestore';
 
 import { EditPasteurModal } from 'components/admin/modals/EditPasteurModal';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
@@ -19,7 +23,6 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Pasteur } from 'types/pasteur';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { makeStyles } from '@rneui/themed';
-import { pasteursCollectionChangeListener } from 'firebase/firestore/pasteurs';
 
 type Props = NativeStackScreenProps<MoreNavigatorParamList, 'AdminPasteurs'>;
 

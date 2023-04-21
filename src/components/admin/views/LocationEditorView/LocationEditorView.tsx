@@ -26,14 +26,14 @@ import {
 } from './types';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import React, { useEffect, useImperativeHandle, useRef } from 'react';
-import { deleteImage, saveImage } from 'firebase/storage/image';
+import { deleteImage, saveImage } from 'firebase/storage';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import FormikEffect from 'components/atoms/FormikEffect';
 import { Location } from 'types/location';
 import { StreetAddress } from 'types/common';
 import { appConfig } from 'config';
-import { saveLocation as commitLocation } from 'firebase/firestore/locations';
+import { saveLocation as commitLocation } from 'firebase/firestore';
 import { makeStyles } from '@rneui/themed';
 import { useSetState } from '@react-native-ajp-elements/core';
 

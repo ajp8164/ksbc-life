@@ -5,11 +5,11 @@ import DocumentPicker, {
 import { Alert } from 'react-native';
 import { MessageType } from '@flyerhq/react-native-chat-ui';
 import { UserProfile } from 'types/user';
-import { addChatMessage } from 'firebase/firestore/chatMessages';
+import { addChatMessage } from 'firebase/firestore';
 import { appConfig } from 'config';
 import { createAuthor } from './createAuthor';
 import { log } from '@react-native-ajp-elements/core';
-import { saveFile } from 'firebase/storage/file';
+import { saveFile } from 'firebase/storage';
 import { uuidv4 } from 'lib/uuid';
 
 export const sendFileMessage = async (

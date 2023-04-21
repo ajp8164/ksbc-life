@@ -38,7 +38,7 @@ import {
 } from 'types/pageContentItem';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { TabBar, TabView } from 'react-native-tab-view';
-import { deleteImage, saveImage } from 'firebase/storage/image';
+import { deleteImage, saveImage } from 'firebase/storage';
 import { ellipsis, useSetState } from '@react-native-ajp-elements/core';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
@@ -53,7 +53,7 @@ import { ItemPickerModal } from 'components/modals/ItemPickerModal';
 import { PageContentItemAssignment } from 'types/pageContentItem';
 import { TextModal } from 'components/modals/TextModal';
 import { appConfig } from 'config';
-import { savePageContentItem as commitPageContentItem } from 'firebase/firestore/pageContentItems';
+import { savePageContentItem as commitPageContentItem } from 'firebase/firestore';
 import { makeStyles } from '@rneui/themed';
 
 const initialPageContentItem: PageContentItem = {
@@ -72,7 +72,7 @@ const initialPageContentItem: PageContentItem = {
   },
   schedule: {
     enabled: false,
-    startDate: DateTime.now().toISO(),
+    startDate: DateTime.now().toISO() || '',
     endDate: '',
   },
   status: 'active',

@@ -18,7 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
 import { Text } from 'react-native';
 import { UserRole } from 'types/user';
-import { pageContentItemCollectionChangeListener } from 'firebase/firestore/pageContentItems';
+import { pageContentItemCollectionChangeListener } from 'firebase/firestore';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { useSelector } from 'react-redux';
 import { useTheme } from 'theme';

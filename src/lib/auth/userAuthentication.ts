@@ -4,7 +4,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { NativeModules } from 'react-native';
 import { appleAuth } from '@invertase/react-native-apple-authentication';
 import auth from '@react-native-firebase/auth';
-import { cancelAllFirestoreSubscriptions } from 'firebase/firestore/subscriptions';
+import { cancelAllFirestoreSubscriptions } from 'firebase/firestore';
 import { log } from '@react-native-ajp-elements/core';
 
 const { RNTwitterSignIn } = NativeModules;

@@ -1,17 +1,14 @@
 import { Asset } from 'react-native-image-picker';
 import { MessageType } from '@flyerhq/react-native-chat-ui';
 import { UserProfile } from 'types/user';
-import { addChatMessage } from 'firebase/firestore/chatMessages';
+import { addChatMessage } from 'firebase/firestore';
 import { appConfig } from 'config';
 import { createAuthor } from './createAuthor';
-import { saveImage } from 'firebase/storage/image';
+import { saveImage } from 'firebase/storage';
 import { selectImage } from '@react-native-ajp-elements/ui';
 import { uuidv4 } from 'lib/uuid';
 
-export const sendImageMessage = (
-  userProfile: UserProfile,
-  groupId: string,
-) => {
+export const sendImageMessage = (userProfile: UserProfile, groupId: string) => {
   selectImage({
     onSuccess: async imageAssets => {
       const imageAsset = imageAssets[0];

@@ -26,6 +26,7 @@ import {
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import { LifeApplication, Sermon, SermonVideo } from 'types/sermon';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { saveSermon as commitSermon, getPasteurs } from 'firebase/firestore';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import { BibleReference } from 'types/bible';
@@ -36,8 +37,6 @@ import FormikEffect from 'components/atoms/FormikEffect';
 import { ItemPickerModal } from 'components/modals/ItemPickerModal';
 import { SermonVideoPickerModal } from 'components/admin/modals/SermonVideoPickerModal';
 import { bibleReferenceToString } from 'lib/bible';
-import { saveSermon as commitSermon } from 'firebase/firestore/sermons';
-import { getPasteurs } from 'firebase/firestore/pasteurs';
 import lodash from 'lodash';
 import { makeStyles } from '@rneui/themed';
 import { useSetState } from '@react-native-ajp-elements/core';
@@ -215,7 +214,7 @@ const SermonEditorView = React.forwardRef<
           <Formik
             innerRef={formikRef}
             initialValues={{
-              date: sermon?.date || DateTime.now().toISODate(),
+              date: sermon?.date || DateTime.now().toISODate() || '',
               pasteur: sermon?.pasteur || '',
               title: sermon?.title || '',
               seriesTitle: sermon?.seriesTitle || '',

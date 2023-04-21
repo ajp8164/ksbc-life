@@ -6,14 +6,14 @@ import { FlatList, Keyboard, ListRenderItem, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   addGroup,
-  groupsDocumentChangeListener,
-  updateGroup,
-} from 'firebase/firestore/groups';
-import {
   chatMessagesCollectionChangeListener,
+  getUsers,
+  groupsDocumentChangeListener,
   sendTypingState,
   updateChatMessage,
-} from 'firebase/firestore/chatMessages';
+  updateGroup,
+  updateUser,
+} from 'firebase/firestore';
 import {
   chatTheme,
   handleMessagePress,
@@ -21,7 +21,6 @@ import {
   useSendAttachment,
 } from 'lib/chat';
 import { getGroupAvatarColor, getGroupMembersStr } from 'lib/group';
-import { getUsers, updateUser } from 'firebase/firestore/users';
 
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { ChatHeader } from 'components/molecules/ChatHeader';

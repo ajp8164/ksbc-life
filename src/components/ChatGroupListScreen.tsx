@@ -15,7 +15,7 @@ import NoItems from 'components/atoms/NoItems';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { UserRole } from 'types/user';
 import { getGroupName } from 'lib/group';
-import { groupsCollectionChangeListener } from 'firebase/firestore/groups';
+import { groupsCollectionChangeListener } from 'firebase/firestore';
 import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { useSelector } from 'react-redux';

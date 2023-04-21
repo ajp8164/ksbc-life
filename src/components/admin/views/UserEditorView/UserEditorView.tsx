@@ -14,7 +14,7 @@ import { UserRolePickerModal } from 'components/admin/modals/UserRolePickerModal
 import { UserStatusPickerModal } from 'components/admin/modals/UserStatusPickerModal';
 import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
-import { updateUser } from 'firebase/firestore/users';
+import { updateUser } from 'firebase/firestore';
 import { useSelector } from 'react-redux';
 import { useSetState } from '@react-native-ajp-elements/core';
 

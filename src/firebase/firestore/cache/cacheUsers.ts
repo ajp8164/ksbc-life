@@ -2,7 +2,7 @@ import { UserProfile } from 'types/user';
 import { cacheUserProfiles } from 'store/slices/cache';
 import { dispatch } from 'store';
 import { log } from '@react-native-ajp-elements/core';
-import { usersCollectionChangeListener } from 'firebase/firestore/users';
+import { usersCollectionChangeListener } from 'firebase/firestore';
 
 export const cacheUsers = async () => {
   usersCollectionChangeListener(snapshot => {

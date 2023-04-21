@@ -7,10 +7,7 @@ import {
 import { AppTheme, useTheme } from 'theme';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  getUsers,
-  usersCollectionChangeListener,
-} from 'firebase/firestore/users';
+import { getUsers, usersCollectionChangeListener } from 'firebase/firestore';
 
 import { EditUserModal } from 'components/admin/modals/EditUserModal';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';

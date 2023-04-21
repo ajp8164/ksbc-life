@@ -13,9 +13,10 @@ import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   deleteSermon,
+  getDocumentCount,
   getSermons,
   sermonsCollectionChangeListener,
-} from 'firebase/firestore/sermons';
+} from 'firebase/firestore';
 
 import { DateTime } from 'luxon';
 import { EditPasteurModal } from 'components/admin/modals/EditPasteurModal';
@@ -26,7 +27,6 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Sermon } from 'types/sermon';
 import { cacheYouTubeBroadcastVideosToFirestore } from 'lib/youTube';
-import { getDocumentCount } from 'firebase/firestore/utils';
 import { makeStyles } from '@rneui/themed';
 
 type Props = NativeStackScreenProps<MoreNavigatorParamList, 'AdminSermons'>;

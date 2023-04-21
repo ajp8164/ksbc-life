@@ -7,7 +7,7 @@ import {
   documentChangeListener,
   getDocument,
   getDocuments,
-} from 'firebase/firestore/utils';
+} from '.';
 import firestore, {
   FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';

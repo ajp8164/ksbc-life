@@ -17,7 +17,7 @@ import { appConfig } from 'config';
 import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { updateUserProfile } from 'store/slices/user';
-import { usersDocumentChangeListener } from 'firebase/firestore/users';
+import { usersDocumentChangeListener } from 'firebase/firestore';
 
 export type Props = CompositeScreenProps<
   NativeStackScreenProps<MoreNavigatorParamList, 'More'>,

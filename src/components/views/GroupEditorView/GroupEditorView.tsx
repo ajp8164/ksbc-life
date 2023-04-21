@@ -16,13 +16,13 @@ import {
 } from './types';
 import { ListItemInput, selectImage } from '@react-native-ajp-elements/ui';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { deleteImage, saveImage } from 'firebase/storage/image';
+import { deleteImage, saveImage } from 'firebase/storage';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { Group } from 'types/group';
 import { appConfig } from 'config';
-import { saveGroup as commitGroup } from 'firebase/firestore/groups';
+import { saveGroup as commitGroup } from 'firebase/firestore';
 import { getGroupName } from 'lib/group';
 import { makeStyles } from '@rneui/themed';
 import { useSetState } from '@react-native-ajp-elements/core';

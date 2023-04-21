@@ -11,10 +11,11 @@ import { Button, Icon } from '@rneui/base';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import React, { useEffect, useRef, useState } from 'react';
 import {
+  churchCollectionChangeListener,
   deleteLocation,
   getLocations,
   locationsCollectionChangeListener,
-} from 'firebase/firestore/locations';
+} from 'firebase/firestore';
 
 import { Church } from 'types/church';
 import { EditChurchModal } from 'components/admin/modals/EditChurchModal';
@@ -22,7 +23,6 @@ import { EditLocationModal } from 'components/admin/modals/EditLocationModal';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { Location } from 'types/location';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { churchCollectionChangeListener } from 'firebase/firestore/churches';
 import { makeStyles } from '@rneui/themed';
 
 const AdminChurchScreen = () => {

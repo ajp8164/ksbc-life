@@ -26,7 +26,7 @@ import {
 } from '@react-native-ajp-elements/ui';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import React, { useEffect, useImperativeHandle, useRef } from 'react';
-import { deleteImage, saveImage } from 'firebase/storage/image';
+import { deleteImage, saveImage } from 'firebase/storage';
 import { ellipsis, useSetState } from '@react-native-ajp-elements/core';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
@@ -34,7 +34,7 @@ import { Church } from 'types/church';
 import FormikEffect from 'components/atoms/FormikEffect';
 import { TextModal } from 'components/modals/TextModal';
 import { appConfig } from 'config';
-import { saveChurch as commitChurch } from 'firebase/firestore/churches';
+import { saveChurch as commitChurch } from 'firebase/firestore';
 import { makeStyles } from '@rneui/themed';
 
 enum Fields {

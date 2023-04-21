@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   getSermons,
   sermonsCollectionChangeListener,
-} from 'firebase/firestore/sermons';
+} from 'firebase/firestore';
 
 import { AuthContext } from 'lib/auth';
 import { DateTime } from 'luxon';

@@ -1,7 +1,7 @@
 import { Group } from 'types/group';
 import { MessageType } from '@flyerhq/react-native-chat-ui';
 import { UserProfile } from 'types/user';
-import { addChatMessage } from 'firebase/firestore/chatMessages';
+import { addChatMessage } from 'firebase/firestore';
 import { createAuthor } from './createAuthor';
 import { uuidv4 } from 'lib/uuid';
 
