@@ -132,18 +132,19 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
         valueStyle={[theme.styles.textSmall, theme.styles.textDim]}
         alignContent={'top'}
         leftImage={
-          <View style={{ flexDirection: 'row' }}>
+          <View
+            style={{
+              borderColor:
+                userProfile?.id &&
+                !group.latestMessageSnippet?.readBy.includes(userProfile.id)
+                  ? theme.colors.brandSecondary
+                  : theme.colors.transparent,
+              borderWidth: 3,
+              borderRadius: 50,
+              padding: 2,
+              marginLeft: -5,
+            }}>
             <ChatAvatar group={group} size={'medium'} />
-            {userProfile?.id &&
-              !group.latestMessageSnippet?.readBy.includes(userProfile.id) && (
-                <Icon
-                  name={'circle'}
-                  type={'material-community'}
-                  color={theme.colors.assertive}
-                  size={16}
-                  containerStyle={{ position: 'absolute', right: 0, bottom: 0 }}
-                />
-              )}
           </View>
         }
         position={[
