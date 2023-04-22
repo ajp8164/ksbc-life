@@ -1,8 +1,9 @@
+import Animated, { SlideOutUp } from 'react-native-reanimated';
 import { AppTheme, useTheme } from 'theme';
 import { Button, Icon } from '@rneui/base';
 import { Chat, MessageType } from '@flyerhq/react-native-chat-ui';
 import { FirestoreMessageType, SearchCriteria, SearchScope } from 'types/chat';
-import { FlatList, Keyboard, ListRenderItem, View } from 'react-native';
+import { FlatList, Keyboard, ListRenderItem, Text, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   addGroup,
@@ -211,9 +212,9 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [composingGroup.current]);
 
-  // Select and set a group (shows messages) while adding users during composing a group.
+  // Select and set/unset a group (shows messages) while adding users during composing a group.
   useEffect(() => {
     if (!composingGroup.current) return;
 
@@ -229,12 +230,16 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
       const group = groupsCache.find(g => {
         return lodash.difference(g.members, members).length === 0;
       });
+
       if (group) {
         setGroup(group);
       } else {
         setGroup(undefined);
         setChatMessages([]);
       }
+    } else {
+      setGroup(undefined);
+      setChatMessages([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addedUsers]);
@@ -422,15 +427,15 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
     return <ChatHeader group={group} />;
   };
 
-  const renderUser: ListRenderItem<UserProfile> = ({ item }) => {
+  const renderUser: ListRenderItem<UserProfile> = ({ item: userProfile }) => {
     return (
       <ListItem
-        title={item.name || item.email}
-        titleStyle={s.title}
-        leftImage={<ChatAvatar userProfile={item} size={'medium'} />}
+        title={userProfile.name || userProfile.email}
+        titleStyle={s.userProfileTitle}
+        leftImage={<ChatAvatar userProfile={userProfile} size={'medium'} />}
         rightImage={false}
         onPress={() => {
-          setAddedUsers(addedUsers.concat(item));
+          setAddedUsers(addedUsers.concat(userProfile));
           resetSearch();
         }}
       />
@@ -446,7 +451,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
   };
 
   const addedUserChips = () => {
-    const chips = addedUsers.map(u => {
+    return addedUsers.map(u => {
       return {
         label: u.name || u.email,
         labelStyle: theme.styles.textSmall,
@@ -457,26 +462,18 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
           lodash.remove(current, u);
           setAddedUsers(current);
         },
-      };
+      } as Incubator.ChipsInputChipProps;
     });
-
-    // Use a stylized chip for the "To:" label since the components leftElement forces
-    // an undesirable left indent for all wrapped rows or chips.
-    return [
-      {
-        label: 'To:',
-        labelStyle: s.toLabel,
-        style: s.toLabelContainer,
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ].concat(chips as any);
   };
 
   return (
     <SafeAreaView edges={['left', 'right']} style={{ flex: 1 }}>
       {composingGroup.current && (
-        <View>
+        <Animated.View
+          exiting={SlideOutUp.duration(750)}
+          style={s.groupComposerContainer}>
           <Incubator.ChipsInput
+            leadingAccessory={<Text style={s.toLabel}>{'To:'}</Text>}
             style={s.chipInputText}
             fieldStyle={s.chipInput}
             chips={addedUserChips()}
@@ -487,7 +484,6 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
                 updatedChip.onDismiss && updatedChip.onDismiss();
               }
             }}
-            // }}
             onChangeText={(text: string) =>
               searchFilter({
                 text,
@@ -504,7 +500,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
             keyExtractor={item => `${item.id}`}
             contentInsetAdjustmentBehavior={'automatic'}
           />
-        </View>
+        </Animated.View>
       )}
       {userProfile?.id && (
         <Chat
@@ -557,6 +553,11 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
 
 const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   emptyListContainer: {},
+  groupComposerContainer: {
+    position: 'absolute',
+    width: '100%',
+    zIndex: 1,
+  },
   chipInput: {
     backgroundColor: theme.colors.white,
     borderBottomWidth: 1,
@@ -574,13 +575,9 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   },
   toLabel: {
     ...theme.styles.textNormal,
-    marginTop: 3,
+    marginRight: 3,
   },
-  toLabelContainer: {
-    marginLeft: -10,
-    marginRight: -5,
-  },
-  title: {
+  userProfileTitle: {
     left: 20,
   },
 }));
