@@ -80,8 +80,10 @@ export const sendTypingState = (
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((e: any) => {
-        log.error(`Failed to update chat typing state: ${e.message}`);
-        throw e;
+        if (!e.message.includes('firestore/permission-denied')) {
+          log.error(`Failed to update chat typing state: ${e.message}`);
+          throw e;
+        }
       })
   );
 };
