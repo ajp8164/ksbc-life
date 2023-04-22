@@ -73,7 +73,9 @@ export const ChatHeader = ({
       <TouchableWithoutFeedback onPress={editGroupModalRef.current?.present}>
         <View style={s.container}>
           <ChatAvatar group={group} size={'large'} />
-          <Text style={s.title}>{group && `${getGroupName(group)} >`}</Text>
+          <Text style={s.title}>
+            {group && `${getGroupName(group, { type: 'short' })} >`}
+          </Text>
         </View>
       </TouchableWithoutFeedback>
     );

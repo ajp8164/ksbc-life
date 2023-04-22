@@ -21,7 +21,7 @@ import {
   sendTextMessage,
   useSendAttachment,
 } from 'lib/chat';
-import { getGroupAvatarColor, getGroupMembersStr } from 'lib/group';
+import { getGroupAvatarColor, getGroupMembersLongStr } from 'lib/group';
 
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { ChatHeader } from 'components/molecules/ChatHeader';
@@ -187,7 +187,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [group?.id]);
 
-  // Set the header.
+  // Set the group composer add button.
   useEffect(() => {
     if (composingGroup.current) {
       // Get the list of users for search.
@@ -279,7 +279,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
         return u.id;
       }),
     ) as string[];
-    const groupName = getGroupMembersStr(memberIds);
+    const groupName = getGroupMembersLongStr(memberIds);
 
     const newGroup = {
       createdBy: userProfile?.id,

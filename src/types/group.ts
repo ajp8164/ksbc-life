@@ -1,3 +1,5 @@
+export type GroupNameSize = 'short' | 'long';
+
 export type Group = {
   id?: string;
   createdBy: string;
