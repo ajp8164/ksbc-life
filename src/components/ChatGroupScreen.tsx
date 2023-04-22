@@ -187,7 +187,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [group?.id]);
 
-  // Set the group composer add button.
+  // Set the group header or composer header.
   useEffect(() => {
     if (composingGroup.current) {
       // Get the list of users for search.
@@ -223,7 +223,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [composingGroup.current]);
+  }, [composingGroup.current, group]);
 
   // Select and set/unset a group (shows messages) while adding users during composing a group.
   useEffect(() => {

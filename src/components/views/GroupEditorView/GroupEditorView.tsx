@@ -50,7 +50,7 @@ const GroupEditorView = React.forwardRef<GroupEditorView, GroupEditorViewProps>(
 
     const groupImageAsset = useRef<ImagePicker.Asset>();
     const groupImageUrl = useRef(group.photoUrl);
-    const [groupName, setGroupName] = useState(getGroupName(group) || '');
+    const [groupName, setGroupName] = useState(group.name);
 
     const me = useSelector(selectUserProfile);
     const userProfiles = useSelector(selectUserProfilesCache);
