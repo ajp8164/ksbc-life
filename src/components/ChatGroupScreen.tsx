@@ -571,6 +571,7 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
     borderBottomColor: theme.colors.subtleGray,
     paddingHorizontal: 10,
     paddingVertical: 7,
+    minHeight: 50,
   },
   chipInputText: {
     ...theme.styles.textNormal,
@@ -583,6 +584,7 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   toLabel: {
     ...theme.styles.textNormal,
     marginRight: 3,
+    marginTop: 14,
   },
   userProfileTitle: {
     left: 20,
