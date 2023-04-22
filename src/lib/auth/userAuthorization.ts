@@ -2,6 +2,7 @@ import { UserProfile, UserRole, UserStatus } from 'types/user';
 import { getUserAvatarColor, getUserInitials } from 'lib/user';
 
 import { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import { cacheUsers } from 'firebase/firestore';
 import firestore from '@react-native-firebase/firestore';
 import lodash from 'lodash';
 import { log } from '@react-native-ajp-elements/core';
@@ -45,6 +46,8 @@ export const useAuthorizeUser = () => {
                 log.debug(`User profile created: ${JSON.stringify(profile)}`);
                 const user = setUser(credentials, profile);
                 result?.onAuthorized && result.onAuthorized(user.profile);
+                // Re-cache users to get ourself into the cache.
+                cacheUsers();
                 log.debug(
                   `User sign in complete: ${JSON.stringify(user.profile)}`,
                 );
