@@ -51,6 +51,9 @@ export const ChatAvatar = ({
       ? theme.styles.avatarTitleLarge
       : theme.styles.avatarTitleGiant;
 
+  const _iconSize =
+    size === 'small' ? 20 : size === 'medium' ? 28 : size === 'large' ? 36 : 42;
+
   const renderUserAvatar = (userProfile?: UserProfile) => {
     if (userProfile?.photoUrl.length) {
       return (
@@ -115,16 +118,23 @@ export const ChatAvatar = ({
   }
 
   if (members.length > 2) {
-    <Avatar
-      title={group?.avatar.title}
-      titleStyle={[_titleStyle, titleStyle]}
-      containerStyle={{
-        ..._avatarStyle,
-        backgroundColor: group?.avatar.color,
-        ...avatarStyle,
-      }}
-      onPress={onPress}
-    />;
+    return (
+      <Avatar
+        title={group?.avatar.title}
+        titleStyle={[_titleStyle, titleStyle]}
+        icon={{
+          name: 'account-multiple',
+          type: 'material-community',
+          size: _iconSize,
+        }}
+        containerStyle={{
+          ..._avatarStyle,
+          backgroundColor: group?.avatar.color,
+          ...avatarStyle,
+        }}
+        onPress={onPress}
+      />
+    );
   }
 
   // Group individual selection
