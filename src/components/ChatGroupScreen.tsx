@@ -239,7 +239,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
       const members = lodash.uniq(added.concat(userProfile?.id)).sort();
       const groupsCache = store.getState().cache.groups;
       const group = groupsCache.find(g => {
-        return lodash.isEqual(g.members.sort(), members);
+        return lodash.isEqual(lodash.sortBy(g.members), members);
       });
 
       if (group) {
