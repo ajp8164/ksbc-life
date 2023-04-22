@@ -132,9 +132,10 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
       <ListItem
         title={group.calculatedName}
         titleStyle={s.title}
+        titleNumberOfLines={1}
         subtitle={group.latestMessageSnippet?.text}
         subtitleStyle={s.subtitle}
-        numberOfLines={2}
+        subtitleNumberOfLines={2}
         value={
           group.latestMessageSnippet?.createdAt &&
           DateTime.fromISO(group.latestMessageSnippet?.createdAt).toFormat(
@@ -221,6 +222,7 @@ const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
   emptyListContainer: {},
   title: {
     left: 20,
+    width: '78%',
   },
   subtitle: {
     left: 20,
