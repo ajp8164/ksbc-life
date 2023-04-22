@@ -20,7 +20,7 @@ import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { useSelector } from 'react-redux';
 
-type ExtendedGroup = Group & { calculatedName: string };
+type ExtendedGroup = Group & { calculatedName?: string };
 
 export type Props = NativeStackScreenProps<
   ChatNavigatorParamList,
@@ -61,6 +61,10 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
 
   // Groups collection listener
   useEffect(() => {
+    // Clear state in anticipation of another sign in without restating the app.
+    // Prevents the new user from accessing the old users data.
+    setGroups([]);
+
     const subscription = groupsCollectionChangeListener(
       snapshot => {
         if (snapshot.docChanges().length === 0) return;
@@ -113,6 +117,13 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
     );
   };
 
+  const cleanGroup = (extendedGroup: ExtendedGroup) => {
+    // Removes any locally defined properties from the group.
+    const cleanGroup = Object.assign({}, extendedGroup);
+    delete cleanGroup.calculatedName;
+    return cleanGroup as Group;
+  };
+
   const renderGroup: ListRenderItem<ExtendedGroup> = ({
     item: group,
     index,
@@ -154,7 +165,7 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
         ]}
         onPress={() =>
           navigation.navigate('ChatGroup', {
-            group,
+            group: cleanGroup(group),
           })
         }
       />
