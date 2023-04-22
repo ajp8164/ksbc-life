@@ -121,8 +121,11 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
           }
 
           setChatMessages(messages);
-          setLatestMessageAsReadByMe();
-          initialized.current = true;
+
+          if (!composingGroup.current) {
+            setLatestMessageAsReadByMe();
+            initialized.current = true;
+          }
         }
       },
     );
@@ -224,11 +227,11 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
 
     if (added.length) {
       // All members of the group include me.
-      const members = added.concat(userProfile?.id);
-      added.concat(userProfile?.id);
+      // Uniqu covers case when I added myself (avoiding adding myself twice).
+      const members = lodash.uniq(added.concat(userProfile?.id));
       const groupsCache = store.getState().cache.groups;
       const group = groupsCache.find(g => {
-        return lodash.difference(g.members, members).length === 0;
+        return lodash.isEqual(g.members, members);
       });
 
       if (group) {
@@ -259,12 +262,14 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
   };
 
   const createGroup = async (): Promise<Group> => {
-    // Uniq  allows for a group  of one; chat with myself.
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const members = [userProfile!].concat(addedUsers);
-    const memberIds = members.map(u => {
-      return u.id;
-    }) as string[];
+    // Uniq allows for a group of one - chat with myself.
+    const memberIds = lodash.uniq(
+      members.map(u => {
+        return u.id;
+      }),
+    ) as string[];
     const groupName = getGroupMembersStr(memberIds);
 
     const newGroup = {
@@ -390,6 +395,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
       group.latestMessageSnippet &&
       !group.latestMessageSnippet.readBy.includes(userProfile.id)
     ) {
+      console.log(group, userProfile.id);
       group.latestMessageSnippet.readBy.push(userProfile.id);
       updateGroup(group);
     }
