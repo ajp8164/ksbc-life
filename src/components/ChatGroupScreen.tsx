@@ -35,6 +35,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import NoItems from 'components/atoms/NoItems';
 import { PreviewData } from '@flyerhq/react-native-link-preview';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { StackActions } from '@react-navigation/native';
 import { UserPickerModal } from 'components/modals/UserPickerModal';
 import { UserProfile } from 'types/user';
 import lodash from 'lodash';
@@ -74,6 +75,13 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
   const [filteredUsers, setFilteredUsers] = useState<UserProfile[]>([]);
   const [userSearchSet, setUserSearchSet] = useState<UserProfile[]>([]);
   const userPickerModalRef = useRef<UserPickerModal>(null);
+
+  useEffect(() => {
+    if (!userProfile) {
+      navigation.dispatch(StackActions.popToTop());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userProfile]);
 
   // Messages listener
   useEffect(() => {

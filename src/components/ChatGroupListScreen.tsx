@@ -37,6 +37,7 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [groups, setGroups] = useState<ExtendedGroup[]>([]);
 
+  // Set header
   useEffect(() => {
     navigation.setOptions({
       // eslint-disable-next-line react/no-unstable-nested-components
@@ -58,6 +59,7 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Groups collection listener
   useEffect(() => {
     const subscription = groupsCollectionChangeListener(
       snapshot => {

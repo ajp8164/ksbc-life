@@ -11,6 +11,7 @@ import { signOut, useUnauthorizeUser } from 'lib/auth';
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { CompositeScreenProps } from '@react-navigation/core';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { StackActions } from '@react-navigation/native';
 import { biometricAuthentication } from 'lib/biometricAuthentication';
 import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
@@ -61,7 +62,7 @@ const UserProfileScreen = ({ navigation }: Props) => {
   const doSignOut = () => {
     signOut().then(() => {
       unauthorizeUser();
-      navigation.goBack();
+      navigation.dispatch(StackActions.popToTop());
     });
   };
 
