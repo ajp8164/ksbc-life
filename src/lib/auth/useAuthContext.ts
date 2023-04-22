@@ -1,6 +1,5 @@
 import { UserProfile, UserRole } from 'types/user';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
-import { cacheGroups, cacheUsers, deleteUser } from 'firebase/firestore';
 import { createContext, useEffect, useRef } from 'react';
 import { signInAnonymously, useAuthorizeUser, useUnauthorizeUser } from '.';
 
@@ -9,6 +8,7 @@ import { DateTime } from 'luxon';
 import { SignInModalMethods } from 'components/modals/SignInModal';
 import { StoreState } from 'store/initialStoreState';
 import { appConfig } from 'config';
+import { deleteUser } from 'firebase/firestore';
 import lodash from 'lodash';
 import { selectUser } from 'store/selectors/userSelectors';
 import { store } from 'store';
@@ -92,14 +92,8 @@ export const useAuthContext = (
     }
   };
 
-  const onAuthorized = (userProfile: UserProfile) => {
+  const onAuthorized = (_userProfile: UserProfile) => {
     dismiss();
-
-    if (userProfile.role !== UserRole.Anonymous) {
-      // Cache data from firestore.
-      cacheGroups();
-      cacheUsers();
-    }
   };
 
   const onUnauthorized = (accountNotActive?: boolean) => {

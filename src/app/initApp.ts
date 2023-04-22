@@ -1,6 +1,7 @@
 import '@react-native-firebase/app';
 
 import { AJPElements, log } from '@react-native-ajp-elements/core';
+import { cacheGroups, cacheUsers } from 'firebase/firestore';
 
 import { AppError } from 'lib/errors';
 import { BackHandler } from 'react-native';
@@ -43,6 +44,10 @@ export const initApp = async (): Promise<InitStatus> => {
     GoogleSignin.configure({
       webClientId: appConfig.firebaseOauthClientId,
     });
+
+    // Cache data from firestore.
+    cacheGroups();
+    cacheUsers();
 
     return InitStatus.Success;
 
