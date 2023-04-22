@@ -239,7 +239,6 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
       const members = lodash.uniq(added.concat(userProfile?.id)).sort();
       const groupsCache = store.getState().cache.groups;
       const group = groupsCache.find(g => {
-        console.log(g.members.sort(), members);
         return lodash.isEqual(g.members.sort(), members);
       });
 
@@ -404,7 +403,6 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
       group.latestMessageSnippet &&
       !group.latestMessageSnippet.readBy.includes(userProfile.id)
     ) {
-      console.log(group, userProfile.id);
       group.latestMessageSnippet.readBy.push(userProfile.id);
       updateGroup(group);
     }
