@@ -228,10 +228,11 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
     if (added.length) {
       // All members of the group include me.
       // Uniqu covers case when I added myself (avoiding adding myself twice).
-      const members = lodash.uniq(added.concat(userProfile?.id));
+      const members = lodash.uniq(added.concat(userProfile?.id)).sort();
       const groupsCache = store.getState().cache.groups;
       const group = groupsCache.find(g => {
-        return lodash.isEqual(g.members, members);
+        console.log(g.members.sort(), members);
+        return lodash.isEqual(g.members.sort(), members);
       });
 
       if (group) {
