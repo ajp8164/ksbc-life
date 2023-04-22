@@ -173,16 +173,13 @@ const GroupEditorView = React.forwardRef<GroupEditorView, GroupEditorViewProps>(
       return u;
     };
 
-    const renderGroup: ListRenderItem<UserProfile> = ({
+    const renderGroupMember: ListRenderItem<UserProfile> = ({
       item: userProfile,
       index,
     }) => {
       return (
         <ListItem
-          title={'Email'}
-          titleStyle={theme.styles.listItemSubtitle}
-          subtitle={userProfile.email}
-          subtitleStyle={theme.styles.listItemTitle}
+          title={userProfile.name || userProfile.email}
           containerStyle={{
             backgroundColor: theme.colors.listItemBackgroundAlt,
           }}
@@ -192,7 +189,6 @@ const GroupEditorView = React.forwardRef<GroupEditorView, GroupEditorViewProps>(
               ? 'last'
               : undefined,
           ]}
-          rightImage={false}
           onPress={() => openEmail(userProfile.email)}
         />
       );
@@ -227,17 +223,19 @@ const GroupEditorView = React.forwardRef<GroupEditorView, GroupEditorViewProps>(
                     />
                   </View>
                 </TouchableWithoutFeedback>
-                <Button
-                  type={'clear'}
-                  title={'Delete photo'}
-                  titleStyle={[
-                    theme.styles.textSmall,
-                    { color: theme.colors.textLink },
-                  ]}
-                  buttonStyle={{ padding: 0 }}
-                  containerStyle={{ marginTop: -10, alignSelf: 'center' }}
-                  onPress={deleteGroupImage}
-                />
+                {group.photoUrl && (
+                  <Button
+                    type={'clear'}
+                    title={'Delete photo'}
+                    titleStyle={[
+                      theme.styles.textSmall,
+                      { color: theme.colors.textLink },
+                    ]}
+                    buttonStyle={{ padding: 0 }}
+                    containerStyle={{ marginTop: -10, alignSelf: 'center' }}
+                    onPress={deleteGroupImage}
+                  />
+                )}
                 <ListItemInput
                   placeholder={'Group name'}
                   placeholderTextColor={theme.colors.textPlaceholder}
@@ -262,10 +260,10 @@ const GroupEditorView = React.forwardRef<GroupEditorView, GroupEditorViewProps>(
                 <Text style={s.groupNameText}>{getGroupName(group)}</Text>
               </View>
             )}
-            <Divider />
+            <Divider text={'GROUP MEMBERS'} style={{ marginTop: 30 }} />
             <FlatList
               data={groupUserProfiles}
-              renderItem={renderGroup}
+              renderItem={renderGroupMember}
               keyExtractor={item => `${item.id}`}
               scrollEnabled={false}
             />
