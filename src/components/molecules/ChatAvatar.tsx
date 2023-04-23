@@ -81,7 +81,7 @@ export const ChatAvatar = ({
 
   // Request is for single user (no group)
 
-  if (!userProfile) {
+  if (!userProfile && !group) {
     // Seems to be a bug which allows the previous avatar image to remain
     // displayed. Use an icon to avoid.
     return (
