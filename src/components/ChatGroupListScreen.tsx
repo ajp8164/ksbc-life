@@ -13,7 +13,6 @@ import InfoMessage from 'components/atoms/InfoMessage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import NoItems from 'components/atoms/NoItems';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { UserRole } from 'types/user';
 import { getGroupName } from 'lib/group';
 import { groupsCollectionChangeListener } from 'firebase/firestore';
 import { makeStyles } from '@rneui/themed';
@@ -186,7 +185,7 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
     <SafeAreaView
       edges={['left', 'right']}
       style={[theme.styles.view, { paddingHorizontal: 0 }]}>
-      {userProfile?.role !== UserRole.Anonymous ? (
+      {userProfile ? (
         <FlatList
           data={groups}
           renderItem={renderGroup}

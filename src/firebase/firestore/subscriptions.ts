@@ -11,7 +11,7 @@ export const addFirestoreSubscription = (
 ) => {
   firestoreSubscriptions.push({ subscription, who });
   log.debug(
-    `Added firestore subscription ${who}, count=${firestoreSubscriptions.length}`,
+    `Added firestore subscription ${who}, subscriptons count=${firestoreSubscriptions.length}`,
   );
 };
 

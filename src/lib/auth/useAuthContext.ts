@@ -1,17 +1,14 @@
-import { UserProfile, UserRole } from 'types/user';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { createContext, useEffect, useRef } from 'react';
-import { signInAnonymously, useAuthorizeUser, useUnauthorizeUser } from '.';
+import { useAuthorizeUser, useUnauthorizeUser } from '.';
 
 import { Alert } from 'react-native';
 import { DateTime } from 'luxon';
 import { SignInModalMethods } from 'components/modals/SignInModal';
-import { StoreState } from 'store/initialStoreState';
+import { UserProfile } from 'types/user';
 import { appConfig } from 'config';
-import { deleteUser } from 'firebase/firestore';
 import lodash from 'lodash';
 import { selectUser } from 'store/selectors/userSelectors';
-import { store } from 'store';
 import { useSelector } from 'react-redux';
 
 type AuthContext = {
@@ -43,10 +40,6 @@ export const useAuthContext = (
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(credentials => {
-      if (credentials) {
-        deleteCurrentProfileIfAnonymous();
-      }
-
       // This handler is called multiple times. Avoid more than one authorization.
       // See https://stackoverflow.com/a/40436769
       if (isReAuthenticationRequired(user.credentials)) {
@@ -107,10 +100,6 @@ export const useAuthContext = (
         { cancelable: false },
       );
     }
-
-    // Not authorized via sign-on credentials. Provide anonymous authentication.
-    // Anonymous sign in allows restricted use of firebase services.
-    signInAnonymously();
   };
 
   return {
@@ -118,16 +107,6 @@ export const useAuthContext = (
     presentSignInModal: present,
     userIsAuthenticated: !lodash.isEmpty(user.credentials),
   };
-};
-
-const deleteCurrentProfileIfAnonymous = () => {
-  // Delete the anonymous user profile.
-  const state: StoreState = store.getState();
-  const currentProfile = state.user.profile;
-
-  if (currentProfile?.role === UserRole.Anonymous && currentProfile.id) {
-    deleteUser(currentProfile.id);
-  }
 };
 
 const isReAuthenticationRequired = (

@@ -10,7 +10,6 @@ import { useSelector } from 'react-redux';
 import { useTheme } from 'theme';
 
 interface ChatAvatarInterface {
-  anonymous?: boolean;
   avatarStyle?: ViewStyle;
   group?: Group;
   onPress?: () => void;
@@ -20,7 +19,6 @@ interface ChatAvatarInterface {
 }
 
 export const ChatAvatar = ({
-  anonymous,
   avatarStyle,
   group,
   onPress,
@@ -83,7 +81,7 @@ export const ChatAvatar = ({
 
   // Request is for single user (no group)
 
-  if (anonymous) {
+  if (!userProfile) {
     // Seems to be a bug which allows the previous avatar image to remain
     // displayed. Use an icon to avoid.
     return (

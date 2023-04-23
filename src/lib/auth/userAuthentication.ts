@@ -11,18 +11,6 @@ import { revertAll } from 'store/actions';
 
 const { RNTwitterSignIn } = NativeModules;
 
-export const signInAnonymously = async () => {
-  try {
-    return await auth().signInAnonymously();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (e: any) {
-    log.error(`Anonymous sign in error: ${e.message}`);
-    throw new Error(
-      'An internal error occurred while trying to sign in. Please try again.',
-    );
-  }
-};
-
 export const signInWithApple = async () => {
   try {
     const appleAuthRequestResponse = await appleAuth.performRequest({

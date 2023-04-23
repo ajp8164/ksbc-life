@@ -4,7 +4,6 @@ export enum UserRole {
   Owner = 'Owner',
   Admin = 'Administrator',
   User = 'User',
-  Anonymous = 'Anonymous',
 }
 
 export enum UserStatus {

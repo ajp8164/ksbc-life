@@ -216,9 +216,11 @@ export const collectionChangeListener = (
     handler,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (e: any) => {
-      log.error(
-        `Failed onSnapshot for ${collectionPath} collection: ${e.message}`,
-      );
+      if (!e.message.includes('firestore/permission-denied')) {
+        log.error(
+          `Failed onSnapshot for ${collectionPath} collection: ${e.message}`,
+        );
+      }
     },
   );
 

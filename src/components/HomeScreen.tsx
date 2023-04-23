@@ -17,7 +17,6 @@ import PageContentItemsView from 'components/views/PageContentItemsView';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
 import { Text } from 'react-native';
-import { UserRole } from 'types/user';
 import { pageContentItemCollectionChangeListener } from 'firebase/firestore';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { useSelector } from 'react-redux';
@@ -64,11 +63,7 @@ const HomeScreen = ({ navigation }: Props) => {
     navigation.setOptions({
       // eslint-disable-next-line react/no-unstable-nested-components
       headerRight: () => (
-        <ChatAvatar
-          userProfile={userProfile}
-          anonymous={userProfile?.role === UserRole.Anonymous}
-          onPress={doAccountAction}
-        />
+        <ChatAvatar userProfile={userProfile} onPress={doAccountAction} />
       ),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -103,7 +98,7 @@ const HomeScreen = ({ navigation }: Props) => {
   };
 
   const doAccountAction = () => {
-    if (auth.userIsAuthenticated && userProfile?.role !== UserRole.Anonymous) {
+    if (auth.userIsAuthenticated && userProfile) {
       navigation.navigate('MoreTab', {
         screen: 'More',
         params: {

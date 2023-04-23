@@ -66,7 +66,7 @@ const MoreScreen = ({ navigation, route }: Props) => {
       showsVerticalScrollIndicator={false}
       contentInsetAdjustmentBehavior={'automatic'}>
       <Divider />
-      {userProfile && userProfile.role !== UserRole.Anonymous ? (
+      {userProfile ? (
         <ListItem
           title={userProfile.name || userProfile.email || 'My Profile'}
           leftImage={

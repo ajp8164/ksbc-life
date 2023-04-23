@@ -137,7 +137,7 @@ const createProfile = (
       color: getUserAvatarColor(`${firstName}${lastName}`, colors),
       title: getUserInitials(firstName || credentials.email || '', lastName),
     },
-    role: credentials.isAnonymous ? UserRole.Anonymous : UserRole.User,
+    role: UserRole.User,
     status: UserStatus.Active,
     groups: [],
   } as UserProfile;
