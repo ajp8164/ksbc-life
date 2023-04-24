@@ -18,6 +18,10 @@
     "storage": {
       "host": "10.6.9.64",
       "port": 9199
+    },
+    "functions": {
+      "host": "10.6.9.64",
+      "port": 5001
     }
   },
   "functions": [
