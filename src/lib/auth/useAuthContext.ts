@@ -2,6 +2,7 @@ import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { createContext, useEffect, useRef } from 'react';
 import {
   subscribeToTopic,
+  unsubscribeFromTopic,
   updatePushNotificationToken,
 } from 'lib/pushNotifications';
 import { useAuthorizeUser, useUnauthorizeUser } from '.';
@@ -96,6 +97,7 @@ export const useAuthContext = (
   };
 
   const onUnauthorized = (accountNotActive?: boolean) => {
+    unsubscribeFromTopic('all-users');
     dismiss();
 
     if (accountNotActive) {

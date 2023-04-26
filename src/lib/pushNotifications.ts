@@ -39,6 +39,10 @@ export const subscribeToTopic = (name: MessagingTopic) => {
   messaging().subscribeToTopic(name);
 };
 
+export const unsubscribeFromTopic = (name: MessagingTopic) => {
+  messaging().unsubscribeFromTopic(name);
+};
+
 const checkPermissionGetToken =
   async (): Promise<PushNotificationToken | null> => {
     const status = await messaging().hasPermission();
