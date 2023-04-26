@@ -1,4 +1,5 @@
 import { UserProfile } from 'types/user';
+import { isEmulator } from 'react-native-device-info';
 import lodash from 'lodash';
 import { log } from '@react-native-ajp-elements/core';
 import messaging from '@react-native-firebase/messaging';
@@ -56,6 +57,16 @@ const checkPermissionGetToken =
   };
 
 const getDeviceToken = async (): Promise<PushNotificationToken> => {
+  if (await isEmulator()) {
+    // Running on the iOS simulator will produce an error. Setting a bogus value here avoids the error.
+    // See https://github.com/invertase/react-native-firebase/issues/6893
+    await messaging().setAPNSToken('bogus');
+  }
+
+  if (!messaging().isDeviceRegisteredForRemoteMessages) {
+    await messaging().registerDeviceForRemoteMessages();
+  }
+
   const fcm = await messaging().getToken();
   const apns = await messaging().getAPNSToken();
   const token = { fcm, apns };
