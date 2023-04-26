@@ -53,11 +53,8 @@ export const initApp = async (): Promise<InitStatus> => {
     cacheGroups();
     cacheUsers();
 
-    requestPushNotificationPermission().then(token => {
+    requestPushNotificationPermission().then(_token => {
       subscribeToTopic('all-installs');
-      if (token) {
-        subscribeToTopic('all-users');
-      }
     });
 
     return InitStatus.Success;

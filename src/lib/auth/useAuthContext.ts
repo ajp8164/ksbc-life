@@ -1,5 +1,9 @@
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { createContext, useEffect, useRef } from 'react';
+import {
+  subscribeToTopic,
+  updatePushNotificationToken,
+} from 'lib/pushNotifications';
 import { useAuthorizeUser, useUnauthorizeUser } from '.';
 
 import { Alert } from 'react-native';
@@ -9,7 +13,6 @@ import { UserProfile } from 'types/user';
 import { appConfig } from 'config';
 import lodash from 'lodash';
 import { selectUser } from 'store/selectors/userSelectors';
-import { updatePushNotificationToken } from 'lib/pushNotifications';
 import { useSelector } from 'react-redux';
 
 type AuthContext = {
@@ -88,6 +91,7 @@ export const useAuthContext = (
 
   const onAuthorized = (userProfile: UserProfile) => {
     updatePushNotificationToken(userProfile);
+    subscribeToTopic('all-users');
     dismiss();
   };
 
