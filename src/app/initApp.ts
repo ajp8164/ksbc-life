@@ -2,6 +2,10 @@ import '@react-native-firebase/app';
 
 import { AJPElements, log } from '@react-native-ajp-elements/core';
 import { cacheGroups, cacheUsers } from 'firebase/firestore';
+import {
+  requestPushNotificationPermission,
+  subscribeToTopic,
+} from 'lib/pushNotifications';
 
 import { AppError } from 'lib/errors';
 import { BackHandler } from 'react-native';
@@ -48,6 +52,13 @@ export const initApp = async (): Promise<InitStatus> => {
     // Cache data from firestore.
     cacheGroups();
     cacheUsers();
+
+    requestPushNotificationPermission().then(token => {
+      subscribeToTopic('all-installs');
+      if (token) {
+        subscribeToTopic('all-users');
+      }
+    });
 
     return InitStatus.Success;
 

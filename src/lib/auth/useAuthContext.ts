@@ -9,6 +9,7 @@ import { UserProfile } from 'types/user';
 import { appConfig } from 'config';
 import lodash from 'lodash';
 import { selectUser } from 'store/selectors/userSelectors';
+import { updatePushNotificationToken } from 'lib/pushNotifications';
 import { useSelector } from 'react-redux';
 
 type AuthContext = {
@@ -85,7 +86,8 @@ export const useAuthContext = (
     }
   };
 
-  const onAuthorized = (_userProfile: UserProfile) => {
+  const onAuthorized = (userProfile: UserProfile) => {
+    updatePushNotificationToken(userProfile);
     dismiss();
   };
 

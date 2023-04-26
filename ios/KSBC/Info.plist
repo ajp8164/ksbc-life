@@ -83,7 +83,7 @@
 	<string>For using Face ID authentication.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>$(PRODUCT_NAME) needs access to your Microphone.</string>
-  <key>NSPhotoLibraryUsageDescription</key>
+	<key>NSPhotoLibraryUsageDescription</key>
 	<string>$(PRODUCT_NAME) needs access to your photos library.</string>
 	<key>UIAppFonts</key>
 	<array>
@@ -126,6 +126,11 @@
 		<string>SFUIText-RegularG3.otf</string>
 		<string>SFUIText-Semibold.otf</string>
 		<string>SFUIText-SemiboldItalic.otf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen.storyboard</string>

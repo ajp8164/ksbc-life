@@ -140,6 +140,7 @@ const createProfile = (
     role: UserRole.User,
     status: UserStatus.Active,
     groups: [],
+    pushTokens: [],
   } as UserProfile;
 };
 
