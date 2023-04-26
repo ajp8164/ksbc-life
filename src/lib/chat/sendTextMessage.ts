@@ -3,6 +3,7 @@ import { MessageType } from '@flyerhq/react-native-chat-ui';
 import { UserProfile } from 'types/user';
 import { addChatMessage } from 'firebase/firestore';
 import { createAuthor } from './createAuthor';
+import { updateGroupLatestMessageSnippet } from './updateGroupLatestMessageSnippet';
 import { uuidv4 } from 'lib/uuid';
 
 export const sendTextMessage = (
@@ -19,4 +20,7 @@ export const sendTextMessage = (
     type: 'text',
   };
   group.id && addChatMessage(textMessage, group.id);
+
+  // Store this message as the latest message posted to this group.
+  updateGroupLatestMessageSnippet(message, userProfile, group);
 };

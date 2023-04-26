@@ -16,10 +16,10 @@ export const useSendAttachment = () => {
       buttonIndex => {
         switch (buttonIndex) {
           case 0:
-            group.id && sendImageMessage(userProfile, group.id);
+            group.id && sendImageMessage(userProfile, group);
             break;
           case 1:
-            group.id && sendFileMessage(userProfile, group.id);
+            group.id && sendFileMessage(userProfile, group);
             break;
         }
       },

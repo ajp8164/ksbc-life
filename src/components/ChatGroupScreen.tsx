@@ -26,7 +26,6 @@ import { getGroupAvatarColor, getGroupMembersLongStr } from 'lib/group';
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { ChatHeader } from 'components/molecules/ChatHeader';
 import { ChatNavigatorParamList } from 'types/navigation';
-import { DateTime } from 'luxon';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { Group } from 'types/group';
 import { Incubator } from 'react-native-ui-lib';
@@ -352,6 +351,9 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
     }
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     sendAttachmentMessage(userProfile, group || newGroup!);
+
+    // Sending a text while composing exits composing mode.
+    composingGroup.current = false;
   };
 
   const sendText = async (message: MessageType.PartialText) => {
@@ -361,37 +363,11 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
     if (!group) {
       newGroup = await createGroup();
     }
-
-    // Store this message as the latest message posted to this group.
-    const updatedGroup = setGroupLatestMessageSnippet(
-      message,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      group || newGroup!,
-    );
-
-    sendTextMessage(message, userProfile, updatedGroup);
-    updateGroup(updatedGroup);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    sendTextMessage(message, userProfile, group || newGroup!);
 
     // Sending a text while composing exits composing mode.
     composingGroup.current = false;
-  };
-
-  const setGroupLatestMessageSnippet = (
-    message: MessageType.PartialText,
-    group: Group,
-  ): Group => {
-    if (!userProfile?.id) return group;
-
-    // This snippet overwrites any previous snippet created by any other group
-    // member. We only track the last message sent by anyone.
-    group.latestMessageSnippet = {
-      createdBy: userProfile.id,
-      createdAt: DateTime.now().toISO() || '', // We don't need server time here
-      text: message.text,
-      type: message.type,
-      readBy: [userProfile.id], // I've always read my own message
-    };
-    return group;
   };
 
   const setLatestMessageAsReadByMe = () => {

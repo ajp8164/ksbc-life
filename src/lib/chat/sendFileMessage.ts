@@ -3,6 +3,7 @@ import DocumentPicker, {
 } from 'react-native-document-picker';
 
 import { Alert } from 'react-native';
+import { Group } from 'types/group';
 import { MessageType } from '@flyerhq/react-native-chat-ui';
 import { UserProfile } from 'types/user';
 import { addChatMessage } from 'firebase/firestore';
@@ -10,11 +11,12 @@ import { appConfig } from 'config';
 import { createAuthor } from './createAuthor';
 import { log } from '@react-native-ajp-elements/core';
 import { saveFile } from 'firebase/storage';
+import { updateGroupLatestMessageSnippet } from './updateGroupLatestMessageSnippet';
 import { uuidv4 } from 'lib/uuid';
 
 export const sendFileMessage = async (
   userProfile: UserProfile,
-  groupId: string,
+  group: Group,
 ) => {
   const file = await DocumentPicker.pickSingle({
     type: [DocumentPicker.types.allFiles],
@@ -36,7 +38,7 @@ export const sendFileMessage = async (
     await saveFile({
       file,
       storagePath: appConfig.storageFileChat,
-      onSuccess: url => send(file, url, userProfile, groupId),
+      onSuccess: url => send(file, url, userProfile, group),
       onError: () => {
         return;
       },
@@ -48,7 +50,7 @@ const send = (
   file: DocumentPickerResponse,
   url: string,
   userProfile: UserProfile,
-  groupId: string,
+  group: Group,
 ) => {
   const fileMessage: MessageType.File = {
     id: uuidv4(),
@@ -60,5 +62,8 @@ const send = (
     type: 'file',
     uri: url,
   };
-  addChatMessage(fileMessage, groupId);
+  group.id && addChatMessage(fileMessage, group.id);
+
+  // Store this message as the latest message posted to this group.
+  updateGroupLatestMessageSnippet(fileMessage, userProfile, group);
 };

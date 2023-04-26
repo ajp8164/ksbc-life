@@ -1,4 +1,5 @@
 import { Asset } from 'react-native-image-picker';
+import { Group } from 'types/group';
 import { MessageType } from '@flyerhq/react-native-chat-ui';
 import { UserProfile } from 'types/user';
 import { addChatMessage } from 'firebase/firestore';
@@ -6,9 +7,10 @@ import { appConfig } from 'config';
 import { createAuthor } from './createAuthor';
 import { saveImage } from 'firebase/storage';
 import { selectImage } from '@react-native-ajp-elements/ui';
+import { updateGroupLatestMessageSnippet } from './updateGroupLatestMessageSnippet';
 import { uuidv4 } from 'lib/uuid';
 
-export const sendImageMessage = (userProfile: UserProfile, groupId: string) => {
+export const sendImageMessage = (userProfile: UserProfile, group: Group) => {
   selectImage({
     onSuccess: async imageAssets => {
       const imageAsset = imageAssets[0];
@@ -16,7 +18,7 @@ export const sendImageMessage = (userProfile: UserProfile, groupId: string) => {
         await saveImage({
           imageAsset,
           storagePath: appConfig.storageImageChat,
-          onSuccess: url => send(imageAsset, url, userProfile, groupId),
+          onSuccess: url => send(imageAsset, url, userProfile, group),
           onError: () => {
             return;
           },
@@ -30,7 +32,7 @@ const send = (
   imageAsset: Asset,
   url: string,
   userProfile: UserProfile,
-  groupId: string,
+  group: Group,
 ) => {
   const imageMessage: MessageType.Image = {
     id: uuidv4(),
@@ -43,5 +45,8 @@ const send = (
     uri: url,
     width: imageAsset.width,
   };
-  groupId && addChatMessage(imageMessage, groupId);
+  group.id && addChatMessage(imageMessage, group.id);
+
+  // Store this message as the latest message posted to this group.
+  updateGroupLatestMessageSnippet(imageMessage, userProfile, group);
 };
