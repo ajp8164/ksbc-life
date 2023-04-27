@@ -10,6 +10,7 @@ export interface AppConfig
   environment: string;
   firebaseOauthClientId: string;
   givingUrl: string;
+  googleSignInWebClientId: string;
   persistStoreVersion: string;
   privacyUrl: string;
   requireReAuthDays: number;
@@ -40,6 +41,7 @@ export const appConfig: AppConfig = {
   environment: Config.ENVIRONMENT || '',
   firebaseOauthClientId: Config.FIREBASE_OAUTH_CLIENT_ID || '',
   givingUrl: Config.GIVING_URL || '',
+  googleSignInWebClientId: Config.GOOGLE_SIGN_IN_WEB_CLIENT_ID || '',
   persistStoreVersion: Config.PERSIST_STORE_VERSION || '',
   privacyUrl: Config.PRIVACY_URL || '',
   requireReAuthDays: Number(Config.REQUIRE_REAUTH_DAYS) || 0,

@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "85125896421-llotplvndjb0t9oq7ccvuk6pkfe9le0v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.kingspring.life",
+            "certificate_hash": "5be4b909f135c8bd312bacd642fb3dfb3984846b"
+          }
+        },
+        {
+          "client_id": "85125896421-pgini62gjs1v3lngde4kb3boet6d27f9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.kingspring.life",
+            "certificate_hash": "a674043f8684a9457ebc9cf09c00ca40ee41de24"
+          }
+        },
+        {
           "client_id": "85125896421-4t2bm6i79t0plmfga320gatishpi85h4.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,6 +45,13 @@
             {
               "client_id": "85125896421-4t2bm6i79t0plmfga320gatishpi85h4.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "85125896421-u2psomm2metko5dsb7eetdsi6cirfci7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.kingspring.life"
+              }
             }
           ]
         }

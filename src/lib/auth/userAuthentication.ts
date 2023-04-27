@@ -2,6 +2,7 @@ import { AccessToken, LoginManager } from 'react-native-fbsdk-next';
 
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { NativeModules } from 'react-native';
+import { appConfig } from 'config';
 import { appleAuth } from '@invertase/react-native-apple-authentication';
 import auth from '@react-native-firebase/auth';
 import { cancelAllFirestoreSubscriptions } from 'firebase/firestore';
@@ -82,6 +83,11 @@ export const signInWithFacebook = async () => {
 export const signInWithGoogle = async () => {
   try {
     await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+
+    // Need to have debug keystore SHA1 in Firebase console.
+    // See https://github.com/react-native-google-signin/google-signin/issues/767
+    GoogleSignin.configure({ webClientId: appConfig.googleSignInWebClientId });
+
     const { idToken } = await GoogleSignin.signIn();
     const googleCredential = auth.GoogleAuthProvider.credential(idToken);
     return auth().signInWithCredential(googleCredential);
