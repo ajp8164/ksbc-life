@@ -5,19 +5,17 @@ import {
   TabNavigatorParamList,
 } from 'types/navigation';
 import React, { useContext, useEffect } from 'react';
-import { UserProfile, UserRole } from 'types/user';
-import { useDispatch, useSelector } from 'react-redux';
 
 import { AuthContext } from 'lib/auth';
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { CompositeScreenProps } from '@react-navigation/core';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ScrollView } from 'react-native';
+import { UserRole } from 'types/user';
 import { appConfig } from 'config';
 import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
-import { updateUserProfile } from 'store/slices/user';
-import { usersDocumentChangeListener } from 'firebase/firestore';
+import { useSelector } from 'react-redux';
 
 export type Props = CompositeScreenProps<
   NativeStackScreenProps<MoreNavigatorParamList, 'More'>,
@@ -28,28 +26,8 @@ const MoreScreen = ({ navigation, route }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
-  const dispatch = useDispatch();
-
   const auth = useContext(AuthContext);
   const userProfile = useSelector(selectUserProfile);
-
-  useEffect(() => {
-    // Updates my profile if my information changed (e.g., admin action).
-    const subscription = usersDocumentChangeListener(
-      userProfile?.id || '',
-      documentSnapshot => {
-        userProfile &&
-          dispatch(
-            updateUserProfile({
-              userProfile: documentSnapshot.data() as UserProfile,
-            }),
-          );
-      },
-    );
-
-    return subscription;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     if (route.params?.subNav) {
