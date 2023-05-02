@@ -1,19 +1,22 @@
+import { AppTheme, useTheme } from 'theme';
 import { Avatar, Icon } from '@rneui/base';
 import { TextStyle, ViewStyle } from 'react-native';
 
 import { Group } from 'types/group';
 import { UserProfile } from 'types/user';
+import { fontFamily } from '@react-native-ajp-elements/ui';
+import { fontSizes } from 'theme/styles';
 import lodash from 'lodash';
+import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { selectUserProfilesCache } from 'store/selectors/cacheSelectors';
 import { useSelector } from 'react-redux';
-import { useTheme } from 'theme';
 
 interface ChatAvatarInterface {
   avatarStyle?: ViewStyle;
   group?: Group;
   onPress?: () => void;
-  size?: 'small' | 'medium' | 'large' | 'giant';
+  size?: 'tiny' | 'small' | 'medium' | 'large' | 'giant';
   titleStyle?: TextStyle;
   userProfile?: UserProfile;
 }
@@ -22,35 +25,48 @@ export const ChatAvatar = ({
   avatarStyle,
   group,
   onPress,
-  size = 'small',
+  size = 'tiny',
   titleStyle,
   userProfile,
 }: ChatAvatarInterface) => {
   const theme = useTheme();
+  const s = useStyles(theme);
 
   const me = useSelector(selectUserProfile);
   const userProfiles = useSelector(selectUserProfilesCache);
 
   const _avatarStyle =
-    size === 'small'
-      ? theme.styles.avatarSmall
+    size === 'tiny'
+      ? s.avatarTiny
+      : size === 'small'
+      ? s.avatarSmall
       : size === 'medium'
-      ? theme.styles.avatarMedium
+      ? s.avatarMedium
       : size === 'large'
-      ? theme.styles.avatarLarge
-      : theme.styles.avatarGiant;
+      ? s.avatarLarge
+      : s.avatarGiant;
 
   const _titleStyle =
-    size === 'small'
-      ? theme.styles.avatarTitleSmall
+    size === 'tiny'
+      ? s.avatarTitleTiny
+      : size === 'small'
+      ? s.avatarTitleSmall
       : size === 'medium'
-      ? theme.styles.avatarTitleMedium
+      ? s.avatarTitleMedium
       : size === 'large'
-      ? theme.styles.avatarTitleLarge
-      : theme.styles.avatarTitleGiant;
+      ? s.avatarTitleLarge
+      : s.avatarTitleGiant;
 
   const _iconSize =
-    size === 'small' ? 20 : size === 'medium' ? 28 : size === 'large' ? 36 : 42;
+    size === 'tiny'
+      ? 20
+      : size === 'small'
+      ? 24
+      : size === 'medium'
+      ? 28
+      : size === 'large'
+      ? 36
+      : 42;
 
   const renderUserAvatar = (userProfile?: UserProfile) => {
     if (userProfile?.photoUrl.length) {
@@ -148,3 +164,66 @@ export const ChatAvatar = ({
 
   return renderUserAvatar(u);
 };
+
+const useStyles = makeStyles((_theme, theme: AppTheme) => ({
+  avatarGiant: {
+    width: 100,
+    height: 100,
+    borderRadius: 100,
+    overflow: 'hidden',
+  },
+  avatarLarge: {
+    width: 55,
+    height: 55,
+    borderRadius: 55,
+    overflow: 'hidden',
+  },
+  avatarMedium: {
+    width: 42,
+    height: 42,
+    borderRadius: 42,
+    overflow: 'hidden',
+  },
+  avatarSmall: {
+    width: 34,
+    height: 34,
+    borderRadius: 34,
+    overflow: 'hidden',
+  },
+  avatarTiny: {
+    width: 30,
+    height: 30,
+    borderRadius: 30,
+    overflow: 'hidden',
+  },
+  avatarTitleGiant: {
+    color: theme.colors.stickyWhite,
+    fontSize: fontSizes.giant,
+    fontFamily,
+    fontWeight: 'normal',
+  },
+  avatarTitleLarge: {
+    color: theme.colors.stickyWhite,
+    fontSize: fontSizes.xl,
+    fontFamily,
+    fontWeight: 'normal',
+  },
+  avatarTitleMedium: {
+    color: theme.colors.stickyWhite,
+    fontSize: fontSizes.large,
+    fontFamily,
+    fontWeight: 'normal',
+  },
+  avatarTitleSmall: {
+    color: theme.colors.stickyWhite,
+    fontSize: fontSizes.normal,
+    fontFamily,
+    fontWeight: 'normal',
+  },
+  avatarTitleTiny: {
+    color: theme.colors.stickyWhite,
+    fontSize: fontSizes.normal,
+    fontFamily,
+    fontWeight: 'normal',
+  },
+}));

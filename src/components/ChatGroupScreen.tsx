@@ -24,7 +24,7 @@ import {
 import { getGroupAvatarColor, getGroupMembersLongStr } from 'lib/group';
 
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
-import { ChatHeader } from 'components/molecules/ChatHeader';
+import { ChatHeaderTitle } from 'components/molecules/ChatHeaderTitle';
 import { ChatNavigatorParamList } from 'types/navigation';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { Group } from 'types/group';
@@ -218,7 +218,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
     } else {
       navigation.setOptions({
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        header: () => renderHeader(group!),
+        headerTitle: () => renderHeaderTitle(group!),
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -412,8 +412,8 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
     }
   };
 
-  const renderHeader = (group: Group) => {
-    return <ChatHeader group={group} />;
+  const renderHeaderTitle = (group: Group) => {
+    return <ChatHeaderTitle group={group} />;
   };
 
   const renderUser: ListRenderItem<UserProfile> = ({ item: userProfile }) => {

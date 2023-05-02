@@ -29,6 +29,7 @@ const ChatNavigator = () => {
           title: 'Chat',
           headerLeft: () => null,
           headerLargeTitle: true,
+          headerBackTitle: '',
         }}
       />
       <ChatStack.Screen
