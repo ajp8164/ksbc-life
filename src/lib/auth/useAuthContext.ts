@@ -12,6 +12,7 @@ import { DateTime } from 'luxon';
 import { SignInModalMethods } from 'components/modals/SignInModal';
 import { UserProfile } from 'types/user';
 import { appConfig } from 'config';
+import { cacheUsers } from 'firebase/firestore';
 import lodash from 'lodash';
 import { selectUser } from 'store/selectors/userSelectors';
 import { useSelector } from 'react-redux';
@@ -91,8 +92,12 @@ export const useAuthContext = (
   };
 
   const onAuthorized = (userProfile: UserProfile) => {
+    // Recache users on possible user switch without app restart.
+    cacheUsers();
+
     updatePushNotificationToken(userProfile);
     subscribeToTopic('all-users');
+
     dismiss();
   };
 
