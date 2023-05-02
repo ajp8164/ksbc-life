@@ -41,11 +41,15 @@ const UsersView = React.forwardRef<UsersView, UsersViewProps>((props, ref) => {
         uncheckedIcon={'checkbox-blank-outline'}
         uncheckedColor={theme.colors.transparent}
         checkedColor={theme.colors.brandSecondary}
-        checked={userProfile.id ? selected.includes(userProfile) : false}
+        checked={
+          userProfile.id
+            ? lodash.find(selected, { id: userProfile.id }) !== undefined
+            : false
+        }
         onPress={() => {
           if (userProfile.id) {
             // Id should always be set.
-            if (selected.includes(userProfile)) {
+            if (lodash.find(selected, { id: userProfile.id }) !== undefined) {
               const updatedSelections = ([] as UserProfile[]).concat(selected);
               lodash.remove(updatedSelections, u => u.id === userProfile.id);
               setSelected(updatedSelections);
