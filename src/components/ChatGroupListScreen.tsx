@@ -102,11 +102,13 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
             calculatedName: getGroupName(g),
           };
         })
-        // Sort groups alphabetically.
+        // Sort by latest message time.
         .sort((a, b) => {
-          return a.calculatedName.toLowerCase() < b.calculatedName.toLowerCase()
-            ? -1
-            : 1;
+          return a.latestMessageSnippet?.createdAt &&
+            b.latestMessageSnippet?.createdAt
+            ? DateTime.fromISO(b.latestMessageSnippet.createdAt).toMillis() -
+                DateTime.fromISO(a.latestMessageSnippet.createdAt).toMillis()
+            : 0;
         })
         // Sort unread groups to the top.
         .sort((a, b) => {
