@@ -60,9 +60,9 @@ const UserProfileScreen = ({ navigation }: Props) => {
   };
 
   const doSignOut = () => {
+    navigation.dispatch(StackActions.popToTop());
     signOut().then(() => {
       unauthorizeUser();
-      navigation.dispatch(StackActions.popToTop());
     });
   };
 
