@@ -60,6 +60,7 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   },
   title: {
     ...theme.styles.textLarge,
+    ...theme.styles.textBold,
   },
   status: {
     ...theme.styles.textSmall,
