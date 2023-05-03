@@ -14,6 +14,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import NoItems from 'components/atoms/NoItems';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getGroupName } from 'lib/group';
+import { getRelativeDate } from 'lib/relativeDate';
 import { groupsCollectionChangeListener } from 'firebase/firestore';
 import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
@@ -142,9 +143,7 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
         subtitleNumberOfLines={2}
         value={
           group.latestMessageSnippet?.createdAt &&
-          DateTime.fromISO(group.latestMessageSnippet?.createdAt).toFormat(
-            'M/d/yy',
-          )
+          getRelativeDate(group.latestMessageSnippet?.createdAt)
         }
         valueStyle={[theme.styles.textSmall, theme.styles.textDim]}
         alignContent={'top'}

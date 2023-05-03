@@ -512,8 +512,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
           showUserNames={
             group && group?.members.length <= 2 ? 'none' : 'outside'
           }
-          dateFormat={'ddd, MMM D'}
-          timeFormat={'h:mm A'}
+          relativeDateTime={true}
           l10nOverride={{ inputPlaceholder: 'Type message' }}
           disableSend={!group && !addedUsers.length}
           sendButtonVisibilityMode={'always'}
