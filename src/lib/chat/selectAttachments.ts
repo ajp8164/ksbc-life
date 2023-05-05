@@ -16,6 +16,7 @@ export const useSelectAttachments = () => {
     const chooseImages = (): Promise<Attachment[]> => {
       return new Promise<Attachment[]>((resolve, reject) => {
         selectImage({
+          multiSelect: true,
           onSuccess: async imageAssets => {
             const selections = imageAssets.map(ia => {
               return {
