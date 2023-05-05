@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
 import { Group } from 'types/group';
-import { MessageType } from '@flyerhq/react-native-chat-ui';
+// import { MessageType } from '@flyerhq/react-native-chat-ui';
+import { MessageType } from '../../../react-native-chat-ui/src';
 import { UserProfile } from 'types/user';
 import { updateGroup } from 'firebase/firestore';
 

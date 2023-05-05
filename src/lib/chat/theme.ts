@@ -1,17 +1,23 @@
+import { fontFamily, fontSizes } from '@react-native-ajp-elements/ui';
+
 import { AppTheme } from 'theme';
 import { Icon } from '@rneui/base';
 import React from 'react';
-import { Theme } from '@flyerhq/react-native-chat-ui';
-import { defaultTheme } from '@flyerhq/react-native-chat-ui';
+// import { defaultTheme, Theme } from '@flyerhq/react-native-chat-ui';
+import { defaultTheme, Theme } from '../../../react-native-chat-ui/src';
+import lodash from 'lodash';
 
 export const chatTheme = (
   theme: AppTheme,
   extra: { tabBarHeight: number },
 ): Theme => {
-  return Object.assign(defaultTheme, {
+  return lodash.merge({}, defaultTheme, {
     avatar: {
       text: {
-        ...theme.styles.avatarTitleSmall,
+        color: theme.colors.stickyWhite,
+        fontSize: fontSizes.normal,
+        fontFamily,
+        fontWeight: 'normal',
         top: 1.5,
       },
     },
@@ -63,7 +69,11 @@ export const chatTheme = (
       activityIndicator: {
         color: theme.colors.brandPrimary,
       },
-      contentOffsetKeyboardOpened: 59, // This values should be adjusted if the design height of the composer changes.
+      attachmentPlaceholderIcon: {
+        tintColor: theme.colors.stickyWhite,
+      },
+      contentOffsetKeyboardClosed: -25, // This values should be adjusted if the design height of the composer changes.
+      contentOffsetKeyboardOpened: 84, // This values should be adjusted if the design height of the composer changes.
       container: {
         backgroundColor: theme.colors.white,
         borderTopLeftRadius: 0,
@@ -71,21 +81,41 @@ export const chatTheme = (
         paddingHorizontal: 10,
         paddingVertical: 5,
       },
+      fileAttachmentPlaceholderContainer: {
+        backgroundColor: theme.colors.subtleGray,
+        borderColor: theme.colors.lightGray,
+      },
+      fileAttachmentPlaceholderIconContainer: {
+        backgroundColor: theme.colors.lightGray,
+      },
+      fileAttachmentPlaceholderText: {
+        ...theme.styles.textNormal,
+      },
+      inputAttachmentDivider: {
+        borderTopColor: theme.colors.subtleGray,
+        borderTopWidth: 1,
+      },
+      inputContainer: {
+        borderWidth: 1,
+        borderRadius: 20,
+      },
       inputStyle: {
         ...theme.styles.textNormal,
         backgroundColor: theme.colors.white,
         color: theme.colors.text,
-        borderRadius: 20,
-        borderWidth: 0.5,
-        borderColor: theme.colors.black,
         minHeight: 35,
         maxHeight: 200,
         lineHeight: 20.5,
         paddingTop: 5,
         paddingBottom: 5,
-        marginLeft: 7,
+        top: 2,
       },
       placeholderTextColor: theme.colors.textPlaceholder,
+      removeAttachmentButton: {
+        backgroundColor: theme.colors.darkGray,
+        borderColor: theme.colors.stickyWhite,
+        tintColor: theme.colors.stickyWhite,
+      },
       sendButton: {
         marginLeft: 10,
       },
@@ -104,6 +134,7 @@ export const chatTheme = (
           type: 'material-community',
           color: theme.colors.brandSecondary,
           size: 32,
+          style: { marginRight: 10 },
         });
       },
       sendButtonIcon: () => {
@@ -113,7 +144,6 @@ export const chatTheme = (
           color: theme.colors.brandSecondary,
           size: 38,
           style: {
-            marginRight: 5,
             transform: [{ rotateZ: '-45deg' }],
           },
         });

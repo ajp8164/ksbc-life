@@ -1,44 +1,45 @@
-import * as ImagePicker from 'react-native-image-picker';
-
 import { log } from '@react-native-ajp-elements/core';
 import storage from '@react-native-firebase/storage';
 import { uuidv4 } from 'lib/uuid';
 
+export type Image = {
+  mimeType: string;
+  uri: string;
+};
+
 /**
  * Save a previously obtained image asset to storage. This function deletes the specified old
  * image if it specified.
- * @param args.imageAsset - the image asset, an image picker Asset
+ * @param args.image - the image description
  * @param args.storagePath - path in storage where the image will be stored
  * @param args.oldImage - (optional) if it exists, this image will be deleted from storage
  * @param args.onSuccess - callback with a storage public url
  * @param args.onError - callback when an error occurs
  */
 export const saveImage = async (args: {
-  imageAsset: ImagePicker.Asset;
+  image: Image;
   storagePath: string;
   oldImage?: string;
   onSuccess: (url: string) => void;
   onError: () => void;
 }) => {
-  const { imageAsset, storagePath, oldImage, onSuccess, onError } = args;
+  const { image, storagePath, oldImage, onSuccess, onError } = args;
   try {
-    if (imageAsset?.type && imageAsset?.uri) {
-      const imageType = imageAsset.type.split('/')[1];
-      const destFilename = `${storagePath}${uuidv4()}.${imageType}`;
-      const sourceFilename = imageAsset.uri.replace('file://', '');
-      const storageRef = storage().ref(destFilename);
+    const imageType = image.mimeType.split('/')[1];
+    const destFilename = `${storagePath}${uuidv4()}.${imageType}`;
+    const sourceFilename = image.uri.replace('file://', '');
+    const storageRef = storage().ref(destFilename);
 
-      try {
-        await storageRef.putFile(sourceFilename).catch(() => {
-          // Need a handler here to swallow possible second throw inside putFile().
-        });
-        const url = await storageRef.getDownloadURL();
-        oldImage && (await deleteImage({ filename: oldImage, storagePath }));
-        onSuccess(url);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (e: any) {
-        onError();
-      }
+    try {
+      await storageRef.putFile(sourceFilename).catch(() => {
+        // Need a handler here to swallow possible second throw inside putFile().
+      });
+      const url = await storageRef.getDownloadURL();
+      oldImage && (await deleteImage({ filename: oldImage, storagePath }));
+      onSuccess(url);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+      onError();
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {

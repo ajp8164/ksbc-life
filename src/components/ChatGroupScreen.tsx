@@ -1,7 +1,8 @@
 import Animated, { SlideOutUp } from 'react-native-reanimated';
 import { AppTheme, useTheme } from 'theme';
 import { Button, Icon } from '@rneui/base';
-import { Chat, MessageType } from '@flyerhq/react-native-chat-ui';
+// import { Chat, MessageType } from '@flyerhq/react-native-chat-ui';
+import { Chat, MessageType } from '../../react-native-chat-ui/src';
 import { FirestoreMessageType, SearchCriteria, SearchScope } from 'types/chat';
 import { FlatList, Keyboard, ListRenderItem, Text, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
@@ -18,8 +19,10 @@ import {
 import {
   chatTheme,
   handleMessagePress,
+  sendFileMessage,
+  sendImageMessage,
   sendTextMessage,
-  useSendAttachment,
+  useSelectAttachments,
 } from 'lib/chat';
 import { getGroupAvatarColor, getGroupMembersLongStr } from 'lib/group';
 
@@ -53,7 +56,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
-  const sendAttachmentMessage = useSendAttachment();
+  const selectAttachments = useSelectAttachments();
 
   const tabBarHeight = useBottomTabBarHeight();
   const [group, setGroup] = useState(route.params.group);
@@ -342,29 +345,24 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
     }
   };
 
-  const sendAttachment = async () => {
-    if (!userProfile) return;
-
-    let newGroup: Group;
-    if (!group) {
-      newGroup = await createGroup();
-    }
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    sendAttachmentMessage(userProfile, group || newGroup!);
-
-    // Sending a text while composing exits composing mode.
-    composingGroup.current = false;
+  const doSelectAttachments = async () => {
+    return await selectAttachments();
   };
 
-  const sendText = async (message: MessageType.PartialText) => {
+  const sendMessage = async (message: MessageType.PartialAny[]) => {
     if (!userProfile) return;
+    const targetGroup = group || (await createGroup());
 
-    let newGroup: Group;
-    if (!group) {
-      newGroup = await createGroup();
+    for (let i = 0; i < message.length; i++) {
+      const m = message[i];
+      if (m.type === 'file') {
+        await sendFileMessage(m, userProfile, targetGroup);
+      } else if (m.type === 'image') {
+        await sendImageMessage(m, userProfile, targetGroup);
+      } else if (m.type === 'text') {
+        await sendTextMessage(m, userProfile, targetGroup);
+      }
     }
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    sendTextMessage(message, userProfile, group || newGroup!);
 
     // Sending a text while composing exits composing mode.
     composingGroup.current = false;
@@ -503,8 +501,8 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
           }}
           isTyping={isTyping.current}
           typingNames={typingNames.current}
-          onSendPress={sendText}
-          onAttachmentPress={sendAttachment}
+          onSendPress={sendMessage}
+          onAttachmentPress={doSelectAttachments}
           onInputTextChanged={onInputTextChanged}
           onMessagePress={handleMessagePress}
           onPreviewDataFetched={handlePreviewDataFetched}

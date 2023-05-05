@@ -1,19 +1,23 @@
-import { DocumentPickerResponse } from 'react-native-document-picker';
 import { log } from '@react-native-ajp-elements/core';
 import storage from '@react-native-firebase/storage';
 import { uuidv4 } from 'lib/uuid';
 
+export type File = {
+  mimeType: string;
+  uri: string;
+};
+
 /**
  * Save a previously obtained file asset to storage. This function deletes the specified old
  * file if specified.
- * @param args.file - the local file, a DocumentPickerResponse
+ * @param args.file - the local file description
  * @param args.storagePath - path in storage where the file will be stored
  * @param args.oldFile - (optional) if it exists, this file will be deleted from storage
  * @param args.onSuccess - callback with a storage public url
  * @param args.onError - callback when an error occurs
  */
 export const saveFile = async (args: {
-  file: DocumentPickerResponse;
+  file: File;
   storagePath: string;
   oldFile?: string;
   onSuccess: (url: string) => void;
@@ -21,23 +25,21 @@ export const saveFile = async (args: {
 }) => {
   const { file, storagePath, oldFile, onSuccess, onError } = args;
   try {
-    if (file?.type && file?.uri) {
-      const fileType = file.type.split('/')[1];
-      const destFilename = `${storagePath}${uuidv4()}.${fileType}`;
-      const sourceFilename = file.uri.replace('file://', '');
-      const storageRef = storage().ref(destFilename);
+    const fileType = file.mimeType.split('/')[1];
+    const destFilename = `${storagePath}${uuidv4()}.${fileType}`;
+    const sourceFilename = file.uri.replace('file://', '');
+    const storageRef = storage().ref(destFilename);
 
-      try {
-        await storageRef.putFile(sourceFilename).catch(() => {
-          // Need a handler here to swallow possible second throw inside putFile().
-        });
-        const url = await storageRef.getDownloadURL();
-        oldFile && (await deleteFile({ filename: oldFile, storagePath }));
-        onSuccess(url);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (e: any) {
-        onError();
-      }
+    try {
+      await storageRef.putFile(sourceFilename).catch(() => {
+        // Need a handler here to swallow possible second throw inside putFile().
+      });
+      const url = await storageRef.getDownloadURL();
+      oldFile && (await deleteFile({ filename: oldFile, storagePath }));
+      onSuccess(url);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+      onError();
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {

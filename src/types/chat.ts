@@ -1,5 +1,6 @@
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
-import { MessageType } from '@flyerhq/react-native-chat-ui';
+// import { MessageType } from '@flyerhq/react-native-chat-ui';
+import { MessageType } from '../../../react-native-chat-ui/src';
 
 export type FirestoreMessageType =
   | MessageType.Any

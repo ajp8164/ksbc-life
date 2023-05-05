@@ -1,5 +1,5 @@
 import { AppTheme, useTheme } from 'theme';
-import { Text, TouchableWithoutFeedback, View } from 'react-native';
+import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native';
 
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { EditGroupModal } from 'components/modals/EditGroupModal';
@@ -21,7 +21,11 @@ export const ChatHeaderTitle = ({ group }: ChatHeaderTitleInterface) => {
 
   return (
     <>
-      <TouchableWithoutFeedback onPress={editGroupModalRef.current?.present}>
+      <TouchableWithoutFeedback
+        onPress={() => {
+          Keyboard.dismiss();
+          editGroupModalRef.current?.present();
+        }}>
         <View style={s.container}>
           <ChatAvatar
             group={group}

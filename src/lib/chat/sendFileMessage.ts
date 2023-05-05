@@ -1,69 +1,52 @@
-import DocumentPicker, {
-  DocumentPickerResponse,
-} from 'react-native-document-picker';
-
-import { Alert } from 'react-native';
 import { Group } from 'types/group';
-import { MessageType } from '@flyerhq/react-native-chat-ui';
+// import { MessageType } from '@flyerhq/react-native-chat-ui';
+import { MessageType } from '../../../react-native-chat-ui/src';
 import { UserProfile } from 'types/user';
 import { addChatMessage } from 'firebase/firestore';
 import { appConfig } from 'config';
 import { createAuthor } from './createAuthor';
-import { log } from '@react-native-ajp-elements/core';
-import { saveFile } from 'firebase/storage';
+import { File, saveFile } from 'firebase/storage';
 import { updateGroupLatestMessageSnippet } from './updateGroupLatestMessageSnippet';
 import { uuidv4 } from 'lib/uuid';
 
-export const sendFileMessage = async (
+export const sendFileMessage = (
+  fileMessage: MessageType.PartialFile,
   userProfile: UserProfile,
   group: Group,
 ) => {
-  const file = await DocumentPicker.pickSingle({
-    type: [DocumentPicker.types.allFiles],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  }).catch((e: any) => {
-    if (!e.message.includes('cancelled')) {
-      Alert.alert(
-        'File Selection Error',
-        'An error occurred while accessing your files. Please try again.',
-        [{ text: 'OK' }],
-        { cancelable: false },
-      );
-      const msg = `File select error: ${e.message}`;
-      log.error(msg);
-    }
-  });
-
-  if (file) {
-    await saveFile({
-      file,
+  return new Promise<void>((resolve, reject) => {
+    saveFile({
+      file: { mimeType: fileMessage.mimeType, uri: fileMessage.uri } as File,
       storagePath: appConfig.storageFileChat,
-      onSuccess: url => send(file, url, userProfile, group),
+      onSuccess: async url => {
+        await send(fileMessage, url, userProfile, group);
+        resolve();
+      },
       onError: () => {
-        return;
+        reject();
       },
     });
-  }
+  });
 };
 
-const send = (
-  file: DocumentPickerResponse,
+const send = async (
+  fileMessage: MessageType.PartialFile,
   url: string,
   userProfile: UserProfile,
   group: Group,
 ) => {
-  const fileMessage: MessageType.File = {
+  const message: MessageType.File = {
     id: uuidv4(),
     author: createAuthor(userProfile),
     metadata: {},
-    mimeType: file.type ?? undefined,
-    name: file.name || `tmp-${uuidv4()}`,
-    size: file.size ?? 0,
+    mimeType: fileMessage.type ?? undefined,
+    name: fileMessage.name || `tmp-${uuidv4()}`,
+    size: fileMessage.size ?? 0,
     type: 'file',
     uri: url,
   };
-  group.id && addChatMessage(fileMessage, group.id);
+  group.id && (await addChatMessage(message, group.id));
 
   // Store this message as the latest message posted to this group.
-  updateGroupLatestMessageSnippet(fileMessage, userProfile, group);
+  updateGroupLatestMessageSnippet(message, userProfile, group);
 };

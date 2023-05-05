@@ -1,52 +1,59 @@
-import { Asset } from 'react-native-image-picker';
+import { Image, saveImage } from 'firebase/storage';
+
 import { Group } from 'types/group';
-import { MessageType } from '@flyerhq/react-native-chat-ui';
+// import { MessageType } from '@flyerhq/react-native-chat-ui';
+import { MessageType } from '../../../react-native-chat-ui/src';
+
 import { UserProfile } from 'types/user';
 import { addChatMessage } from 'firebase/firestore';
 import { appConfig } from 'config';
 import { createAuthor } from './createAuthor';
-import { saveImage } from 'firebase/storage';
-import { selectImage } from '@react-native-ajp-elements/ui';
 import { updateGroupLatestMessageSnippet } from './updateGroupLatestMessageSnippet';
 import { uuidv4 } from 'lib/uuid';
 
-export const sendImageMessage = (userProfile: UserProfile, group: Group) => {
-  selectImage({
-    onSuccess: async imageAssets => {
-      const imageAsset = imageAssets[0];
-      if (imageAsset) {
-        await saveImage({
-          imageAsset,
-          storagePath: appConfig.storageImageChat,
-          onSuccess: url => send(imageAsset, url, userProfile, group),
-          onError: () => {
-            return;
-          },
-        });
-      }
-    },
+export const sendImageMessage = (
+  imageMessage: MessageType.PartialImage,
+  userProfile: UserProfile,
+  group: Group,
+) => {
+  return new Promise<void>((resolve, reject) => {
+    saveImage({
+      image: {
+        mimeType: imageMessage.mimeType,
+        uri: imageMessage.uri,
+      } as Image,
+      storagePath: appConfig.storageImageChat,
+      onSuccess: async url => {
+        await send(imageMessage, url, userProfile, group);
+        resolve();
+      },
+      onError: () => {
+        reject();
+      },
+    });
   });
 };
 
-const send = (
-  imageAsset: Asset,
+const send = async (
+  imageMessage: MessageType.PartialImage,
   url: string,
   userProfile: UserProfile,
   group: Group,
 ) => {
-  const imageMessage: MessageType.Image = {
+  const message: MessageType.Image = {
     id: uuidv4(),
     author: createAuthor(userProfile),
-    height: imageAsset.height,
+    height: imageMessage.height,
     metadata: {},
+    mimeType: imageMessage.mimeType,
     name: url?.split('/').pop() ?? '🖼',
-    size: imageAsset.fileSize ?? 0,
+    size: imageMessage.size ?? 0,
     type: 'image',
     uri: url,
-    width: imageAsset.width,
+    width: imageMessage.width,
   };
-  group.id && addChatMessage(imageMessage, group.id);
+  group.id && (await addChatMessage(message, group.id));
 
   // Store this message as the latest message posted to this group.
-  updateGroupLatestMessageSnippet(imageMessage, userProfile, group);
+  updateGroupLatestMessageSnippet(message, userProfile, group);
 };

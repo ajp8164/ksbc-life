@@ -1,4 +1,6 @@
 export * from './handleMessagePress';
-export * from './sendAttachmentMessage';
+export * from './selectAttachments';
+export * from './sendFileMessage';
+export * from './sendImageMessage';
 export * from './sendTextMessage';
 export * from './theme';
