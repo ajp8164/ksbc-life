@@ -25,8 +25,12 @@ import {
   LocationEditorViewProps,
 } from './types';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
+import {
+  Image as ImageUpload,
+  deleteImage,
+  uploadImage,
+} from 'firebase/storage';
 import React, { useEffect, useImperativeHandle, useRef } from 'react';
-import { deleteImage, saveImage } from 'firebase/storage';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import FormikEffect from 'components/atoms/FormikEffect';
@@ -162,8 +166,11 @@ const LocationEditorView = React.forwardRef<
 
   const saveLocationImage = async () => {
     if (locationImageAsset.current) {
-      await saveImage({
-        imageAsset: locationImageAsset.current,
+      await uploadImage({
+        image: {
+          mimeType: locationImageAsset.current.type,
+          uri: locationImageAsset.current.uri,
+        } as ImageUpload,
         storagePath: appConfig.storageImageLocations,
         oldImage: location?.photoUrl,
         onSuccess: url => formikRef.current?.setFieldValue('photoUrl', url),

@@ -25,8 +25,12 @@ import {
   PasteurEditorViewProps,
 } from './types';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
+import {
+  Image as ImageUpload,
+  deleteImage,
+  uploadImage,
+} from 'firebase/storage';
 import React, { useEffect, useImperativeHandle, useRef } from 'react';
-import { deleteImage, saveImage } from 'firebase/storage';
 import { ellipsis, useSetState } from '@react-native-ajp-elements/core';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
@@ -161,8 +165,11 @@ const PasteurEditorView = React.forwardRef<
 
   const savePasteurImage = async () => {
     if (pasteurImageAsset.current) {
-      await saveImage({
-        imageAsset: pasteurImageAsset.current,
+      await uploadImage({
+        image: {
+          mimeType: pasteurImageAsset.current.type,
+          uri: pasteurImageAsset.current.uri,
+        } as ImageUpload,
         storagePath: appConfig.storageImagePasteurs,
         oldImage: pasteur?.photoUrl,
         onSuccess: url => formikRef.current?.setFieldValue('photoUrl', url),

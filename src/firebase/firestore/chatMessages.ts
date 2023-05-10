@@ -7,8 +7,7 @@ import firestore, {
   FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';
 
-// import { MessageType } from '@flyerhq/react-native-chat-ui';
-import { MessageType } from '../../../../react-native-chat-ui/src';
+import { MessageType } from '@flyerhq/react-native-chat-ui';
 import { log } from '@react-native-ajp-elements/core';
 
 export const addChatMessage = (

@@ -33,12 +33,16 @@ import {
 } from './types';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import {
+  Image as ImageUpload,
+  deleteImage,
+  uploadImage,
+} from 'firebase/storage';
+import {
   PageContentItem,
   PageContentItemImageSize,
 } from 'types/pageContentItem';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { TabBar, TabView } from 'react-native-tab-view';
-import { deleteImage, saveImage } from 'firebase/storage';
 import { ellipsis, useSetState } from '@react-native-ajp-elements/core';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
@@ -239,8 +243,11 @@ const PageContentItemEditorView = React.forwardRef<
 
   const savePageContentImage = async () => {
     if (pageContentImageAsset.current) {
-      await saveImage({
-        imageAsset: pageContentImageAsset.current,
+      await uploadImage({
+        image: {
+          mimeType: pageContentImageAsset.current.type,
+          uri: pageContentImageAsset.current.uri,
+        } as ImageUpload,
         storagePath: appConfig.storageImagePageContentItems,
         oldImage: pageContentItem?.content.imageUrl,
         onSuccess: url =>

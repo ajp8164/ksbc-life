@@ -1,6 +1,5 @@
 import { Linking } from 'react-native';
-// import { MessageType } from '@flyerhq/react-native-chat-ui';
-import { MessageType } from '../../../react-native-chat-ui/src';
+import { MessageType } from '@flyerhq/react-native-chat-ui';
 
 // import FileViewer from 'react-native-file-viewer';
 

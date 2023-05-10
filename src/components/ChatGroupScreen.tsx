@@ -1,8 +1,7 @@
 import Animated, { SlideOutUp } from 'react-native-reanimated';
 import { AppTheme, useTheme } from 'theme';
 import { Button, Icon } from '@rneui/base';
-// import { Chat, MessageType } from '@flyerhq/react-native-chat-ui';
-import { Chat, MessageType } from '../../react-native-chat-ui/src';
+import { Chat, MessageType } from '@flyerhq/react-native-chat-ui';
 import { FirestoreMessageType, SearchCriteria, SearchScope } from 'types/chat';
 import { FlatList, Keyboard, ListRenderItem, Text, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
@@ -22,6 +21,7 @@ import {
   sendFileMessage,
   sendImageMessage,
   sendTextMessage,
+  sendVideoMessage,
   useSelectAttachments,
 } from 'lib/chat';
 import { getGroupAvatarColor, getGroupMembersLongStr } from 'lib/group';
@@ -361,6 +361,8 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
         await sendImageMessage(m, userProfile, targetGroup);
       } else if (m.type === 'text') {
         await sendTextMessage(m, userProfile, targetGroup);
+      } else if (m.type === 'video') {
+        await sendVideoMessage(m, userProfile, targetGroup);
       }
     }
 

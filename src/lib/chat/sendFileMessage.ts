@@ -1,11 +1,11 @@
+import { File, saveFile } from 'firebase/storage';
+
 import { Group } from 'types/group';
-// import { MessageType } from '@flyerhq/react-native-chat-ui';
-import { MessageType } from '../../../react-native-chat-ui/src';
+import { MessageType } from '@flyerhq/react-native-chat-ui';
 import { UserProfile } from 'types/user';
 import { addChatMessage } from 'firebase/firestore';
 import { appConfig } from 'config';
 import { createAuthor } from './createAuthor';
-import { File, saveFile } from 'firebase/storage';
 import { updateGroupLatestMessageSnippet } from './updateGroupLatestMessageSnippet';
 import { uuidv4 } from 'lib/uuid';
 

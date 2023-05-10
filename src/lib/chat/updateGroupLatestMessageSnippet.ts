@@ -1,7 +1,6 @@
 import { DateTime } from 'luxon';
 import { Group } from 'types/group';
-// import { MessageType } from '@flyerhq/react-native-chat-ui';
-import { MessageType } from '../../../react-native-chat-ui/src';
+import { MessageType } from '@flyerhq/react-native-chat-ui';
 import { UserProfile } from 'types/user';
 import { updateGroup } from 'firebase/firestore';
 
@@ -9,7 +8,8 @@ export const updateGroupLatestMessageSnippet = (
   message:
     | MessageType.PartialText
     | MessageType.PartialFile
-    | MessageType.PartialImage,
+    | MessageType.PartialImage
+    | MessageType.PartialVideo,
   userProfile: UserProfile,
   group: Group,
 ) => {
@@ -25,6 +25,9 @@ export const updateGroupLatestMessageSnippet = (
       break;
     case 'text':
       text = message.text;
+      break;
+    case 'video':
+      text = 'Attachment: Video';
       break;
   }
 

@@ -1,10 +1,9 @@
+import { Theme, defaultTheme } from '@flyerhq/react-native-chat-ui';
 import { fontFamily, fontSizes } from '@react-native-ajp-elements/ui';
 
 import { AppTheme } from 'theme';
 import { Icon } from '@rneui/base';
 import React from 'react';
-// import { defaultTheme, Theme } from '@flyerhq/react-native-chat-ui';
-import { defaultTheme, Theme } from '../../../react-native-chat-ui/src';
 import lodash from 'lodash';
 
 export const chatTheme = (

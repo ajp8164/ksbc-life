@@ -22,8 +22,12 @@ import {
   GroupEditorViewMethods,
   GroupEditorViewProps,
 } from './types';
+import {
+  Image as ImageUpload,
+  deleteImage,
+  uploadImage,
+} from 'firebase/storage';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { deleteImage, saveImage } from 'firebase/storage';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
@@ -115,8 +119,11 @@ const GroupEditorView = React.forwardRef<GroupEditorView, GroupEditorViewProps>(
     const saveGroupImage = async () => {
       if (groupImageAsset.current) {
         setEditorState({ isSubmitting: true });
-        await saveImage({
-          imageAsset: groupImageAsset.current,
+        await uploadImage({
+          image: {
+            mimeType: groupImageAsset.current.type,
+            uri: groupImageAsset.current.uri,
+          } as ImageUpload,
           storagePath: appConfig.storageImageGroups,
           oldImage: group?.photoUrl,
           onSuccess: url => {

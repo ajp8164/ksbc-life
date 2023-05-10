@@ -1,9 +1,7 @@
-import { Image, saveImage } from 'firebase/storage';
+import { Image as ImageUpload, uploadImage } from 'firebase/storage';
 
 import { Group } from 'types/group';
-// import { MessageType } from '@flyerhq/react-native-chat-ui';
-import { MessageType } from '../../../react-native-chat-ui/src';
-
+import { MessageType } from '@flyerhq/react-native-chat-ui';
 import { UserProfile } from 'types/user';
 import { addChatMessage } from 'firebase/firestore';
 import { appConfig } from 'config';
@@ -17,11 +15,11 @@ export const sendImageMessage = (
   group: Group,
 ) => {
   return new Promise<void>((resolve, reject) => {
-    saveImage({
+    uploadImage({
       image: {
         mimeType: imageMessage.mimeType,
         uri: imageMessage.uri,
-      } as Image,
+      } as ImageUpload,
       storagePath: appConfig.storageImageChat,
       onSuccess: async url => {
         await send(imageMessage, url, userProfile, group);

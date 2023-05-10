@@ -635,6 +635,13 @@ PODS:
     - FBSDKCoreKit (= 15.0.0)
   - FBSDKShareKit (15.0.0):
     - FBSDKCoreKit (= 15.0.0)
+  - ffmpeg-kit-ios-https (5.1)
+  - ffmpeg-kit-react-native (5.1.0):
+    - ffmpeg-kit-react-native/https (= 5.1.0)
+    - React-Core
+  - ffmpeg-kit-react-native/https (5.1.0):
+    - ffmpeg-kit-ios-https (= 5.1)
+    - React-Core
   - Firebase/Auth (10.7.0):
     - Firebase/CoreOnly
     - FirebaseAuth (~> 10.7.0)
@@ -1241,6 +1248,8 @@ PODS:
     - RNFBApp
   - RNFileViewer (2.1.5):
     - React-Core
+  - RNFS (2.20.0):
+    - React-Core
   - RNGestureHandler (2.9.0):
     - React-Core
   - RNGoogleSignin (9.0.2):
@@ -1303,6 +1312,7 @@ DEPENDENCIES:
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../node_modules/react-native/React/FBReactNativeSpec`)
+  - ffmpeg-kit-react-native (from `../node_modules/ffmpeg-kit-react-native`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - libevent (~> 2.1.12)
@@ -1371,6 +1381,7 @@ DEPENDENCIES:
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
   - "RNFBStorage (from `../node_modules/@react-native-firebase/storage`)"
   - RNFileViewer (from `../node_modules/react-native-file-viewer`)
+  - RNFS (from `../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - "RNGoogleSignin (from `../node_modules/@react-native-google-signin/google-signin`)"
   - RNOS (from `../node_modules/react-native-os`)
@@ -1395,6 +1406,7 @@ SPEC REPOS:
     - FBSDKGamingServicesKit
     - FBSDKLoginKit
     - FBSDKShareKit
+    - ffmpeg-kit-ios-https
     - Firebase
     - FirebaseAppCheckInterop
     - FirebaseAuth
@@ -1434,6 +1446,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/Libraries/FBLazyVector"
   FBReactNativeSpec:
     :path: "../node_modules/react-native/React/FBReactNativeSpec"
+  ffmpeg-kit-react-native:
+    :path: "../node_modules/ffmpeg-kit-react-native"
   glog:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
   hermes-engine:
@@ -1566,6 +1580,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/storage"
   RNFileViewer:
     :path: "../node_modules/react-native-file-viewer"
+  RNFS:
+    :path: "../node_modules/react-native-fs"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
   RNGoogleSignin:
@@ -1605,6 +1621,8 @@ SPEC CHECKSUMS:
   FBSDKGamingServicesKit: e0766514d64d26a9f846e793c0a44bc4a236723b
   FBSDKLoginKit: 11995469cd7da16fd4d5245e8d2ec61060479270
   FBSDKShareKit: 9501792c3024580809f811a8a549868699d9bd32
+  ffmpeg-kit-ios-https: 8dffbe1623a2f227be98fc314294847a97f818e4
+  ffmpeg-kit-react-native: 56ecfcd21536379dd123eade87c3b6fd55f12030
   Firebase: 0219acf760880eeec8ce479895bd7767466d9f81
   FirebaseAppCheckInterop: 8e907eea79958960a8bd2058e067f31e03a7914b
   FirebaseAuth: dd64c01631df724b09f33e584625775c52f7d71f
@@ -1695,6 +1713,7 @@ SPEC CHECKSUMS:
   RNFBMessaging: d365361650cc697294227e1280923f35a31d2501
   RNFBStorage: d40ebadfad4755ed1ef6a74cae84c9ee9ca47ffd
   RNFileViewer: ce7ca3ac370e18554d35d6355cffd7c30437c592
+  RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
   RNGestureHandler: 071d7a9ad81e8b83fe7663b303d132406a7d8f39
   RNGoogleSignin: 22e468a9474dbcb8618d8847205ad4f0b2575d13
   RNOS: 6f2f9a70895bbbfbdad7196abd952e7b01d45027

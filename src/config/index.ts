@@ -24,6 +24,7 @@ export interface AppConfig
   storageImagePasteurs: string;
   storageImagePageContentItems: string;
   storageSchemaVersion: number;
+  storageVideoChat: string;
   supportEmail: string;
   supportUrl: string;
   websiteUrl: string;
@@ -55,6 +56,7 @@ export const appConfig: AppConfig = {
   storageImagePasteurs: Config.STORAGE_IMAGE_PASTEURS || '',
   storageImagePageContentItems: Config.STORAGE_IMAGE_SCREEN_CONTENT_ITEMS || '',
   storageSchemaVersion: Number(Config.STORAGE_SCHEMA_VERSION) || 0,
+  storageVideoChat: Config.STORAGE_VIDEO_CHAT || '',
   supportEmail: Config.SUPPORT_EMAIL || '',
   supportUrl: Config.SUPPORT_URL || '',
   websiteUrl: Config.WEBSITE_URL || '',

@@ -3,4 +3,5 @@ export * from './selectAttachments';
 export * from './sendFileMessage';
 export * from './sendImageMessage';
 export * from './sendTextMessage';
+export * from './sendVideoMessage';
 export * from './theme';

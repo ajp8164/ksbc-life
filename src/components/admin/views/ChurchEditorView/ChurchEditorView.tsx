@@ -25,8 +25,12 @@ import {
   viewport,
 } from '@react-native-ajp-elements/ui';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
+import {
+  Image as ImageUpload,
+  deleteImage,
+  uploadImage,
+} from 'firebase/storage';
 import React, { useEffect, useImperativeHandle, useRef } from 'react';
-import { deleteImage, saveImage } from 'firebase/storage';
 import { ellipsis, useSetState } from '@react-native-ajp-elements/core';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
@@ -150,8 +154,11 @@ const ChurchEditorView = React.forwardRef<
 
   const saveChurchImage = async () => {
     if (churchImageAsset.current) {
-      await saveImage({
-        imageAsset: churchImageAsset.current,
+      await uploadImage({
+        image: {
+          mimeType: churchImageAsset.current.type,
+          uri: churchImageAsset.current.uri,
+        } as ImageUpload,
         storagePath: appConfig.storageImageChurch,
         oldImage: church?.photoUrl,
         onSuccess: url => formikRef.current?.setFieldValue('photoUrl', url),
