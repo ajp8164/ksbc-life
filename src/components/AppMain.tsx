@@ -1,4 +1,6 @@
 import { AuthContext, useAuthContext } from 'lib/auth';
+import { CameraContext, useCameraContext } from 'lib/camera';
+import { CameraModal, ColorModeSwitch } from '@react-native-ajp-elements/ui';
 import {
   DarkTheme,
   DefaultTheme,
@@ -11,7 +13,6 @@ import { useEffect, useRef, useState } from 'react';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { AppError } from 'lib/errors';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { ColorModeSwitch } from '@react-native-ajp-elements/ui';
 import ErrorBoundary from 'react-native-error-boundary';
 import { LinkingOptions } from '@react-navigation/native';
 import MainNavigator from 'components/navigation/MainNavigator';
@@ -35,8 +36,10 @@ const AppMain = () => {
   const themeSettings = useSelector(selectThemeSettings);
   const scheme = useColorScheme();
 
+  const cameraModalRef = useRef<CameraModal>(null);
   const signInModalRef = useRef<SignInModal>(null);
   const auth = useAuthContext(signInModalRef);
+  const camera = useCameraContext(cameraModalRef);
 
   const [startupScreen, setStartupScreen] = useState<StartupScreen>(
     StartupScreen.None,
@@ -102,8 +105,11 @@ const AppMain = () => {
           <ColorModeSwitch themeSettings={themeSettings}>
             <ErrorBoundary onError={onError}>
               <AuthContext.Provider value={auth}>
-                <MainNavigator startupScreen={startupScreen} />
-                <SignInModal ref={signInModalRef} />
+                <CameraContext.Provider value={camera}>
+                  <MainNavigator startupScreen={startupScreen} />
+                  <SignInModal ref={signInModalRef} />
+                  <CameraModal ref={cameraModalRef} />
+                </CameraContext.Provider>
               </AuthContext.Provider>
             </ErrorBoundary>
           </ColorModeSwitch>

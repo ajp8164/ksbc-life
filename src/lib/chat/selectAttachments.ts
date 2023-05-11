@@ -1,13 +1,19 @@
 import { Attachment, MessageType } from '@flyerhq/react-native-chat-ui';
 import { FFmpegKit, ReturnCode } from 'ffmpeg-kit-react-native';
+import {
+  MediaAsset,
+  MediaCapture,
+  selectImage,
+} from '@react-native-ajp-elements/ui';
 
 import DocumentPicker from 'react-native-document-picker';
 import RNFS from 'react-native-fs';
-import { selectImage } from '@react-native-ajp-elements/ui';
 import { useActionSheet } from '@expo/react-native-action-sheet';
+import { useCamera } from 'lib/camera';
 
 export const useSelectAttachments = () => {
   const { showActionSheetWithOptions } = useActionSheet();
+  const camera = useCamera();
 
   return (): Promise<Attachment[]> => {
     // Images and videos
@@ -16,41 +22,30 @@ export const useSelectAttachments = () => {
         selectImage({
           multiSelect: true,
           onSuccess: async assets => {
-            const selections = [];
-            for (let i = 0; i < assets.length; i++) {
-              const asset = assets[i];
-              if (asset.type?.includes('video')) {
-                const posterUri =
-                  asset.uri && (await createVideoPoster(asset.uri));
-                selections.push({
-                  duration: asset.duration,
-                  height: asset.height,
-                  metadata: {},
-                  mimeType: asset.type,
-                  name: asset.fileName,
-                  posterUri,
-                  size: asset.fileSize,
-                  type: 'video',
-                  uri: asset.uri,
-                  width: asset.width,
-                } as MessageType.PartialVideo);
-              } else {
-                selections.push({
-                  height: asset.height,
-                  metadata: {},
-                  mimeType: asset.type,
-                  name: asset.fileName,
-                  size: asset.fileSize,
-                  type: 'image',
-                  uri: asset.uri,
-                  width: asset.width,
-                } as MessageType.PartialImage);
-              }
-            }
-            resolve(selections as Attachment[]);
+            const attachments = await createAssetAttachments(assets);
+            resolve(attachments);
           },
           onError: () => {
             reject([] as Attachment[]);
+          },
+        });
+      });
+    };
+
+    // Take photo or video using camera
+    const takePhoto = (): Promise<Attachment[]> => {
+      return new Promise<Attachment[]>((resolve, _reject) => {
+        camera.presentCameraModal({
+          onCapture: async (capture: MediaCapture) => {
+            console.log(JSON.stringify(capture));
+            const attachment = await createCaptureAttachment(capture);
+            console.log(JSON.stringify(attachment));
+            resolve([attachment]);
+          },
+          onSelect: async (assets: MediaAsset[]) => {
+            console.log(JSON.stringify(assets));
+            const attachments = await createAssetAttachments(assets);
+            resolve(attachments);
           },
         });
       });
@@ -82,6 +77,75 @@ export const useSelectAttachments = () => {
       });
     };
 
+    const createAssetAttachments = async (
+      assets: MediaAsset[],
+    ): Promise<Attachment[]> => {
+      const selections = [];
+      for (let i = 0; i < assets.length; i++) {
+        const asset = assets[i];
+        if (asset.type?.includes('video')) {
+          const posterUri = asset.uri && (await createVideoPoster(asset.uri));
+          selections.push({
+            duration: asset.duration,
+            height: asset.height,
+            metadata: {},
+            mimeType: asset.type,
+            name: asset.fileName,
+            posterUri,
+            size: asset.fileSize,
+            type: 'video',
+            uri: asset.uri,
+            width: asset.width,
+          } as MessageType.PartialVideo);
+        } else {
+          selections.push({
+            height: asset.height,
+            metadata: {},
+            mimeType: asset.type,
+            name: asset.fileName,
+            size: asset.fileSize,
+            type: 'image',
+            uri: asset.uri,
+            width: asset.width,
+          } as MessageType.PartialImage);
+        }
+      }
+      return selections;
+    };
+
+    const createCaptureAttachment = async (
+      capture: MediaCapture,
+    ): Promise<Attachment> => {
+      let attachment: Attachment;
+      if (capture.type?.includes('video')) {
+        const posterUri = capture.uri && (await createVideoPoster(capture.uri));
+        attachment = {
+          duration: capture.media.duration,
+          height: capture.media.height,
+          metadata: {},
+          mimeType: capture.mimeType,
+          name: capture.media.path.split('/').pop(),
+          posterUri,
+          size: 0, // TODO: can't easily get this here
+          type: 'video',
+          uri: capture.media.path,
+          width: capture.media.width,
+        } as MessageType.PartialVideo;
+      } else {
+        attachment = {
+          height: capture.media.height,
+          metadata: {},
+          mimeType: capture.mimeType,
+          name: capture.media.path.split('/').pop(),
+          size: 0, // TODO: can't easily get this here
+          type: 'image',
+          uri: capture.media.path,
+          width: capture.media.width,
+        } as MessageType.PartialImage;
+      }
+      return attachment;
+    };
+
     const createVideoPoster = async (videoUri: string) => {
       const filename = videoUri.split('/').pop();
       const posterUri = `${RNFS.DocumentDirectoryPath}/${filename}.png`;
@@ -103,15 +167,18 @@ export const useSelectAttachments = () => {
     return new Promise<Attachment[]>((resolve, reject) => {
       showActionSheetWithOptions(
         {
-          options: ['Camera Roll', 'File', 'Cancel'],
-          cancelButtonIndex: 2,
+          options: ['Take Photo', 'Choose Photos', 'Choose Files', 'Cancel'],
+          cancelButtonIndex: 3,
         },
         buttonIndex => {
           switch (buttonIndex) {
             case 0:
-              resolve(chooseFromCameraRoll());
+              resolve(takePhoto());
               break;
             case 1:
+              resolve(chooseFromCameraRoll());
+              break;
+            case 2:
               resolve(chooseFiles());
               break;
             default:
