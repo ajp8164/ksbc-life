@@ -152,6 +152,7 @@
     "@types/react-native-scrollable-tab-view": "^0.10.3",
     "@types/react-native-typing-animation": "^0.1.0",
     "@types/react-native-video": "^5.0.14",
+    "@welldone-software/why-did-you-render": "^7.0.1",
     "babel-jest": "^29.4.1",
     "babel-plugin-inline-import": "^3.0.0",
     "babel-plugin-module-resolver": "^5.0.0",
