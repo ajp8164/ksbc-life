@@ -119,6 +119,10 @@ export const chatTheme = (
         marginLeft: 10,
       },
       tabBarHeight: extra.tabBarHeight,
+      videoAttachmentDurationText: {
+        ...theme.styles.textTiny,
+        color: theme.colors.stickyWhite,
+      },
     },
     date: {
       text: {

@@ -37,13 +37,10 @@ export const useSelectAttachments = () => {
       return new Promise<Attachment[]>((resolve, _reject) => {
         camera.presentCameraModal({
           onCapture: async (capture: MediaCapture) => {
-            console.log(JSON.stringify(capture));
             const attachment = await createCaptureAttachment(capture);
-            console.log(JSON.stringify(attachment));
             resolve([attachment]);
           },
           onSelect: async (assets: MediaAsset[]) => {
-            console.log(JSON.stringify(assets));
             const attachments = await createAssetAttachments(assets);
             resolve(attachments);
           },
@@ -118,7 +115,8 @@ export const useSelectAttachments = () => {
     ): Promise<Attachment> => {
       let attachment: Attachment;
       if (capture.type?.includes('video')) {
-        const posterUri = capture.uri && (await createVideoPoster(capture.uri));
+        const posterUri =
+          capture.media.path && (await createVideoPoster(capture.media.path));
         attachment = {
           duration: capture.media.duration,
           height: capture.media.height,
@@ -126,7 +124,7 @@ export const useSelectAttachments = () => {
           mimeType: capture.mimeType,
           name: capture.media.path.split('/').pop(),
           posterUri,
-          size: 0, // TODO: can't easily get this here
+          size: capture.media.duration,
           type: 'video',
           uri: capture.media.path,
           width: capture.media.width,
@@ -137,7 +135,7 @@ export const useSelectAttachments = () => {
           metadata: {},
           mimeType: capture.mimeType,
           name: capture.media.path.split('/').pop(),
-          size: 0, // TODO: can't easily get this here
+          size: capture.media.size,
           type: 'image',
           uri: capture.media.path,
           width: capture.media.width,
@@ -148,18 +146,17 @@ export const useSelectAttachments = () => {
 
     const createVideoPoster = async (videoUri: string) => {
       const filename = videoUri.split('/').pop();
-      const posterUri = `${RNFS.DocumentDirectoryPath}/${filename}.png`;
+      const posterUri = `${RNFS.CachesDirectoryPath}/${filename}.png`;
       return await FFmpegKit.execute(
-        `-y -ss 00:00:01.000 -i ${videoUri} -vframes 1 ${posterUri}`,
+        `-y -i ${videoUri} -frames:v 1 ${posterUri}`,
       ).then(async session => {
         const returnCode = await session.getReturnCode();
         if (ReturnCode.isSuccess(returnCode)) {
           return `file://${posterUri}`;
-          // SUCCESS
         } else if (ReturnCode.isCancel(returnCode)) {
-          // CANCEL
+          // Canceled
         } else {
-          // ERROR
+          // Error
         }
       });
     };

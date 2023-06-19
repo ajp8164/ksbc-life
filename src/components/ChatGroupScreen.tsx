@@ -352,17 +352,31 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
   const sendMessage = async (message: MessageType.PartialAny[]) => {
     if (!userProfile) return;
     const targetGroup = group || (await createGroup());
+    let messageBeingSent: MessageType.Any | undefined;
 
     for (let i = 0; i < message.length; i++) {
       const m = message[i];
       if (m.type === 'file') {
-        await sendFileMessage(m, userProfile, targetGroup);
+        messageBeingSent = sendFileMessage(m, userProfile, targetGroup);
       } else if (m.type === 'image') {
-        await sendImageMessage(m, userProfile, targetGroup);
+        messageBeingSent = sendImageMessage(m, userProfile, targetGroup);
       } else if (m.type === 'text') {
-        await sendTextMessage(m, userProfile, targetGroup);
+        messageBeingSent = sendTextMessage(m, userProfile, targetGroup);
       } else if (m.type === 'video') {
-        await sendVideoMessage(m, userProfile, targetGroup);
+        messageBeingSent = sendVideoMessage(m, userProfile, targetGroup);
+      }
+
+      if (messageBeingSent !== undefined) {
+        // Add the messsage to the UI while it's being sent.
+        // This provides the user with feedback that the attachment is uploading.
+        (messageBeingSent as MessageType.Any).status = 'sending';
+        const messages = ([] as MessageType.Any[]).concat(
+          [messageBeingSent as MessageType.Any],
+          chatMessages,
+        );
+        setChatMessages(messages);
+
+        console.log(messages);
       }
     }
 

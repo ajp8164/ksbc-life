@@ -14,44 +14,48 @@ export const sendImageMessage = (
   userProfile: UserProfile,
   group: Group,
 ) => {
-  return new Promise<void>((resolve, reject) => {
-    uploadImage({
-      image: {
-        mimeType: imageMessage.mimeType,
-        uri: imageMessage.uri,
-      } as ImageUpload,
-      storagePath: appConfig.storageImageChat,
-      onSuccess: async url => {
-        await send(imageMessage, url, userProfile, group);
-        resolve();
-      },
-      onError: () => {
-        reject();
-      },
-    });
+  const message = buildMessage(imageMessage, userProfile);
+
+  uploadImage({
+    image: { mimeType: message.mimeType, uri: message.uri } as ImageUpload,
+    storagePath: appConfig.storageImageChat,
+    onSuccess: url => {
+      // Update message with uri's from uploaded assets.
+      message.uri = url;
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      addChatMessage(message, group.id!)
+        .then(() => {
+          // Store this message as the latest message posted to this group.
+          updateGroupLatestMessageSnippet(message, userProfile, group);
+        })
+        .catch(() => {
+          // Message failed to send.
+        });
+    },
+    onError: () => {
+      // Message failed to send.
+    },
   });
+
+  // Prevent blocking the UI during upload by returning locally created message (local video/poster url's).
+  return message;
 };
 
-const send = async (
-  imageMessage: MessageType.PartialImage,
-  url: string,
+const buildMessage = (
+  message: MessageType.PartialImage,
   userProfile: UserProfile,
-  group: Group,
 ) => {
-  const message: MessageType.Image = {
+  return {
     id: uuidv4(),
     author: createAuthor(userProfile),
-    height: imageMessage.height,
+    height: message.height,
     metadata: {},
-    mimeType: imageMessage.mimeType,
-    name: url?.split('/').pop() ?? '🖼',
-    size: imageMessage.size ?? 0,
+    mimeType: message.mimeType,
+    name: message.uri?.split('/').pop() ?? '🖼',
+    size: message.size ?? 0,
     type: 'image',
-    uri: url,
-    width: imageMessage.width,
-  };
-  group.id && (await addChatMessage(message, group.id));
-
-  // Store this message as the latest message posted to this group.
-  updateGroupLatestMessageSnippet(message, userProfile, group);
+    uri: message.uri,
+    width: message.width,
+  } as MessageType.Image;
 };

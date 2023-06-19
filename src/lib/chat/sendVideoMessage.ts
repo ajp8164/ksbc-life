@@ -1,8 +1,8 @@
 import {
+  uploadImage as FSUploadImage,
+  uploadVideo as FSUploadVideo,
   Image as ImageUpload,
   Video as VideoUpload,
-  uploadImage,
-  uploadVideo,
 } from 'firebase/storage';
 
 import { Group } from 'types/group';
@@ -19,40 +19,42 @@ export const sendVideoMessage = (
   userProfile: UserProfile,
   group: Group,
 ) => {
+  const message = buildMessage(videoMessage, userProfile);
   let posterUrl = '';
   let videoUrl = '';
 
-  return new Promise<void>((resolve, reject) => {
-    _uploadVideo(videoMessage)
-      .then(url => {
-        if (url) {
-          videoUrl = url;
-        } else {
-          reject();
-        }
-        return _uploadPoster(videoMessage);
-      })
-      .then(url => {
-        if (url) {
-          posterUrl = url;
-        } else {
-          reject();
-        }
-        return send(videoMessage, videoUrl, posterUrl, userProfile, group);
-      })
-      .then(() => {
-        resolve();
-      })
-      .catch(() => reject());
-  });
+  uploadVideo(message)
+    .then(url => {
+      videoUrl = url;
+      return uploadPoster(message);
+    })
+    .then(url => {
+      posterUrl = url;
+      // Update message with uri's from uploaded assets.
+      message.posterUri = posterUrl;
+      message.uri = videoUrl;
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      addChatMessage(message, group.id!);
+    })
+    .then(() => {
+      // Store this message as the latest message posted to this group.
+      updateGroupLatestMessageSnippet(message, userProfile, group);
+    })
+    .catch(() => {
+      // Message failed to send.
+    });
+
+  // Prevent blocking the UI during upload by returning locally created message (local video/poster url's).
+  return message;
 };
 
-const _uploadVideo = (videoMessage: MessageType.PartialVideo) => {
-  return new Promise<string | void>((resolve, reject) => {
-    uploadVideo({
+const uploadVideo = (message: MessageType.PartialVideo) => {
+  return new Promise<string>((resolve, reject) => {
+    FSUploadVideo({
       video: {
-        mimeType: videoMessage.mimeType,
-        uri: videoMessage.uri,
+        mimeType: message.mimeType,
+        uri: message.uri,
       } as VideoUpload,
       storagePath: appConfig.storageVideoChat,
       onSuccess: url => resolve(url),
@@ -61,12 +63,12 @@ const _uploadVideo = (videoMessage: MessageType.PartialVideo) => {
   });
 };
 
-const _uploadPoster = (videoMessage: MessageType.PartialVideo) => {
-  return new Promise<string | void>((resolve, reject) => {
-    uploadImage({
+const uploadPoster = (message: MessageType.PartialVideo) => {
+  return new Promise<string>((resolve, reject) => {
+    FSUploadImage({
       image: {
         mimeType: 'image/png',
-        uri: videoMessage.posterUri,
+        uri: message.posterUri,
       } as ImageUpload,
       storagePath: appConfig.storageVideoChat,
       onSuccess: url => resolve(url),
@@ -75,28 +77,21 @@ const _uploadPoster = (videoMessage: MessageType.PartialVideo) => {
   });
 };
 
-const send = async (
-  videoMessage: MessageType.PartialVideo,
-  videoUrl: string,
-  posterUrl: string,
+const buildMessage = (
+  message: MessageType.PartialVideo,
   userProfile: UserProfile,
-  group: Group,
 ) => {
-  const message: MessageType.Video = {
+  return {
     id: uuidv4(),
     author: createAuthor(userProfile),
-    height: videoMessage.height,
+    height: message.height,
     metadata: {},
-    mimeType: videoMessage.mimeType,
-    name: videoUrl?.split('/').pop() ?? '🖼',
-    size: videoMessage.size ?? 0,
-    posterUri: posterUrl,
+    mimeType: message.mimeType,
+    name: message.uri?.split('/').pop() ?? '🖼',
+    size: message.size ?? 0,
+    posterUri: message.posterUri,
     type: 'video',
-    uri: videoUrl,
-    width: videoMessage.width,
-  };
-  group.id && (await addChatMessage(message, group.id));
-
-  // Store this message as the latest message posted to this group.
-  updateGroupLatestMessageSnippet(message, userProfile, group);
+    uri: message.uri,
+    width: message.width,
+  } as MessageType.Video;
 };

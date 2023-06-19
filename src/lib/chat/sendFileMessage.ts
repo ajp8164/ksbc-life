@@ -14,39 +14,46 @@ export const sendFileMessage = (
   userProfile: UserProfile,
   group: Group,
 ) => {
-  return new Promise<void>((resolve, reject) => {
-    saveFile({
-      file: { mimeType: fileMessage.mimeType, uri: fileMessage.uri } as File,
-      storagePath: appConfig.storageFileChat,
-      onSuccess: async url => {
-        await send(fileMessage, url, userProfile, group);
-        resolve();
-      },
-      onError: () => {
-        reject();
-      },
-    });
+  const message = buildMessage(fileMessage, userProfile);
+
+  saveFile({
+    file: { mimeType: message.mimeType, uri: message.uri } as File,
+    storagePath: appConfig.storageFileChat,
+    onSuccess: url => {
+      // Update message with uri's from uploaded assets.
+      message.uri = url;
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      addChatMessage(message, group.id!)
+        .then(() => {
+          // Store this message as the latest message posted to this group.
+          updateGroupLatestMessageSnippet(message, userProfile, group);
+        })
+        .catch(() => {
+          // Message failed to send.
+        });
+    },
+    onError: () => {
+      // Message failed to send.
+    },
   });
+
+  // Prevent blocking the UI during upload by returning locally created message (local video/poster url's).
+  return message;
 };
 
-const send = async (
-  fileMessage: MessageType.PartialFile,
-  url: string,
+const buildMessage = (
+  message: MessageType.PartialFile,
   userProfile: UserProfile,
-  group: Group,
 ) => {
-  const message: MessageType.File = {
+  return {
     id: uuidv4(),
     author: createAuthor(userProfile),
     metadata: {},
-    mimeType: fileMessage.type ?? undefined,
-    name: fileMessage.name || `tmp-${uuidv4()}`,
-    size: fileMessage.size ?? 0,
+    mimeType: message.type ?? undefined,
+    name: message.name || `tmp-${uuidv4()}`,
+    size: message.size ?? 0,
     type: 'file',
-    uri: url,
-  };
-  group.id && (await addChatMessage(message, group.id));
-
-  // Store this message as the latest message posted to this group.
-  updateGroupLatestMessageSnippet(message, userProfile, group);
+    uri: message.uri,
+  } as MessageType.File;
 };
