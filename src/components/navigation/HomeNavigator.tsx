@@ -6,13 +6,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { getSvg } from '@react-native-ajp-elements/ui';
 import { useTheme } from 'theme';
 
-const POSStack = createNativeStackNavigator<HomeNavigatorParamList>();
+const HomeStack = createNativeStackNavigator<HomeNavigatorParamList>();
 
 const HomeNavigator = () => {
   const theme = useTheme();
 
   return (
-    <POSStack.Navigator
+    <HomeStack.Navigator
       initialRouteName="Home"
       screenOptions={{
         headerStyle: {
@@ -23,7 +23,7 @@ const HomeNavigator = () => {
         },
         headerTintColor: theme.colors.screenHeaderBackButton,
       }}>
-      <POSStack.Screen
+      <HomeStack.Screen
         name="Home"
         component={HomeScreen}
         options={{
@@ -39,7 +39,7 @@ const HomeNavigator = () => {
           ),
         }}
       />
-    </POSStack.Navigator>
+    </HomeStack.Navigator>
   );
 };
 
