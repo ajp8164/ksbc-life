@@ -26,7 +26,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>org.ksbc</string>
+			<string>org.kingspring.life</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>ksbc</string>
