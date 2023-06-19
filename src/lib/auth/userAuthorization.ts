@@ -1,9 +1,8 @@
 import { UserProfile, UserRole, UserStatus } from 'types/user';
+import { addUser, cacheUsers, getUser, updateUser } from 'firebase/firestore';
 import { getUserAvatarColor, getUserInitials } from 'lib/user';
 
 import { FirebaseAuthTypes } from '@react-native-firebase/auth';
-import { cacheUsers } from 'firebase/firestore';
-import firestore from '@react-native-firebase/firestore';
 import lodash from 'lodash';
 import { log } from '@react-native-ajp-elements/core';
 import { saveUser } from 'store/slices/user';
@@ -26,22 +25,16 @@ export const useAuthorizeUser = () => {
   ) => {
     if (credentials) {
       // Check if user already exists in firstore. If not then add the user to firestore.
-      firestore()
-        .collection('Users')
-        .doc(credentials.uid)
-        .get()
-        .then(documentSnapshot => {
-          if (!documentSnapshot.exists) {
+      getUser(credentials.uid)
+        .then(userProfile => {
+          if (!userProfile) {
             // Add user to firestore and set user.
             const profile = createProfile(
               credentials,
               theme.colors.avatarColors,
             );
 
-            firestore()
-              .collection('Users')
-              .doc(credentials.uid)
-              .set(profile)
+            addUser(profile)
               .then(() => {
                 log.debug(`User profile created: ${JSON.stringify(profile)}`);
                 const user = setUser(credentials, profile);
@@ -59,21 +52,14 @@ export const useAuthorizeUser = () => {
               });
           } else {
             // User exists. Update user in firestore (if needed) and set user.
-            const profile = documentSnapshot.data() as UserProfile;
-
-            if (profile.status === UserStatus.Active) {
-              const updatedProfile = Object.assign({}, profile, {
+            if (userProfile.status === UserStatus.Active) {
+              const updatedProfile = Object.assign({}, userProfile, {
                 photoUrl:
                   credentials?.photoURL !== null ? credentials?.photoURL : '',
               }) as UserProfile;
 
-              if (!lodash.isEqual(updatedProfile, profile)) {
-                firestore()
-                  .collection('Users')
-                  .doc(credentials.uid)
-                  .update({
-                    photoUrl: updatedProfile.photoUrl,
-                  })
+              if (!lodash.isEqual(updatedProfile, userProfile)) {
+                updateUser(updatedProfile)
                   .then(() => {
                     log.debug(
                       `User profile updated: ${JSON.stringify(updatedProfile)}`,
@@ -90,7 +76,7 @@ export const useAuthorizeUser = () => {
                     result?.onError && result.onError(e.message);
                   });
               } else {
-                const user = setUser(credentials, profile);
+                const user = setUser(credentials, userProfile);
                 result?.onAuthorized && result.onAuthorized(user.profile);
                 log.debug(
                   `User sign in complete: ${JSON.stringify(user.profile)}`,

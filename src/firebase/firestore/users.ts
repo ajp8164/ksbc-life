@@ -42,6 +42,26 @@ export const getUsers = (opts?: {
   });
 };
 
+export const addUser = (user: UserProfile): Promise<UserProfile> => {
+  const added = Object.assign({}, user); // Don't mutate input.
+  const id = added.id;
+  delete added.id; // Not storing the doc id in the object.
+  return (
+    firestore()
+      .collection('Users')
+      .doc(id)
+      .set(user)
+      .then(() => {
+        return user;
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch((e: any) => {
+        log.error(`Failed to add user document: ${e.message}`);
+        throw e;
+      })
+  );
+};
+
 export const updateUser = (user: UserProfile): Promise<UserProfile> => {
   const updated = Object.assign({}, user); // Don't mutate input.
   const id = updated.id;
