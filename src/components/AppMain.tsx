@@ -8,6 +8,7 @@ import {
 } from '@react-navigation/native';
 import { InitStatus, initApp } from 'app';
 import { MainNavigatorParamList, StartupScreen } from 'types/navigation';
+import { NetworkContext, useNetworkContext } from 'lib/network';
 import { useEffect, useRef, useState } from 'react';
 
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
@@ -16,6 +17,7 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import ErrorBoundary from 'react-native-error-boundary';
 import { LinkingOptions } from '@react-navigation/native';
 import MainNavigator from 'components/navigation/MainNavigator';
+import NetworkConnectionBar from 'components/atoms/NetworkConnnectionBar';
 import RNBootSplash from 'react-native-bootsplash';
 import { SignInModal } from 'components/modals/SignInModal';
 import { StatusBar } from 'react-native';
@@ -40,6 +42,7 @@ const AppMain = () => {
   const signInModalRef = useRef<SignInModal>(null);
   const auth = useAuthContext(signInModalRef);
   const camera = useCameraContext(cameraModalRef);
+  const network = useNetworkContext();
 
   const [startupScreen, setStartupScreen] = useState<StartupScreen>(
     StartupScreen.None,
@@ -104,13 +107,16 @@ const AppMain = () => {
         <BottomSheetModalProvider>
           <ColorModeSwitch themeSettings={themeSettings}>
             <ErrorBoundary onError={onError}>
-              <AuthContext.Provider value={auth}>
-                <CameraContext.Provider value={camera}>
-                  <MainNavigator startupScreen={startupScreen} />
-                  <SignInModal ref={signInModalRef} />
-                  <CameraModal ref={cameraModalRef} />
-                </CameraContext.Provider>
-              </AuthContext.Provider>
+              <NetworkContext.Provider value={network}>
+                <NetworkConnectionBar />
+                <AuthContext.Provider value={auth}>
+                  <CameraContext.Provider value={camera}>
+                    <MainNavigator startupScreen={startupScreen} />
+                    <SignInModal ref={signInModalRef} />
+                    <CameraModal ref={cameraModalRef} />
+                  </CameraContext.Provider>
+                </AuthContext.Provider>
+              </NetworkContext.Provider>
             </ErrorBoundary>
           </ColorModeSwitch>
         </BottomSheetModalProvider>
