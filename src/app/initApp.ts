@@ -29,7 +29,7 @@ export const initApp = async (): Promise<InitStatus> => {
       firestore().useEmulator('10.6.9.64', 8080);
       storage().useEmulator('10.6.9.64', 9199);
       console.log('Firestore emulator running at 10.6.9.100:8080');
-      firestore().clearPersistence();
+      // firestore().clearPersistence();
     }
 
     // Disable Android hardware back button.
