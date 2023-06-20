@@ -1,7 +1,11 @@
 import {
   CollectionChangeListenerOptions,
+  QueryOrderBy,
+  QueryResult,
+  QueryWhere,
   collectionChangeListener,
   documentChangeListener,
+  getDocuments,
 } from '.';
 import firestore, {
   FirebaseFirestoreTypes,
@@ -9,6 +13,30 @@ import firestore, {
 
 import { MessageType } from '@flyerhq/react-native-chat-ui';
 import { log } from '@react-native-ajp-elements/core';
+
+export const getChatMessages = (
+  groupId: string,
+  opts?: {
+    lastDocument?: FirebaseFirestoreTypes.DocumentData;
+    limit?: number;
+    orderBy?: QueryOrderBy;
+    where?: QueryWhere[];
+  },
+): Promise<QueryResult<MessageType.Any>> => {
+  const {
+    lastDocument,
+    limit = 10,
+    orderBy = { fieldPath: 'createdAt', directionStr: 'desc' },
+    where,
+  } = opts || {};
+  return getDocuments(`ChatMessages/${groupId}/Messages`, {
+    orderBy,
+    limit,
+    lastDocument,
+    where,
+    // fromCache: true,
+  });
+};
 
 export const addChatMessage = (
   message: MessageType.Any,
