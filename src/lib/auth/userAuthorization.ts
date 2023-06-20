@@ -93,9 +93,7 @@ export const useAuthorizeUser = () => {
         })
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .catch((e: any) => {
-          log.error(
-            `Failed to query User collection from firestore: ${e.message}`,
-          );
+          log.error(`Failed to authenticate credentialed user: ${e.message}`);
           result?.onError && result.onError(e.message);
         });
     } else {
