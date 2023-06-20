@@ -7,6 +7,7 @@ import {
   PageContentItemAssignment,
 } from 'types/pageContentItem';
 import React, { useContext, useEffect, useState } from 'react';
+import { ScrollView, Text } from 'react-native';
 import { TabBar, TabView } from 'react-native-tab-view';
 
 import { AuthContext } from 'lib/auth';
@@ -15,8 +16,6 @@ import { CompositeScreenProps } from '@react-navigation/core';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import PageContentItemsView from 'components/views/PageContentItemsView';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ScrollView } from 'react-native';
-import { Text } from 'react-native';
 import { pageContentItemCollectionChangeListener } from 'firebase/firestore';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { useSelector } from 'react-redux';
