@@ -112,6 +112,7 @@ const createProfile = (
   const firstName = credentials.displayName?.split(' ')[0] || '';
   const lastName = credentials.displayName?.split(' ')[1] || '';
   return {
+    id: credentials.uid,
     name: credentials.displayName || '',
     firstName,
     lastName,
