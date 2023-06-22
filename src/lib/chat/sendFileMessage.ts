@@ -50,7 +50,7 @@ const buildMessage = (
     id: uuidv4(),
     author: createAuthor(userProfile),
     metadata: {},
-    mimeType: message.type ?? undefined,
+    mimeType: message.mimeType,
     name: message.name || `tmp-${uuidv4()}`,
     size: message.size ?? 0,
     type: 'file',
