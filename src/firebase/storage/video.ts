@@ -7,6 +7,11 @@ export type Video = {
   uri: string;
 };
 
+// Convert destination file extensions as needed for video player compatibility.
+const videoTypeMap: { [key in string]: string } = {
+  quicktime: 'mov',
+};
+
 /**
  * Upload a previously obtained video asset to storage. This function deletes the specified old
  * video if it specified.
@@ -26,7 +31,9 @@ export const uploadVideo = async (args: {
   const { video, storagePath, oldVideo, onSuccess, onError } = args;
   try {
     const videoType = video.mimeType.split('/')[1];
-    const destFilename = `${storagePath}${uuidv4()}.${videoType}`;
+    const destFilename = `${storagePath}${uuidv4()}.${
+      videoTypeMap[videoType] || videoType
+    }`;
     const sourceFilename = video.uri.replace('file://', '');
     const storageRef = storage().ref(destFilename);
 
