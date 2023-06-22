@@ -23,7 +23,7 @@ export const sendVideoMessage = (
   let posterUrl = '';
   let videoUrl = '';
 
-  uploadVideo(message)
+  uploadVideo(message, group.id)
     .then(url => {
       videoUrl = url;
       return uploadPoster(message);
@@ -49,14 +49,16 @@ export const sendVideoMessage = (
   return message;
 };
 
-const uploadVideo = (message: MessageType.PartialVideo) => {
+const uploadVideo = (message: MessageType.PartialVideo, container?: string) => {
   return new Promise<string>((resolve, reject) => {
     FSUploadVideo({
       video: {
         mimeType: message.mimeType,
         uri: message.uri,
       } as VideoUpload,
-      storagePath: appConfig.storageVideoChat,
+      storagePath: `${appConfig.storageVideoChat}/${
+        container || 'unknown-group'
+      }/`,
       onSuccess: url => resolve(url),
       onError: () => reject(),
     });
