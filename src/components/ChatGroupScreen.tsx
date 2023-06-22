@@ -42,6 +42,7 @@ import { UserPickerModal } from 'components/modals/UserPickerModal';
 import { UserProfile } from 'types/user';
 import lodash from 'lodash';
 import { makeStyles } from '@rneui/themed';
+import { resolveUrl } from 'lib/fileCache';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { store } from 'store';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
@@ -368,15 +369,13 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
 
       if (messageBeingSent !== undefined) {
         // Add the messsage to the UI while it's being sent.
-        // This provides the user with feedback that the attachment is uploading.
+        // This provides the user with feedback that the message is uploading.
         (messageBeingSent as MessageType.Any).status = 'sending';
         const messages = ([] as MessageType.Any[]).concat(
           [messageBeingSent as MessageType.Any],
           chatMessages,
         );
         setChatMessages(messages);
-
-        console.log(messages);
       }
     }
 
@@ -532,6 +531,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
           sendButtonVisibilityMode={'always'}
           theme={chatTheme(theme, { tabBarHeight })}
           emptyState={renderListEmptyComponent}
+          resolveUrl={resolveUrl}
         />
       )}
       <UserPickerModal
