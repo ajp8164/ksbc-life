@@ -8,6 +8,7 @@ import {
 
 import DocumentPicker from 'react-native-document-picker';
 import RNFS from 'react-native-fs';
+import { log } from '@react-native-ajp-elements/core';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { useCamera } from 'lib/camera';
 
@@ -147,15 +148,18 @@ export const useSelectAttachments = () => {
     const createVideoPoster = async (videoUri: string) => {
       const filename = videoUri.split('/').pop();
       const posterUri = `${RNFS.CachesDirectoryPath}/${filename}.png`;
+      log.debug('Creating video poster...');
       return await FFmpegKit.execute(
-        `-y -i ${videoUri} -frames:v 1 ${posterUri}`,
+        `-loglevel quiet -y -i ${videoUri} -frames:v 1 ${posterUri}`,
       ).then(async session => {
         const returnCode = await session.getReturnCode();
         if (ReturnCode.isSuccess(returnCode)) {
+          log.debug('Done creating video poster');
           return `file://${posterUri}`;
         } else if (ReturnCode.isCancel(returnCode)) {
           // Canceled
         } else {
+          log.debug('Error creating video poster');
           // Error
         }
       });
