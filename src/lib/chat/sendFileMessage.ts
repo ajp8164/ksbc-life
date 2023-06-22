@@ -18,7 +18,7 @@ export const sendFileMessage = (
 
   saveFile({
     file: { mimeType: message.mimeType, uri: message.uri } as File,
-    storagePath: appConfig.storageFileChat,
+    storagePath: `${appConfig.storageFileChat}/${group.id || 'unknown-group'}/`,
     onSuccess: url => {
       // Update message with uri's from uploaded assets.
       message.uri = url;
