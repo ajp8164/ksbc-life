@@ -18,7 +18,9 @@ export const sendImageMessage = (
 
   uploadImage({
     image: { mimeType: message.mimeType, uri: message.uri } as ImageUpload,
-    storagePath: appConfig.storageImageChat,
+    storagePath: `${appConfig.storageImageChat}/${
+      group.id || 'unknown-group'
+    }/`,
     onSuccess: url => {
       // Update message with uri's from uploaded assets.
       message.uri = url;
