@@ -10,6 +10,7 @@ import {
 import { AppError } from 'lib/errors';
 import { BackHandler } from 'react-native';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { RNFileCache } from 'react-native-file-cache';
 import { appConfig } from 'config';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
@@ -30,6 +31,11 @@ export const initApp = async (): Promise<InitStatus> => {
       storage().useEmulator('10.6.9.64', 9199);
       console.log('Firestore emulator running at 10.6.9.100:8080');
       // firestore().clearPersistence();
+      // RNFileCache.load().then(() => {
+      //   RNFileCache.removeAll().then(removed => {
+      //     console.log(`Local file cache cleared: ${removed}`);
+      //   });
+      // });
     }
 
     // Disable Android hardware back button.
@@ -56,6 +62,9 @@ export const initApp = async (): Promise<InitStatus> => {
     requestPushNotificationPermission().then(_token => {
       subscribeToTopic('all-installs');
     });
+
+    // Load cached file indexes.
+    RNFileCache.load();
 
     return InitStatus.Success;
 
