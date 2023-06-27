@@ -376,6 +376,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
           chatMessages,
         );
         setChatMessages(messages);
+        messageBeingSent = undefined;
       }
     }
 

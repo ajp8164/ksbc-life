@@ -46,7 +46,8 @@ export const sendVideoMessage = (
     });
 
   // Prevent blocking the UI during upload by returning locally created message (local video/poster url's).
-  return message;
+  // Return a copy to prevent any mutation by the caller.
+  return Object.assign({}, message);
 };
 
 const uploadVideo = (message: MessageType.PartialVideo, container?: string) => {
