@@ -353,6 +353,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
   const sendMessage = async (message: MessageType.PartialAny[]) => {
     if (!userProfile) return;
     const targetGroup = group || (await createGroup());
+    let sentMessages: MessageType.Any[] = [] as MessageType.Any[];
     let messageBeingSent: MessageType.Any | undefined;
 
     for (let i = 0; i < message.length; i++) {
@@ -368,19 +369,21 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
       }
 
       if (messageBeingSent !== undefined) {
-        // Add the messsage to the UI while it's being sent.
-        // This provides the user with feedback that the message is uploading.
         (messageBeingSent as MessageType.Any).status = 'sending';
-        const messages = ([] as MessageType.Any[]).concat(
-          [messageBeingSent as MessageType.Any],
-          chatMessages,
-        );
-        setChatMessages(messages);
+        sentMessages = sentMessages.concat(messageBeingSent);
         messageBeingSent = undefined;
       }
     }
 
-    // Sending a text while composing exits composing mode.
+    // Add the messsage to the UI while it's being sent.
+    // This provides the user with feedback that the message is uploading.
+    const messages = ([] as MessageType.Any[]).concat(
+      sentMessages,
+      chatMessages,
+    );
+    setChatMessages(messages);
+
+    // Sending a message while composing exits composing mode.
     composingGroup.current = false;
   };
 
