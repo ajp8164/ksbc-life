@@ -76,7 +76,6 @@ export const updateGroupLatestMessageSnippet = (
     createdBy: userProfile.id,
     createdAt: DateTime.now().toISO() || '', // We don't need server time here
     text,
-    type: 'text', //,message.type,
     readBy: [userProfile.id], // I've always read my own message
   };
   console.log(group.latestMessageSnippet);

@@ -19,7 +19,6 @@ export type Group = {
     createdBy: string;
     createdAt: string;
     text: string;
-    type: string;
     //List of group member ids that have read this message
     readBy: string[];
   };
