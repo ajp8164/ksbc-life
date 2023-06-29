@@ -1,6 +1,12 @@
 import { RNFileCache } from 'react-native-file-cache';
 import { log } from '@react-native-ajp-elements/core';
 
+/**
+ * Given a remote url check our local cache and return the local url to the same file. If
+ * a locally cached version does not exist then download it and return the url for the
+ * cached copy.
+ */
+
 export const resolveUrl = (url: string, callback: (url: string) => void) => {
   if (!RNFileCache.isInternetURL(url)) {
     return callback(url);

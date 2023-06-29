@@ -5,11 +5,7 @@ import { UserProfile } from 'types/user';
 import { updateGroup } from 'firebase/firestore';
 
 export const updateGroupLatestMessageSnippet = (
-  message:
-    | MessageType.PartialText
-    | MessageType.PartialFile
-    | MessageType.PartialImage
-    | MessageType.PartialVideo,
+  message: MessageType.Any,
   userProfile: UserProfile,
   group: Group,
 ) => {

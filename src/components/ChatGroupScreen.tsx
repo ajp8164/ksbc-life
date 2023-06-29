@@ -18,10 +18,7 @@ import {
 import {
   chatTheme,
   handleMessagePress,
-  sendFileMessage,
-  sendImageMessage,
-  sendTextMessage,
-  sendVideoMessage,
+  sendMessages,
   useSelectAttachments,
 } from 'lib/chat';
 import { getGroupAvatarColor, getGroupMembersLongStr } from 'lib/group';
@@ -353,37 +350,19 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
   const sendMessage = async (message: MessageType.PartialAny[]) => {
     if (!userProfile) return;
     const targetGroup = group || (await createGroup());
-    let sentMessages: MessageType.Any[] = [] as MessageType.Any[];
-    let messageBeingSent: MessageType.Any | undefined;
 
-    for (let i = 0; i < message.length; i++) {
-      const m = message[i];
-      if (m.type === 'file') {
-        messageBeingSent = sendFileMessage(m, userProfile, targetGroup);
-      } else if (m.type === 'image') {
-        messageBeingSent = sendImageMessage(m, userProfile, targetGroup);
-      } else if (m.type === 'text') {
-        messageBeingSent = sendTextMessage(m, userProfile, targetGroup);
-      } else if (m.type === 'video') {
-        messageBeingSent = sendVideoMessage(m, userProfile, targetGroup);
-      }
+    sendMessages(message, userProfile, targetGroup, messagesBeingSend => {
+      // Add pending messsages to the UI while they are being sent.
+      // This provides the user with feedback that the message is uploading.
+      // Need to reverse the messagesBeingSent because the chat list is a reversed list.
+      const messages = ([] as MessageType.Any[]).concat(
+        messagesBeingSend.reverse(),
+        chatMessages,
+      );
+      setChatMessages(messages);
+    });
 
-      if (messageBeingSent !== undefined) {
-        (messageBeingSent as MessageType.Any).status = 'sending';
-        sentMessages = sentMessages.concat(messageBeingSent);
-        messageBeingSent = undefined;
-      }
-    }
-
-    // Add the messsage to the UI while it's being sent.
-    // This provides the user with feedback that the message is uploading.
-    const messages = ([] as MessageType.Any[]).concat(
-      sentMessages,
-      chatMessages,
-    );
-    setChatMessages(messages);
-
-    // Sending a message while composing exits composing mode.
+    // Sending messages while composing exits composing mode.
     composingGroup.current = false;
   };
 
