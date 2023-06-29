@@ -100,6 +100,7 @@ export const sendMessages = async (
     } else if (m.type === 'text') {
       // No upload. There can be only one text message per send.
       textMessage = buildTextMessage(m, userProfile);
+      messageToPrepare = textMessage;
     } else if (m.type === 'video') {
       const videoMessage = buildVideoMessage(m, userProfile);
       messageToPrepare = videoMessage;
@@ -135,7 +136,7 @@ export const sendMessages = async (
     }
   }
 
-  onBeforeSend(messagesBeingSent.concat(textMessage || []));
+  onBeforeSend(messagesBeingSent);
 
   // Upload all attachments.
   let preparedMessages: MessageType.Any[] = [];
@@ -145,7 +146,7 @@ export const sendMessages = async (
   }
 
   // Add text message if present.
-  preparedMessages.concat(textMessage || []);
+  preparedMessages = preparedMessages.concat(textMessage || []);
 
   // Send all the messages in order.
   // We don't need to wait for each message to be sent.
@@ -153,13 +154,8 @@ export const sendMessages = async (
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     addChatMessage(preparedMessages[i], group.id!)
       .then(() => {
-        if (i === preparedMessages.length) {
-          // Store this message as the latest message posted to this group.
-          updateGroupLatestMessageSnippet(
-            preparedMessages[i],
-            userProfile,
-            group,
-          );
+        if (i === preparedMessages.length - 1) {
+          updateGroupLatestMessageSnippet(preparedMessages, userProfile, group);
         }
       })
       .catch(() => {
