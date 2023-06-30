@@ -78,6 +78,6 @@ export const updateGroupLatestMessageSnippet = (
     text,
     readBy: [userProfile.id], // I've always read my own message
   };
-  console.log(group.latestMessageSnippet);
+
   updateGroup(group);
 };
