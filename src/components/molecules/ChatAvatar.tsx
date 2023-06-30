@@ -152,15 +152,19 @@ export const ChatAvatar = ({
   }
 
   // Group individual selection
-
   let u = me;
   if (members.length === 2) {
     // Filter me out
-    u = lodash.filter(userProfiles, i => {
-      return i.id !== u?.id;
+    const uid = lodash.filter(members, id => {
+      return id !== u?.id;
     })[0];
+
+    u = lodash.find(userProfiles, u => {
+      return u.id === uid;
+    });
   }
-  // Else it's me only
+
+  // Render for a single user.
 
   return renderUserAvatar(u);
 };
