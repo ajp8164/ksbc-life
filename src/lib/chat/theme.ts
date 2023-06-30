@@ -30,9 +30,7 @@ export const chatTheme = (
         color: theme.colors.whiteTransparentMid,
       },
       contentLeftContainer: {
-        backgroundColor: theme.colors.transparent,
-        borderWidth: 0.5,
-        borderColor: theme.colors.black,
+        backgroundColor: theme.colors.subtleGray,
         borderRadius: 20,
       },
       contentRightContainer: {
@@ -71,8 +69,8 @@ export const chatTheme = (
       attachmentPlaceholderIcon: {
         tintColor: theme.colors.stickyWhite,
       },
-      contentOffsetKeyboardClosed: -25, // This values should be adjusted if the design height of the composer changes.
-      contentOffsetKeyboardOpened: 84, // This values should be adjusted if the design height of the composer changes.
+      contentOffsetKeyboardClosed: 0, // This values should be adjusted if the design height of the composer changes.
+      contentOffsetKeyboardOpened: 59, // This values should be adjusted if the design height of the composer changes.
       container: {
         backgroundColor: theme.colors.white,
         borderTopLeftRadius: 0,
