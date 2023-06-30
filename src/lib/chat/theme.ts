@@ -41,9 +41,11 @@ export const chatTheme = (
       documentIconRightColor: theme.colors.stickyWhite,
       messageTextLeft: {
         ...theme.styles.textNormal,
+        lineHeight: 20,
       },
       messageTextRight: {
         ...theme.styles.textNormal,
+        lineHeight: 20,
         color: theme.colors.textInv,
       },
       headerText: {},
