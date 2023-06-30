@@ -6,10 +6,12 @@ import { log } from '@react-native-ajp-elements/core';
 import { updateUserProfile } from 'store/slices/user';
 import { usersCollectionChangeListener } from 'firebase/firestore';
 
-export const cacheUsers = async () => {
+export const addUsersCollectionListener = async () => {
   const me = store.getState().user.profile;
 
   usersCollectionChangeListener(snapshot => {
+    if (snapshot.docChanges().length === 0) return;
+
     const users: UserProfile[] = [];
     snapshot.docs.forEach(d => {
       const u = { ...d.data(), id: d.id } as UserProfile;
@@ -25,6 +27,6 @@ export const cacheUsers = async () => {
       }
     });
     dispatch(cacheUserProfiles({ userProfiles: users }));
-    log.debug(`Cached ${users.length} users from firestore`);
+    log.debug(`Cached ${users.length} users from firestore`, users);
   });
 };

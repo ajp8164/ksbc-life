@@ -1,9 +1,5 @@
-import { UserProfile } from 'types/user';
 import { isEmulator } from 'react-native-device-info';
-import lodash from 'lodash';
-import { log } from '@react-native-ajp-elements/core';
 import messaging from '@react-native-firebase/messaging';
-import { updateUser } from 'firebase/firestore';
 
 export type PushNotificationToken = {
   fcm: string;
@@ -24,17 +20,6 @@ export const requestPushNotificationPermission =
         return null;
       });
   };
-
-export const updatePushNotificationToken = async (userProfile: UserProfile) => {
-  const updatedProfile = Object.assign({}, userProfile);
-  const token = await checkPermissionGetToken();
-  if (token) {
-    updatedProfile.pushTokens = lodash.uniq(
-      updatedProfile.pushTokens.concat(token?.fcm),
-    );
-    updateUser(updatedProfile);
-  }
-};
 
 export const subscribeToTopic = (name: MessagingTopic) => {
   messaging().subscribeToTopic(name);
@@ -70,6 +55,5 @@ const getDeviceToken = async (): Promise<PushNotificationToken> => {
   const fcm = await messaging().getToken();
   const apns = await messaging().getAPNSToken();
   const token = { fcm, apns };
-  log.debug(`Push notification token: ${JSON.stringify(token)}`);
   return token;
 };

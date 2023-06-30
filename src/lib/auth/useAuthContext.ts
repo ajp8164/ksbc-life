@@ -1,9 +1,9 @@
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { createContext, useEffect, useRef } from 'react';
 import {
+  requestPushNotificationPermission,
   subscribeToTopic,
   unsubscribeFromTopic,
-  updatePushNotificationToken,
 } from 'lib/pushNotifications';
 import { useAuthorizeUser, useUnauthorizeUser } from '.';
 
@@ -12,9 +12,9 @@ import { DateTime } from 'luxon';
 import { SignInModalMethods } from 'components/modals/SignInModal';
 import { UserProfile } from 'types/user';
 import { appConfig } from 'config';
-import { cacheUsers } from 'firebase/firestore';
 import lodash from 'lodash';
 import { selectUser } from 'store/selectors/userSelectors';
+import { updateUser } from 'firebase/firestore';
 import { useSelector } from 'react-redux';
 
 type AuthContext = {
@@ -92,11 +92,18 @@ export const useAuthContext = (
   };
 
   const onAuthorized = (userProfile: UserProfile) => {
-    // Recache users on possible user switch without app restart.
-    cacheUsers();
-
-    updatePushNotificationToken(userProfile);
-    subscribeToTopic('all-users');
+    // Update the authorized user profile with push notification tokens.
+    requestPushNotificationPermission().then(token => {
+      if (token) {
+        const updatedProfile = Object.assign({}, userProfile);
+        updatedProfile.pushTokens = lodash.uniq(
+          updatedProfile.pushTokens.concat(token?.fcm),
+        );
+        updateUser(updatedProfile);
+      }
+      subscribeToTopic('all-installs');
+      subscribeToTopic('all-users');
+    });
 
     dismiss();
   };

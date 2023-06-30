@@ -185,6 +185,7 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
     );
   };
 
+  console.log(groups);
   return (
     <SafeAreaView
       edges={['left', 'right']}

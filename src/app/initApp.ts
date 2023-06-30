@@ -1,7 +1,10 @@
 import '@react-native-firebase/app';
 
 import { AJPElements, log } from '@react-native-ajp-elements/core';
-import { cacheGroups, cacheUsers } from 'firebase/firestore';
+import {
+  addGroupsCollectionListener,
+  addUsersCollectionListener,
+} from 'firebase/firestore';
 import {
   requestPushNotificationPermission,
   subscribeToTopic,
@@ -19,7 +22,6 @@ import { svgImages } from 'theme';
 export enum InitStatus {
   NotAuthorized = 'NotAuthorized',
   NotVerified = 'NotVerified',
-  NoKey = 'NoKey',
   Success = 'Success',
 }
 
@@ -55,11 +57,12 @@ export const initApp = async (): Promise<InitStatus> => {
       webClientId: appConfig.firebaseOauthClientId,
     });
 
-    // Cache data from firestore.
-    cacheGroups();
-    cacheUsers();
+    // Add firestore collection listeners.
+    addGroupsCollectionListener();
+    addUsersCollectionListener();
 
-    requestPushNotificationPermission().then(_token => {
+    requestPushNotificationPermission().then(token => {
+      log.debug(`Push notification token: ${JSON.stringify(token)}`);
       subscribeToTopic('all-installs');
     });
 

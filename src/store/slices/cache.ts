@@ -2,7 +2,6 @@ import { CaseReducer, PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 import { Group } from 'types/group';
 import { UserProfile } from 'types/user';
-import { revertAll } from 'store/actions';
 
 export interface CacheState {
   groups: Group[];
@@ -36,7 +35,8 @@ const handleCacheUserProfiles: CaseReducer<
 const cacheSlice = createSlice({
   name: 'cache',
   initialState: initialCacheState,
-  extraReducers: builder => builder.addCase(revertAll, () => initialCacheState),
+  // Not adding revertAll extra reducer. The cache should survive a user
+  // switch since it's independent of who is signed in.
   reducers: {
     cacheGroups: handleCacheGroups,
     cacheUserProfiles: handleCacheUserProfiles,
