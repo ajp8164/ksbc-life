@@ -7,6 +7,7 @@ import lodash from 'lodash';
 import { log } from '@react-native-ajp-elements/core';
 import { saveUser } from 'store/slices/user';
 import { signOut } from 'lib/auth';
+import { unsubscribeFromTopic } from 'lib/pushNotifications';
 import { useDispatch } from 'react-redux';
 import { useTheme } from 'theme';
 
@@ -83,7 +84,7 @@ export const useAuthorizeUser = () => {
             } else {
               // User is not allowed to sign in.
               signOut().then(() => {
-                unauthorizeUser();
+                unauthorizeUser(userProfile);
                 result?.onUnauthorized && result.onUnauthorized(true);
               });
             }
@@ -145,7 +146,17 @@ const useSetUser = () => {
 
 export const useUnauthorizeUser = () => {
   const dispatch = useDispatch();
-  return () => {
+  return (userProfile?: UserProfile) => {
+    // When a user is unauthorized (e.g. on sign out) remove the users push tokens.
+    // This avoids sending notifications to a device that used to have the user signed
+    // in but is no longer.
+    if (userProfile) {
+      const updatedProfile = Object.assign({}, userProfile);
+      updatedProfile.pushTokens = [];
+      updateUser(updatedProfile);
+    }
+    unsubscribeFromTopic('all-users');
+
     dispatch(
       saveUser({
         user: {

@@ -3,7 +3,6 @@ import { createContext, useEffect, useRef } from 'react';
 import {
   requestPushNotificationPermission,
   subscribeToTopic,
-  unsubscribeFromTopic,
 } from 'lib/pushNotifications';
 import { useAuthorizeUser, useUnauthorizeUser } from '.';
 
@@ -109,7 +108,6 @@ export const useAuthContext = (
   };
 
   const onUnauthorized = (accountNotActive?: boolean) => {
-    unsubscribeFromTopic('all-users');
     dismiss();
 
     if (accountNotActive) {
