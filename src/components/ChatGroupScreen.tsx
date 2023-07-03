@@ -360,6 +360,9 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
         chatMessages,
       );
       setChatMessages(messages);
+
+      // Message sent, reset typing state
+      setTypingState('');
     });
 
     // Sending messages while composing exits composing mode.
