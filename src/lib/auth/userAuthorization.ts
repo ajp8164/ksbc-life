@@ -1,19 +1,28 @@
 import { UserProfile, UserRole, UserStatus } from 'types/user';
-import { addUser, getUser, updateUser } from 'firebase/firestore';
+import {
+  addUser,
+  cancelAllFirestoreSubscriptions,
+  getUser,
+  updateUser,
+} from 'firebase/firestore';
+import {
+  disablePushNotifications,
+  enablePushNotifications,
+} from 'lib/notifications';
 import { getUserAvatarColor, getUserInitials } from 'lib/user';
 
 import { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import lodash from 'lodash';
 import { log } from '@react-native-ajp-elements/core';
+import { revertAll } from 'store/actions';
 import { saveUser } from 'store/slices/user';
 import { signOut } from 'lib/auth';
-import { unsubscribeFromTopic } from 'lib/pushNotifications';
+import { store } from 'store';
 import { useDispatch } from 'react-redux';
 import { useTheme } from 'theme';
 
 export const useAuthorizeUser = () => {
   const setUser = useSetUser();
-  const unauthorizeUser = useUnauthorizeUser();
   const theme = useTheme();
 
   return (
@@ -39,6 +48,7 @@ export const useAuthorizeUser = () => {
               .then(() => {
                 log.debug(`User profile created: ${JSON.stringify(profile)}`);
                 const user = setUser(credentials, profile);
+                postSignInActions(user.profile);
                 result?.onAuthorized && result.onAuthorized(user.profile);
                 log.debug(
                   `User sign in complete: ${JSON.stringify(user.profile)}`,
@@ -64,6 +74,7 @@ export const useAuthorizeUser = () => {
                       `User profile updated: ${JSON.stringify(updatedProfile)}`,
                     );
                     const user = setUser(credentials, updatedProfile);
+                    postSignInActions(user.profile);
                     result?.onAuthorized && result.onAuthorized(user.profile);
                     log.debug(
                       `User sign in complete: ${JSON.stringify(user.profile)}`,
@@ -76,6 +87,7 @@ export const useAuthorizeUser = () => {
                   });
               } else {
                 const user = setUser(credentials, userProfile);
+                postSignInActions(user.profile);
                 result?.onAuthorized && result.onAuthorized(user.profile);
                 log.debug(
                   `User sign in complete: ${JSON.stringify(user.profile)}`,
@@ -84,7 +96,6 @@ export const useAuthorizeUser = () => {
             } else {
               // User is not allowed to sign in.
               signOut().then(() => {
-                unauthorizeUser(userProfile);
                 result?.onUnauthorized && result.onUnauthorized(true);
               });
             }
@@ -96,8 +107,8 @@ export const useAuthorizeUser = () => {
           result?.onError && result.onError(e.message);
         });
     } else {
-      signOut().then(() => {
-        unauthorizeUser();
+      // Ensure a clean state.
+      preSignOutActions().then(() => {
         result?.onUnauthorized && result.onUnauthorized();
       });
     }
@@ -144,27 +155,21 @@ const useSetUser = () => {
   };
 };
 
-export const useUnauthorizeUser = () => {
-  const dispatch = useDispatch();
-  return (userProfile?: UserProfile) => {
-    // When a user is unauthorized (e.g. on sign out) remove the users push tokens.
-    // This avoids sending notifications to a device that used to have the user signed
-    // in but is no longer.
-    if (userProfile) {
-      const updatedProfile = Object.assign({}, userProfile);
-      updatedProfile.pushTokens = [];
-      updateUser(updatedProfile);
-    }
-    unsubscribeFromTopic('all-users');
+const postSignInActions = async (userProfile: UserProfile): Promise<void> => {
+  enablePushNotifications(userProfile);
+};
 
-    dispatch(
-      saveUser({
-        user: {
-          credentials: undefined,
-          profile: undefined,
-        },
-      }),
-    );
-    log.debug('User sign out complete');
-  };
+export const preSignOutActions = async (): Promise<void> => {
+  const userProfile = store.getState().user.profile;
+
+  // Cancel firestore data listener subscriptions before sign out.
+  cancelAllFirestoreSubscriptions();
+
+  // When a user is unauthorized (e.g. on sign out) remove the users push tokens.
+  // This avoids sending notifications to a device that used to have the user signed
+  // in but is no longer. Could get here with no previously authorized user.
+  userProfile && (await disablePushNotifications(userProfile));
+
+  // Clear our redux store.
+  store.dispatch(revertAll());
 };

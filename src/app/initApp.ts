@@ -8,7 +8,7 @@ import {
 import {
   requestPushNotificationPermission,
   subscribeToTopic,
-} from 'lib/pushNotifications';
+} from 'lib/notifications';
 
 import { AppError } from 'lib/errors';
 import { BackHandler } from 'react-native';

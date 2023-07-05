@@ -5,10 +5,8 @@ import { NativeModules } from 'react-native';
 import { appConfig } from 'config';
 import { appleAuth } from '@invertase/react-native-apple-authentication';
 import auth from '@react-native-firebase/auth';
-import { cancelAllFirestoreSubscriptions } from 'firebase/firestore';
-import { dispatch } from 'store';
 import { log } from '@react-native-ajp-elements/core';
-import { revertAll } from 'store/actions';
+import { preSignOutActions } from 'lib/auth';
 
 const { RNTwitterSignIn } = NativeModules;
 
@@ -147,12 +145,9 @@ export const signInwithEmailAndPassword = async (
 
 export const signOut = async () => {
   try {
-    // Cancel firestore data listener subscriptions before sign out.
-    cancelAllFirestoreSubscriptions();
+    await preSignOutActions();
 
-    // Clear our redux store.
-    dispatch(revertAll());
-
+    // Sign out here results in an event to auth().onAuthStateChanged() with null credentials.
     LoginManager.logOut();
     await auth().signOut();
 

@@ -1,5 +1,8 @@
+import { UserProfile } from 'types/user';
 import { isEmulator } from 'react-native-device-info';
+import lodash from 'lodash';
 import messaging from '@react-native-firebase/messaging';
+import { updateUser } from 'firebase/firestore';
 
 export type PushNotificationToken = {
   fcm: string;
@@ -56,4 +59,34 @@ const getDeviceToken = async (): Promise<PushNotificationToken> => {
   const apns = await messaging().getAPNSToken();
   const token = { fcm, apns };
   return token;
+};
+
+export const enablePushNotifications = async (
+  userProfile: UserProfile,
+): Promise<void> => {
+  // Add push token to the authorized user profile.
+  const token = await requestPushNotificationPermission();
+
+  if (token) {
+    const updatedProfile = Object.assign({}, userProfile);
+    updatedProfile.pushTokens = lodash.uniq(
+      updatedProfile.pushTokens.concat(token?.fcm),
+    );
+    console.log('ENABLE PN', updatedProfile);
+    updateUser(updatedProfile);
+  }
+  subscribeToTopic('all-users');
+};
+
+export const disablePushNotifications = async (
+  userProfile?: UserProfile,
+): Promise<void> => {
+  // Remove push token from the authorized user profile.
+  if (userProfile) {
+    const updatedProfile = Object.assign({}, userProfile);
+    updatedProfile.pushTokens = [];
+    console.log('DISABLE PN', updatedProfile);
+    await updateUser(updatedProfile);
+  }
+  unsubscribeFromTopic('all-users');
 };

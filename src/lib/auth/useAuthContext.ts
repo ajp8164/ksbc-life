@@ -1,10 +1,5 @@
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { createContext, useEffect, useRef } from 'react';
-import {
-  requestPushNotificationPermission,
-  subscribeToTopic,
-} from 'lib/pushNotifications';
-import { useAuthorizeUser, useUnauthorizeUser } from '.';
 
 import { Alert } from 'react-native';
 import { DateTime } from 'luxon';
@@ -13,7 +8,7 @@ import { UserProfile } from 'types/user';
 import { appConfig } from 'config';
 import lodash from 'lodash';
 import { selectUser } from 'store/selectors/userSelectors';
-import { updateUser } from 'firebase/firestore';
+import { useAuthorizeUser } from '.';
 import { useSelector } from 'react-redux';
 
 type AuthContext = {
@@ -37,10 +32,6 @@ export const useAuthContext = (
 ): AuthContext => {
   const authorizeUser = useAuthorizeUser();
   const authorizeUserDebounced = useRef(lodash.debounce(authorizeUser, 200));
-  const unauthorizeUser = useUnauthorizeUser();
-  const unauthorizeUserDebounced = useRef(
-    lodash.debounce(unauthorizeUser, 200),
-  );
   const user = useSelector(selectUser);
 
   useEffect(() => {
@@ -48,7 +39,6 @@ export const useAuthContext = (
       // This handler is called multiple times. Avoid more than one authorization.
       // See https://stackoverflow.com/a/40436769
       if (isReAuthenticationRequired(user.credentials)) {
-        unauthorizeUserDebounced.current();
         return present(
           'You have been signed out.\nPlease sign in again to keep using all features.',
         );
@@ -90,26 +80,12 @@ export const useAuthContext = (
     }
   };
 
-  const onAuthorized = (userProfile: UserProfile) => {
-    // Update the authorized user profile with push notification tokens.
-    requestPushNotificationPermission().then(token => {
-      if (token) {
-        const updatedProfile = Object.assign({}, userProfile);
-        updatedProfile.pushTokens = lodash.uniq(
-          updatedProfile.pushTokens.concat(token?.fcm),
-        );
-        updateUser(updatedProfile);
-      }
-      subscribeToTopic('all-installs');
-      subscribeToTopic('all-users');
-    });
-
+  const onAuthorized = (_userProfile: UserProfile) => {
     dismiss();
   };
 
   const onUnauthorized = (accountNotActive?: boolean) => {
     dismiss();
-
     if (accountNotActive) {
       Alert.alert(
         'Account Disabled',

@@ -6,7 +6,6 @@ import {
   MoreNavigatorParamList,
 } from 'types/navigation';
 import React, { useEffect } from 'react';
-import { signOut, useUnauthorizeUser } from 'lib/auth';
 
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { CompositeScreenProps } from '@react-navigation/core';
@@ -15,6 +14,7 @@ import { StackActions } from '@react-navigation/native';
 import { biometricAuthentication } from 'lib/biometricAuthentication';
 import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
+import { signOut } from 'lib/auth';
 import { useSelector } from 'react-redux';
 
 type Props = CompositeScreenProps<
@@ -26,7 +26,6 @@ const UserProfileScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
-  const unauthorizeUser = useUnauthorizeUser();
   const userProfile = useSelector(selectUserProfile);
 
   useEffect(() => {
@@ -34,7 +33,16 @@ const UserProfileScreen = ({ navigation }: Props) => {
       // headerTitle: user?.displayName || 'My Profile',
       headerTitle: 'My Profile',
     });
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    // Wait for sign out to complete before navigating away.
+    if (!userProfile) {
+      navigation.dispatch(StackActions.popToTop());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userProfile]);
 
   const confirmSignOut = async () => {
     await biometricAuthentication()
@@ -45,8 +53,8 @@ const UserProfileScreen = ({ navigation }: Props) => {
           [
             {
               text: 'Yes, sign out',
-              onPress: doSignOut,
               style: 'destructive',
+              onPress: signOut,
             },
             {
               text: 'No',
@@ -57,13 +65,6 @@ const UserProfileScreen = ({ navigation }: Props) => {
         );
       })
       .catch();
-  };
-
-  const doSignOut = () => {
-    navigation.dispatch(StackActions.popToTop());
-    signOut().then(() => {
-      unauthorizeUser();
-    });
   };
 
   return (

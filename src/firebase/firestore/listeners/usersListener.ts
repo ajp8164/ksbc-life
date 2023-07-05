@@ -27,6 +27,6 @@ export const addUsersCollectionListener = async () => {
       }
     });
     dispatch(cacheUserProfiles({ userProfiles: users }));
-    log.debug(`Cached ${users.length} users from firestore`, users);
+    log.debug(`Cached ${users.length} users from firestore`);
   });
 };
