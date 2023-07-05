@@ -72,7 +72,6 @@ export const enablePushNotifications = async (
     updatedProfile.pushTokens = lodash.uniq(
       updatedProfile.pushTokens.concat(token?.fcm),
     );
-    console.log('ENABLE PN', updatedProfile);
     updateUser(updatedProfile);
   }
   subscribeToTopic('all-users');
@@ -85,7 +84,6 @@ export const disablePushNotifications = async (
   if (userProfile) {
     const updatedProfile = Object.assign({}, userProfile);
     updatedProfile.pushTokens = [];
-    console.log('DISABLE PN', updatedProfile);
     await updateUser(updatedProfile);
   }
   unsubscribeFromTopic('all-users');
