@@ -25,7 +25,10 @@ export type UserProfile = {
   role: UserRole;
   status: UserStatus;
   groups: string[];
-  pushTokens: string[];
+  notifications: {
+    badgeCount: number;
+    pushTokens: string[];
+  };
 };
 
 export type User = {

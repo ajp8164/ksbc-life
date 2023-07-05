@@ -69,8 +69,8 @@ export const enablePushNotifications = async (
 
   if (token) {
     const updatedProfile = Object.assign({}, userProfile);
-    updatedProfile.pushTokens = lodash.uniq(
-      updatedProfile.pushTokens.concat(token?.fcm),
+    updatedProfile.notifications.pushTokens = lodash.uniq(
+      updatedProfile.notifications.pushTokens.concat(token?.fcm),
     );
     updateUser(updatedProfile);
   }
@@ -83,7 +83,7 @@ export const disablePushNotifications = async (
   // Remove push token from the authorized user profile.
   if (userProfile) {
     const updatedProfile = Object.assign({}, userProfile);
-    updatedProfile.pushTokens = [];
+    updatedProfile.notifications.pushTokens = [];
     await updateUser(updatedProfile);
   }
   unsubscribeFromTopic('all-users');

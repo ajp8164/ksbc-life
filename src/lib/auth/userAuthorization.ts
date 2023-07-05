@@ -135,7 +135,10 @@ const createProfile = (
     role: UserRole.User,
     status: UserStatus.Active,
     groups: [],
-    pushTokens: [],
+    notifications: {
+      badgeCount: 0,
+      pushTokens: [],
+    },
   } as UserProfile;
 };
 
