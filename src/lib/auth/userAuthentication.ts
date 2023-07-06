@@ -145,11 +145,13 @@ export const signInwithEmailAndPassword = async (
 
 export const signOut = async () => {
   try {
-    await preSignOutActions();
+    const userProfile = await preSignOutActions();
 
     // Sign out here results in an event to auth().onAuthStateChanged() with null credentials.
     LoginManager.logOut();
     await auth().signOut();
+
+    log.debug(`User sign out complete: ${JSON.stringify(userProfile)}`);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {

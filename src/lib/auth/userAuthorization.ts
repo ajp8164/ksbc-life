@@ -48,11 +48,12 @@ export const useAuthorizeUser = () => {
               .then(() => {
                 log.debug(`User profile created: ${JSON.stringify(profile)}`);
                 const user = setUser(credentials, profile);
-                postSignInActions(user.profile);
-                result?.onAuthorized && result.onAuthorized(user.profile);
-                log.debug(
-                  `User sign in complete: ${JSON.stringify(user.profile)}`,
-                );
+                postSignInActions(user.profile).then(userProfile => {
+                  result?.onAuthorized && result.onAuthorized(userProfile);
+                  log.debug(
+                    `User sign in complete: ${JSON.stringify(userProfile)}`,
+                  );
+                });
               })
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               .catch((e: any) => {
@@ -74,11 +75,12 @@ export const useAuthorizeUser = () => {
                       `User profile updated: ${JSON.stringify(updatedProfile)}`,
                     );
                     const user = setUser(credentials, updatedProfile);
-                    postSignInActions(user.profile);
-                    result?.onAuthorized && result.onAuthorized(user.profile);
-                    log.debug(
-                      `User sign in complete: ${JSON.stringify(user.profile)}`,
-                    );
+                    postSignInActions(user.profile).then(userProfile => {
+                      result?.onAuthorized && result.onAuthorized(userProfile);
+                      log.debug(
+                        `User sign in complete: ${JSON.stringify(userProfile)}`,
+                      );
+                    });
                   })
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   .catch((e: any) => {
@@ -87,11 +89,12 @@ export const useAuthorizeUser = () => {
                   });
               } else {
                 const user = setUser(credentials, userProfile);
-                postSignInActions(user.profile);
-                result?.onAuthorized && result.onAuthorized(user.profile);
-                log.debug(
-                  `User sign in complete: ${JSON.stringify(user.profile)}`,
-                );
+                postSignInActions(user.profile).then(userProfile => {
+                  result?.onAuthorized && result.onAuthorized(userProfile);
+                  log.debug(
+                    `User sign in complete: ${JSON.stringify(userProfile)}`,
+                  );
+                });
               }
             } else {
               // User is not allowed to sign in.
@@ -158,11 +161,13 @@ const useSetUser = () => {
   };
 };
 
-const postSignInActions = async (userProfile: UserProfile): Promise<void> => {
-  enablePushNotifications(userProfile);
+const postSignInActions = async (
+  userProfile: UserProfile,
+): Promise<UserProfile> => {
+  return await enablePushNotifications(userProfile);
 };
 
-export const preSignOutActions = async (): Promise<void> => {
+export const preSignOutActions = async (): Promise<UserProfile | undefined> => {
   const userProfile = store.getState().user.profile;
 
   // Cancel firestore data listener subscriptions before sign out.
@@ -175,4 +180,6 @@ export const preSignOutActions = async (): Promise<void> => {
 
   // Clear our redux store.
   store.dispatch(revertAll());
+
+  return userProfile;
 };

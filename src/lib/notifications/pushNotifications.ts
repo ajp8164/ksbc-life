@@ -63,18 +63,20 @@ const getDeviceToken = async (): Promise<PushNotificationToken> => {
 
 export const enablePushNotifications = async (
   userProfile: UserProfile,
-): Promise<void> => {
+): Promise<UserProfile> => {
   // Add push token to the authorized user profile.
   const token = await requestPushNotificationPermission();
 
+  const updatedProfile = Object.assign({}, userProfile);
   if (token) {
-    const updatedProfile = Object.assign({}, userProfile);
     updatedProfile.notifications.pushTokens = lodash.uniq(
       updatedProfile.notifications.pushTokens.concat(token?.fcm),
     );
     updateUser(updatedProfile);
   }
   subscribeToTopic('all-users');
+
+  return updatedProfile;
 };
 
 export const disablePushNotifications = async (
