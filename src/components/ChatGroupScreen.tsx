@@ -39,6 +39,7 @@ import { UserPickerModal } from 'components/modals/UserPickerModal';
 import { UserProfile } from 'types/user';
 import lodash from 'lodash';
 import { makeStyles } from '@rneui/themed';
+import notifee from '@notifee/react-native';
 import { resolveUrl } from 'lib/fileCache';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { store } from 'store';
@@ -92,6 +93,11 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
         if (snapshot.metadata.hasPendingWrites || snapshot.empty) return;
 
         const messages: MessageType.Any[] = [];
+
+        // Keep track of how many new messages I've read.
+        let recentMessagesCount = 0;
+        const now = new Date().toISOString();
+
         snapshot.docs.forEach(d => {
           const msg = d.data() as FirestoreMessageType;
           // Convert server timestamps to be compatible with chat library (javascript ms timestamp).
@@ -103,30 +109,46 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
               (msg.updatedAt as FirebaseFirestoreTypes.Timestamp).seconds *
               1000;
           }
+
+          // Delivery and seen/readBy status.
+          if (userProfile?.id) {
+            if (msg.author.id === userProfile.id) {
+              // When our sent message comes back to us then it has been delivered.
+              msg.status = 'delivered';
+            } else if (!msg.readBy?.[userProfile.id]) {
+              // Mark this message as seen if we haven't see it before now.
+              group?.id &&
+                updateChatMessage(
+                  {
+                    readBy: {
+                      ...msg.readBy,
+                      [userProfile.id]: {
+                        name: `${userProfile.firstName} ${userProfile.lastName}`,
+                        readAt: now,
+                      },
+                    },
+                    status: 'seen',
+                  },
+                  msg.id,
+                  group.id,
+                );
+
+              recentMessagesCount++;
+            }
+          }
+
           messages.push(msg as MessageType.Any);
         });
 
         if (!snapshot.metadata.hasPendingWrites && messages) {
+          // Reduce app badge count by the number of new messages read.
+          if (recentMessagesCount > 0) {
+            notifee.decrementBadgeCount(recentMessagesCount);
+          }
+
           messages.sort((a, b) => {
             return (b.createdAt as number) - (a.createdAt as number);
           });
-
-          // Use the latest message in the list to set status.
-          if (
-            messages[0].author.id === userProfile?.id &&
-            messages[0].status !== 'seen'
-          ) {
-            messages[0].status = 'delivered';
-          } else if (messages[0].status !== 'seen') {
-            messages[0].status = 'seen';
-
-            group?.id &&
-              updateChatMessage(
-                { status: messages[0].status },
-                messages[0].id,
-                group.id,
-              );
-          }
 
           setChatMessages(messages);
 
