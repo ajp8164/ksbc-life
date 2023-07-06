@@ -83,9 +83,16 @@ export const disablePushNotifications = async (
   userProfile?: UserProfile,
 ): Promise<void> => {
   // Remove push token from the authorized user profile.
+  // Remove only the token for this device.
   if (userProfile) {
+    const { fcm } = await getDeviceToken();
     const updatedProfile = Object.assign({}, userProfile);
-    updatedProfile.notifications.pushTokens = [];
+    updatedProfile.notifications.pushTokens = lodash.filter(
+      userProfile.notifications.pushTokens,
+      t => {
+        return t !== fcm;
+      },
+    );
     await updateUser(updatedProfile);
   }
   unsubscribeFromTopic('all-users');
