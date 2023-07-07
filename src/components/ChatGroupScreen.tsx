@@ -146,8 +146,10 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
             notifee.decrementBadgeCount(recentMessagesCount);
 
             const updatedProfile = Object.assign({}, userProfile);
-            updatedProfile.notifications.badgeCount =
-              updatedProfile.notifications.badgeCount - recentMessagesCount;
+            updatedProfile.notifications.badgeCount = Math.max(
+              0,
+              updatedProfile.notifications.badgeCount - recentMessagesCount,
+            );
             updateUser(updatedProfile);
           }
 

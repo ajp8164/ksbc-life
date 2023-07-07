@@ -15,11 +15,14 @@ export type MessagingTopic = 'all-installs' | 'all-users';
 export const initPushNotifications = () => {
   messaging()
     .requestPermission()
-    .then(permission => {
-      log.debug(`Push notifications permission: ${permission}`);
-    });
+    .then(async permission => {
+      // Need to fetch token before subscribing to topic.
+      const token = await getDeviceToken();
+      subscribeToTopic('all-installs');
 
-  subscribeToTopic('all-installs');
+      log.debug(`Push notifications permission: ${permission}`);
+      log.debug(`Push notifications token: ${JSON.stringify(token)}`);
+    });
 };
 
 export const subscribeToTopic = (name: MessagingTopic) => {

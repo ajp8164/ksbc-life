@@ -7,8 +7,6 @@ import { updateUserProfile } from 'store/slices/user';
 import { usersCollectionChangeListener } from 'firebase/firestore';
 
 export const addUsersCollectionListener = async () => {
-  const me = store.getState().user.profile;
-
   usersCollectionChangeListener(snapshot => {
     if (snapshot.docChanges().length === 0) return;
 
@@ -22,6 +20,7 @@ export const addUsersCollectionListener = async () => {
       // the redux store in sync during the current app session.
       // Maintain a separate instance of our own profile has a performance benefit since
       // we don't need to search the cache each time we need to read our own profile.
+      const me = store.getState().user.profile;
       if (me && u.id === me.id) {
         dispatch(updateUserProfile({ userProfile: u }));
       }
