@@ -141,9 +141,14 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
         });
 
         if (!snapshot.metadata.hasPendingWrites && messages) {
-          // Reduce app badge count by the number of new messages read.
+          // Reduce app and user badge count by the number of new messages read.
           if (recentMessagesCount > 0) {
             notifee.decrementBadgeCount(recentMessagesCount);
+
+            const updatedProfile = Object.assign({}, userProfile);
+            updatedProfile.notifications.badgeCount =
+              updatedProfile.notifications.badgeCount - recentMessagesCount;
+            updateUser(updatedProfile);
           }
 
           messages.sort((a, b) => {
