@@ -1,6 +1,16 @@
-import { Divider, ListItemSwitch } from '@react-native-ajp-elements/ui';
-import React, { useState } from 'react';
-import { ScrollView, View, useColorScheme } from 'react-native';
+import {
+  AppState,
+  Linking,
+  ScrollView,
+  View,
+  useColorScheme,
+} from 'react-native';
+import {
+  Divider,
+  ListItem,
+  ListItemSwitch,
+} from '@react-native-ajp-elements/ui';
+import React, { useEffect, useState } from 'react';
 import { saveBiometrics, saveThemeSettings } from 'store/slices/appSettings';
 import {
   selectBiometrics,
@@ -9,6 +19,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 
 import { biometricAuthentication } from 'lib/biometricAuthentication';
+import { hasPushNotificationsPermission } from 'lib/notifications';
 import { useTheme } from 'theme';
 
 const AppSettings = () => {
@@ -20,6 +31,25 @@ const AppSettings = () => {
   const biometrics = useSelector(selectBiometrics);
 
   const [biometricsValue, setBiometricsValue] = useState(biometrics);
+  const [hasPNPermission, setHasPNPermission] = useState(false);
+
+  useEffect(() => {
+    hasPushNotificationsPermission().then(permission => {
+      setHasPNPermission(permission);
+    });
+
+    const listener = AppState.addEventListener('change', nextState => {
+      if (nextState === 'active') {
+        hasPushNotificationsPermission().then(permission => {
+          setHasPNPermission(permission);
+        });
+      }
+    });
+
+    return () => {
+      listener.remove();
+    };
+  }, []);
 
   const toggleAppearance = (value: boolean) => {
     dispatch(
@@ -61,6 +91,13 @@ const AppSettings = () => {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior={'automatic'}>
+        <Divider text={'NOTIFICATIONS'} />
+        <ListItem
+          title={'Push Notifications'}
+          value={hasPNPermission ? 'On' : 'Off'}
+          position={['first', 'last']}
+          onPress={Linking.openSettings}
+        />
         <Divider text={'SECURITY'} />
         <ListItemSwitch
           title={'Use Biometrics ID'}

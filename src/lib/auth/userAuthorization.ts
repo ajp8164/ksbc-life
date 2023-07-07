@@ -5,11 +5,11 @@ import {
   getUser,
   updateUser,
 } from 'firebase/firestore';
-import {
-  disablePushNotifications,
-  enablePushNotifications,
-} from 'lib/notifications';
 import { getUserAvatarColor, getUserInitials } from 'lib/user';
+import {
+  removePushNotificationsFromUser,
+  setupPushNotificationsForUser,
+} from 'lib/notifications';
 
 import { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import lodash from 'lodash';
@@ -164,7 +164,7 @@ const useSetUser = () => {
 const postSignInActions = async (
   userProfile: UserProfile,
 ): Promise<UserProfile> => {
-  return await enablePushNotifications(userProfile);
+  return await setupPushNotificationsForUser(userProfile);
 };
 
 export const preSignOutActions = async (): Promise<UserProfile | undefined> => {
@@ -176,7 +176,7 @@ export const preSignOutActions = async (): Promise<UserProfile | undefined> => {
   // When a user is unauthorized (e.g. on sign out) remove the users push tokens.
   // This avoids sending notifications to a device that used to have the user signed
   // in but is no longer. Could get here with no previously authorized user.
-  userProfile && (await disablePushNotifications(userProfile));
+  userProfile && (await removePushNotificationsFromUser(userProfile));
 
   // Clear our redux store.
   store.dispatch(revertAll());

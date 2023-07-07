@@ -1,6 +1,7 @@
 import { UserProfile } from 'types/user';
 import { isEmulator } from 'react-native-device-info';
 import lodash from 'lodash';
+import { log } from '@react-native-ajp-elements/core';
 import messaging from '@react-native-firebase/messaging';
 import { updateUser } from 'firebase/firestore';
 
@@ -11,18 +12,15 @@ export type PushNotificationToken = {
 
 export type MessagingTopic = 'all-installs' | 'all-users';
 
-export const requestPushNotificationPermission =
-  async (): Promise<PushNotificationToken | null> => {
-    return messaging()
-      .requestPermission()
-      .then(() => {
-        return checkPermissionGetToken();
-      })
-      .catch(() => {
-        // User has rejected permission
-        return null;
-      });
-  };
+export const initPushNotifications = () => {
+  messaging()
+    .requestPermission()
+    .then(permission => {
+      log.debug(`Push notifications permission: ${permission}`);
+    });
+
+  subscribeToTopic('all-installs');
+};
 
 export const subscribeToTopic = (name: MessagingTopic) => {
   messaging().subscribeToTopic(name);
@@ -31,18 +29,6 @@ export const subscribeToTopic = (name: MessagingTopic) => {
 export const unsubscribeFromTopic = (name: MessagingTopic) => {
   messaging().unsubscribeFromTopic(name);
 };
-
-const checkPermissionGetToken =
-  async (): Promise<PushNotificationToken | null> => {
-    const status = await messaging().hasPermission();
-    if (status === messaging.AuthorizationStatus.AUTHORIZED) {
-      return await getDeviceToken();
-    } else if (status === messaging.AuthorizationStatus.NOT_DETERMINED) {
-      return await requestPushNotificationPermission();
-    } else {
-      return null;
-    }
-  };
 
 const getDeviceToken = async (): Promise<PushNotificationToken> => {
   if (await isEmulator()) {
@@ -57,15 +43,19 @@ const getDeviceToken = async (): Promise<PushNotificationToken> => {
 
   const fcm = await messaging().getToken();
   const apns = await messaging().getAPNSToken();
-  const token = { fcm, apns };
-  return token;
+  return { fcm, apns };
 };
 
-export const enablePushNotifications = async (
+export const hasPushNotificationsPermission = async () => {
+  const authStatus = await messaging().hasPermission();
+  return authStatus === messaging.AuthorizationStatus.AUTHORIZED;
+};
+
+export const setupPushNotificationsForUser = async (
   userProfile: UserProfile,
 ): Promise<UserProfile> => {
   // Add push token to the authorized user profile.
-  const token = await requestPushNotificationPermission();
+  const token = await getDeviceToken();
 
   const updatedProfile = Object.assign({}, userProfile);
   if (token) {
@@ -79,7 +69,7 @@ export const enablePushNotifications = async (
   return updatedProfile;
 };
 
-export const disablePushNotifications = async (
+export const removePushNotificationsFromUser = async (
   userProfile?: UserProfile,
 ): Promise<void> => {
   // Remove push token from the authorized user profile.
