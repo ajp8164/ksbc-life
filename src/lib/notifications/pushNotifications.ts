@@ -3,6 +3,7 @@ import { isEmulator } from 'react-native-device-info';
 import lodash from 'lodash';
 import { log } from '@react-native-ajp-elements/core';
 import messaging from '@react-native-firebase/messaging';
+import notifee from '@notifee/react-native';
 import { updateUser } from 'firebase/firestore';
 
 export type PushNotificationToken = {
@@ -69,6 +70,9 @@ export const setupPushNotificationsForUser = async (
   }
   subscribeToTopic('all-users');
 
+  // Restore badge count to app icon.
+  notifee.setBadgeCount(userProfile.notifications.badgeCount);
+
   return updatedProfile;
 };
 
@@ -89,4 +93,7 @@ export const removePushNotificationsFromUser = async (
     await updateUser(updatedProfile);
   }
   unsubscribeFromTopic('all-users');
+
+  // Remove app icon badge count.
+  notifee.setBadgeCount(0);
 };
