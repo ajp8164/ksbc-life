@@ -143,6 +143,8 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
         if (!snapshot.metadata.hasPendingWrites && messages) {
           // Reduce app and user badge count by the number of new messages read.
           if (recentMessagesCount > 0) {
+            // This supported on iOS only. Android has no maintainable support for app icon badging.
+            // See https://github.com/invertase/notifee/issues/409#issuecomment-1136100729
             notifee.decrementBadgeCount(recentMessagesCount);
 
             const updatedProfile = Object.assign({}, userProfile);
@@ -202,15 +204,14 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
       typingNames.current = typingNames.current.length
         ? typingNames.current
         : undefined;
-
-      setGroup(doc);
     });
+
     return () => {
       subscription();
 
       if (userProfile?.id && group.id) {
         // Make sure we stop typing when the view is dismissed.
-        sendTypingState(false, userProfile.id, userProfile.firstName, group.id);
+        setTypingState('');
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -389,9 +390,6 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
         chatMessages,
       );
       setChatMessages(messages);
-
-      // Message sent, reset typing state
-      setTypingState('');
     });
 
     // Sending messages while composing exits composing mode.
@@ -427,13 +425,13 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
     setTypingState(text);
   };
 
-  const setTypingState = (text: string) => {
+  const setTypingState = (text: string | undefined) => {
     if (userProfile?.id && group?.id) {
       // This logic ensures we send typing updates on state transitions, not on every keystroke.
-      if (text.length > 0 && !iAmTyping.current) {
+      if (text && text.length > 0 && !iAmTyping.current) {
         iAmTyping.current = true;
         sendTypingState(true, userProfile.id, userProfile.firstName, group.id);
-      } else if (text.length === 0 && iAmTyping.current) {
+      } else if ((!text || text.length === 0) && iAmTyping.current) {
         iAmTyping.current = false;
         sendTypingState(false, userProfile.id, userProfile.firstName, group.id);
       }
