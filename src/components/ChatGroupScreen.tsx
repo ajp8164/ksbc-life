@@ -62,7 +62,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
   const composingGroup = useRef(lodash.isEmpty(route.params.group));
   const userProfile = useSelector(selectUserProfile);
   const initialized = useRef(false);
-  const isTyping = useRef(false);
+  const [isTyping, setIsTyping] = useState(false);
   const typingNames = useRef<string | undefined>();
   const iAmTyping = useRef(false);
 
@@ -191,7 +191,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
         return el[userProfile?.id || ''] !== undefined;
       });
 
-      isTyping.current = Object.keys(othersTyping).length > 0;
+      setIsTyping(Object.keys(othersTyping).length > 0);
       typingNames.current = '';
 
       othersTyping.forEach(other => {
@@ -204,6 +204,8 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
       typingNames.current = typingNames.current.length
         ? typingNames.current
         : undefined;
+
+      console.log('HANDLE TYPING', typingNames.current);
     });
 
     return () => {
@@ -527,7 +529,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
             imageUrl: userProfile.photoUrl || '',
             avatarColor: userProfile.avatar.color,
           }}
-          isTyping={isTyping.current}
+          isTyping={isTyping}
           typingNames={typingNames.current}
           onSendPress={sendMessage}
           onAttachmentPress={doSelectAttachments}
