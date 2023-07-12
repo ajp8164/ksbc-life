@@ -14,6 +14,7 @@ export type QueryResult<T> = {
   allLoaded: boolean;
   lastDocument: FirebaseFirestoreTypes.DocumentData;
   result: T[];
+  snapshot: FirebaseFirestoreTypes.QuerySnapshot<FirebaseFirestoreTypes.DocumentData>;
 };
 
 export type QueryOrderBy = {
@@ -128,8 +129,9 @@ export const getDocuments = <T extends { id?: string | undefined }>(
         });
         return <QueryResult<T>>{
           allLoaded: querySnapshot.docs.length < limit + 1,
-          lastDocument: querySnapshot.docs[querySnapshot.docs.length - 2],
+          lastDocument: querySnapshot.docs[querySnapshot.docs.length - 1],
           result,
+          snapshot: querySnapshot,
         };
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -52,14 +52,11 @@ export const addLocation = (location: Location): Promise<Location> => {
 };
 
 export const updateLocation = (location: Location): Promise<Location> => {
-  const updated = Object.assign({}, location); // Don't mutate input.
-  const id = updated.id;
-  delete updated.id; // Not storing the doc id in the object.
   return (
     firestore()
       .collection('Locations')
-      .doc(id)
-      .update(updated)
+      .doc(location.id)
+      .update(location)
       .then(() => {
         return location;
       })
