@@ -14,6 +14,8 @@ import firestore, {
 import { MessageType } from '@flyerhq/react-native-chat-ui';
 import { log } from '@react-native-ajp-elements/core';
 
+const paginationLimit = 50;
+
 export const getChatMessages = (
   groupId: string,
   opts?: {
@@ -25,7 +27,7 @@ export const getChatMessages = (
 ): Promise<QueryResult<MessageType.Any>> => {
   const {
     lastDocument,
-    limit = 10,
+    limit = paginationLimit,
     orderBy = { fieldPath: 'createdAt', directionStr: 'desc' },
     where,
   } = opts || {};
@@ -124,6 +126,7 @@ export const chatMessagesCollectionChangeListener = (
   opts?: Omit<CollectionChangeListenerOptions, 'subCollection'>,
 ): (() => void) => {
   opts = {
+    limit: paginationLimit,
     orderBy: { fieldPath: 'createdAt', directionStr: 'desc' },
     subCollection: { documentPath: groupId, name: 'Messages' },
     ...opts,
