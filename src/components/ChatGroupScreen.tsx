@@ -8,6 +8,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   addGroup,
   chatMessagesCollectionChangeListener,
+  getChatMessages,
   getUsers,
   groupsDocumentChangeListener,
   sendTypingState,
@@ -61,12 +62,15 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
   const [group, setGroup] = useState(route.params.group);
   const composingGroup = useRef(lodash.isEmpty(route.params.group));
   const userProfile = useSelector(selectUserProfile);
-  const initialized = useRef(false);
   const [isTyping, setIsTyping] = useState(false);
   const typingNames = useRef<string | undefined>();
   const iAmTyping = useRef(false);
 
   const [chatMessages, setChatMessages] = useState<MessageType.Any[]>([]);
+
+  const allLoaded = useRef(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const lastDocument = useRef<FirebaseFirestoreTypes.DocumentData>();
 
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchCriteria, setSearchCriteria] = useState<SearchCriteria>(
@@ -87,90 +91,111 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
   // Messages listener
   useEffect(() => {
     if (!group?.id) return;
+    setIsLoading(true);
+
     const subscription = chatMessagesCollectionChangeListener(
       group?.id,
       snapshot => {
+        lastDocument.current = snapshot.docs[snapshot.docs.length - 1];
         if (snapshot.metadata.hasPendingWrites || snapshot.empty) return;
-
-        const messages: MessageType.Any[] = [];
-
-        // Keep track of how many new messages I've read.
-        let recentMessagesCount = 0;
-        const now = new Date().toISOString();
-
-        snapshot.docs.forEach(d => {
-          const msg = d.data() as FirestoreMessageType;
-          // Convert server timestamps to be compatible with chat library (javascript ms timestamp).
-          msg.createdAt =
-            (msg.createdAt as FirebaseFirestoreTypes.Timestamp).seconds * 1000;
-
-          if (msg.updatedAt) {
-            msg.updatedAt =
-              (msg.updatedAt as FirebaseFirestoreTypes.Timestamp).seconds *
-              1000;
-          }
-
-          // Delivery and seen/readBy status.
-          if (userProfile?.id) {
-            if (msg.author.id === userProfile.id) {
-              // When our sent message comes back to us then it has been delivered.
-              msg.status = 'delivered';
-            } else if (!msg.readBy?.[userProfile.id]) {
-              // Mark this message as seen if we haven't see it before now.
-              group?.id &&
-                updateChatMessage(
-                  {
-                    readBy: {
-                      ...msg.readBy,
-                      [userProfile.id]: {
-                        name: `${userProfile.firstName} ${userProfile.lastName}`,
-                        readAt: now,
-                      },
-                    },
-                    status: 'seen',
-                  },
-                  msg.id,
-                  group.id,
-                );
-
-              recentMessagesCount++;
-            }
-          }
-
-          messages.push(msg as MessageType.Any);
-        });
-
-        if (!snapshot.metadata.hasPendingWrites && messages) {
-          // Reduce app and user badge count by the number of new messages read.
-          if (recentMessagesCount > 0) {
-            // This supported on iOS only. Android has no maintainable support for app icon badging.
-            // See https://github.com/invertase/notifee/issues/409#issuecomment-1136100729
-            notifee.decrementBadgeCount(recentMessagesCount);
-
-            const updatedProfile = Object.assign({}, userProfile);
-            updatedProfile.notifications.badgeCount = Math.max(
-              0,
-              updatedProfile.notifications.badgeCount - recentMessagesCount,
-            );
-            updateUser(updatedProfile);
-          }
-
-          messages.sort((a, b) => {
-            return (b.createdAt as number) - (a.createdAt as number);
-          });
-
-          setChatMessages(messages);
-
-          if (!composingGroup.current) {
-            setLatestMessageAsReadByMe();
-            initialized.current = true;
-          }
-        }
+        processChatMessageDocuments(snapshot.docs);
+        setIsLoading(false);
       },
     );
     return subscription;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [group?.id]);
+
+  const getMoreChatMessages = async () => {
+    if (group?.id && !allLoaded.current) {
+      const s = await getChatMessages(group.id, {
+        lastDocument: lastDocument.current,
+      });
+      allLoaded.current = s.allLoaded;
+      lastDocument.current = s.lastDocument;
+      processChatMessageDocuments(s.snapshot.docs);
+    }
+  };
+
+  const processChatMessageDocuments = (
+    messageDocs: FirebaseFirestoreTypes.QueryDocumentSnapshot<FirebaseFirestoreTypes.DocumentData>[],
+  ) => {
+    const processedMessages: MessageType.Any[] = [];
+
+    // Keep track of how many new messages I've read.
+    let recentMessagesCount = 0;
+    const now = new Date().toISOString();
+
+    messageDocs.forEach(doc => {
+      // Critical to clone here so that date conversion does not mutate the lastDocument which
+      // is used as the pagination cursor.
+      const msg = Object.assign({}, doc.data()) as FirestoreMessageType;
+
+      // Convert server timestamps to be compatible with chat library (javascript ms timestamp).
+      msg.createdAt =
+        (msg.createdAt as FirebaseFirestoreTypes.Timestamp).seconds * 1000;
+
+      if (msg.updatedAt) {
+        msg.updatedAt =
+          (msg.updatedAt as FirebaseFirestoreTypes.Timestamp).seconds * 1000;
+      }
+
+      // Delivery and seen/readBy status.
+      if (userProfile?.id) {
+        if (msg.author.id === userProfile.id) {
+          // When our sent message comes back to us then it has been delivered.
+          msg.status = 'delivered';
+        } else if (!msg.readBy?.[userProfile.id]) {
+          // Mark this message as seen if we haven't see it before now.
+          group?.id &&
+            updateChatMessage(
+              {
+                readBy: {
+                  ...msg.readBy,
+                  [userProfile.id]: {
+                    name: `${userProfile.firstName} ${userProfile.lastName}`,
+                    readAt: now,
+                  },
+                },
+                status: 'seen',
+              },
+              msg.id,
+              group.id,
+            );
+
+          recentMessagesCount++;
+        }
+      }
+
+      processedMessages.push(msg as MessageType.Any);
+    });
+
+    if (processedMessages.length) {
+      // Reduce app and user badge count by the number of new messages read.
+      if (recentMessagesCount > 0) {
+        // This supported on iOS only. Android has no maintainable support for app icon badging.
+        // See https://github.com/invertase/notifee/issues/409#issuecomment-1136100729
+        notifee.decrementBadgeCount(recentMessagesCount);
+
+        const updatedProfile = Object.assign({}, userProfile);
+        updatedProfile.notifications.badgeCount = Math.max(
+          0,
+          updatedProfile.notifications.badgeCount - recentMessagesCount,
+        );
+        updateUser(updatedProfile);
+      }
+
+      processedMessages.sort((a, b) => {
+        return (b.createdAt as number) - (a.createdAt as number);
+      });
+
+      setChatMessages(chatMessages.concat(processedMessages));
+
+      if (!composingGroup.current) {
+        setLatestMessageAsReadByMe();
+      }
+    }
+  };
 
   // Typing indicator
   useEffect(() => {
@@ -204,8 +229,6 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
       typingNames.current = typingNames.current.length
         ? typingNames.current
         : undefined;
-
-      console.log('HANDLE TYPING', typingNames.current);
     });
 
     return () => {
@@ -213,7 +236,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
 
       if (userProfile?.id && group.id) {
         // Make sure we stop typing when the view is dismissed.
-        setTypingState('');
+        setTypingState();
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -427,7 +450,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
     setTypingState(text);
   };
 
-  const setTypingState = (text: string | undefined) => {
+  const setTypingState = (text?: string) => {
     if (userProfile?.id && group?.id) {
       // This logic ensures we send typing updates on state transitions, not on every keystroke.
       if (text && text.length > 0 && !iAmTyping.current) {
@@ -438,6 +461,10 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
         sendTypingState(false, userProfile.id, userProfile.firstName, group.id);
       }
     }
+  };
+
+  const onEndReached = async (): Promise<void> => {
+    return getMoreChatMessages();
   };
 
   const renderHeaderTitle = (group: Group) => {
@@ -462,7 +489,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
   const renderListEmptyComponent = () => {
     return (
       <View style={s.emptyListContainer}>
-        <NoItems title={'No messages'} />
+        {isLoading ? <NoItems isLoading /> : <NoItems title={'No messages'} />}
       </View>
     );
   };
@@ -529,10 +556,12 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
             imageUrl: userProfile.photoUrl || '',
             avatarColor: userProfile.avatar.color,
           }}
+          isLastPage={allLoaded.current}
           isTyping={isTyping}
           typingNames={typingNames.current}
           onSendPress={sendMessage}
           onAttachmentPress={doSelectAttachments}
+          onEndReached={onEndReached}
           onInputTextChanged={onInputTextChanged}
           onMessagePress={handleMessagePress}
           onPreviewDataFetched={handlePreviewDataFetched}
