@@ -5,10 +5,6 @@ import {
   addGroupsCollectionListener,
   addUsersCollectionListener,
 } from 'firebase/firestore';
-import {
-  requestPushNotificationPermission,
-  subscribeToTopic,
-} from 'lib/notifications';
 
 import { AppError } from 'lib/errors';
 import { BackHandler } from 'react-native';
@@ -16,6 +12,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { RNFileCache } from 'react-native-file-cache';
 import { appConfig } from 'config';
 import firestore from '@react-native-firebase/firestore';
+import { initPushNotifications } from 'lib/notifications';
 import storage from '@react-native-firebase/storage';
 import { svgImages } from 'theme';
 
@@ -45,6 +42,8 @@ export const initApp = async (): Promise<InitStatus> => {
       return true;
     });
 
+    initPushNotifications();
+
     AJPElements.init({
       buildEnvironment: appConfig.buildEnvironment,
       sentryEndpoint: appConfig.sentryEndpoint,
@@ -60,11 +59,6 @@ export const initApp = async (): Promise<InitStatus> => {
     // Add firestore collection listeners.
     addGroupsCollectionListener();
     addUsersCollectionListener();
-
-    requestPushNotificationPermission().then(token => {
-      log.debug(`Push notification token: ${JSON.stringify(token)}`);
-      subscribeToTopic('all-installs');
-    });
 
     // Load cached file indexes.
     RNFileCache.load();
