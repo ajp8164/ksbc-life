@@ -26,10 +26,10 @@ const AdminHomeScreen = ({ navigation }: Props) => {
           onPress={() => navigation.navigate('AdminChurch')}
         />
         <ListItem
-          title={'Pasteurs'}
+          title={'Pastors'}
           leftImage={'account-outline'}
           leftImageType={'material-community'}
-          onPress={() => navigation.navigate('AdminPasteurs')}
+          onPress={() => navigation.navigate('AdminPastors')}
         />
         <ListItem
           title={'Sermons'}

@@ -74,7 +74,7 @@ const AdminUsersScreen = () => {
     if (isLoading) return null;
     return (
       <ListItem
-        title={'Add a pasteur'}
+        title={'Add a pastor'}
         position={['first', 'last']}
         leftImage={'cross-outline'}
         leftImageType={'material-community'}

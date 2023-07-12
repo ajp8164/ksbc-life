@@ -4,7 +4,7 @@ import AdminContentScreen from 'components/admin/AdminContentScreen';
 import AdminHomeScreen from 'components/admin/AdminHomeScreen';
 import AdminNotificationsScreen from 'components/admin/AdminNotificationsScreen';
 import AdminPageContentScreen from 'components/admin/AdminPageContentScreen';
-import AdminPasteursScreen from 'components/admin/AdminPasteursScreen';
+import AdminPastorsScreen from 'components/admin/AdminPastorsScreen';
 import AdminSermonsScreen from 'components/admin/AdminSermonsScreen';
 import AdminUsersScreen from 'components/admin/AdminUsersScreen';
 import AppSettingsScreen from 'components/AppSettingsScreen';
@@ -98,10 +98,10 @@ const MoreNavigator = () => {
         }}
       />
       <MoreStack.Screen
-        name="AdminPasteurs"
-        component={AdminPasteursScreen}
+        name="AdminPastors"
+        component={AdminPastorsScreen}
         options={{
-          title: 'Pasteurs',
+          title: 'Pastors',
           headerLeft: () => null,
           headerLargeTitle: true,
         }}

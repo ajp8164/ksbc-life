@@ -21,8 +21,8 @@ import {
 } from '@react-native-ajp-elements/ui';
 import {
   EditorState,
-  PasteurEditorViewMethods,
-  PasteurEditorViewProps,
+  PastorEditorViewMethods,
+  PastorEditorViewProps,
 } from './types';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import {
@@ -35,10 +35,10 @@ import { ellipsis, useSetState } from '@react-native-ajp-elements/core';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import FormikEffect from 'components/atoms/FormikEffect';
-import { Pasteur } from 'types/pasteur';
+import { Pastor } from 'types/pastor';
 import { TextModal } from 'components/modals/TextModal';
 import { appConfig } from 'config';
-import { savePasteur as commitPasteur } from 'firebase/firestore';
+import { savePastor as commitPastor } from 'firebase/firestore';
 import { makeStyles } from '@rneui/themed';
 
 enum Fields {
@@ -61,13 +61,13 @@ type FormValues = {
   photoUrl: string;
 };
 
-type PasteurEditorView = PasteurEditorViewMethods;
+type PastorEditorView = PastorEditorViewMethods;
 
-const PasteurEditorView = React.forwardRef<
-  PasteurEditorView,
-  PasteurEditorViewProps
+const PastorEditorView = React.forwardRef<
+  PastorEditorView,
+  PastorEditorViewProps
 >((props, ref) => {
-  const { onEditorStateChange, pasteur } = props;
+  const { onEditorStateChange, pastor } = props;
 
   const theme = useTheme();
   const s = useStyles(theme);
@@ -80,7 +80,7 @@ const PasteurEditorView = React.forwardRef<
   const refPhone = useRef<TextInput>(null);
 
   const biographyModalRef = useRef<TextModal>(null);
-  const pasteurImageAsset = useRef<ImagePicker.Asset>();
+  const pastorImageAsset = useRef<ImagePicker.Asset>();
 
   // Same order as on form.
   const fieldRefs = [
@@ -100,7 +100,7 @@ const PasteurEditorView = React.forwardRef<
 
   useImperativeHandle(ref, () => ({
     //  These functions exposed to the parent component through the ref.
-    savePasteur,
+    savePastor,
   }));
 
   useEffect(() => {
@@ -112,7 +112,7 @@ const PasteurEditorView = React.forwardRef<
     formikRef.current?.setFieldValue('biography', text);
   };
 
-  const savePasteur = async () => {
+  const savePastor = async () => {
     return formikRef.current?.submitForm();
   };
 
@@ -122,12 +122,12 @@ const PasteurEditorView = React.forwardRef<
   ) => {
     Keyboard.dismiss();
     setEditorState({ isSubmitting: true });
-    await savePasteurImage();
+    await savePastorImage();
     // Saving the image updates the form but form values are already passed in.
     // Overwrite the image value after saving the image to storage.
     values.photoUrl = formikRef.current?.values.photoUrl || '';
 
-    const p: Pasteur = {
+    const p: Pastor = {
       firstName: values.firstName,
       lastName: values.lastName,
       title: values.title,
@@ -137,52 +137,52 @@ const PasteurEditorView = React.forwardRef<
       photoUrl: values.photoUrl,
     };
 
-    if (pasteur?.id) {
-      p.id = pasteur.id;
+    if (pastor?.id) {
+      p.id = pastor.id;
     }
 
     try {
-      await commitPasteur(p);
+      await commitPastor(p);
       resetForm({ values });
       setEditorState({ isSubmitting: false });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       setEditorState({ isSubmitting: false });
-      Alert.alert('Pasteur Not Saved', 'Please try again.', [{ text: 'OK' }], {
+      Alert.alert('Pastor Not Saved', 'Please try again.', [{ text: 'OK' }], {
         cancelable: false,
       });
     }
   };
 
-  const selectPasteurImage = () => {
+  const selectPastorImage = () => {
     selectImage({
       onSuccess: imageAssets => {
-        pasteurImageAsset.current = imageAssets[0];
+        pastorImageAsset.current = imageAssets[0];
         formikRef.current?.setFieldValue('photoUrl', imageAssets[0].uri);
       },
     });
   };
 
-  const savePasteurImage = async () => {
-    if (pasteurImageAsset.current) {
+  const savePastorImage = async () => {
+    if (pastorImageAsset.current) {
       await uploadImage({
         image: {
-          mimeType: pasteurImageAsset.current.type,
-          uri: pasteurImageAsset.current.uri,
+          mimeType: pastorImageAsset.current.type,
+          uri: pastorImageAsset.current.uri,
         } as ImageUpload,
-        storagePath: appConfig.storageImagePasteurs,
-        oldImage: pasteur?.photoUrl,
+        storagePath: appConfig.storageImagePastors,
+        oldImage: pastor?.photoUrl,
         onSuccess: url => formikRef.current?.setFieldValue('photoUrl', url),
         onError: () => formikRef.current?.setFieldValue('photoUrl', ''),
       });
     }
   };
 
-  const deletePasteurImage = async () => {
-    if (pasteur?.photoUrl) {
+  const deletePastorImage = async () => {
+    if (pastor?.photoUrl) {
       await deleteImage({
-        filename: pasteur.photoUrl,
-        storagePath: appConfig.storageImagePasteurs,
+        filename: pastor.photoUrl,
+        storagePath: appConfig.storageImagePastors,
       })
         .then(() => {
           formikRef.current?.setFieldValue('photoUrl', '');
@@ -217,13 +217,13 @@ const PasteurEditorView = React.forwardRef<
           <Formik
             innerRef={formikRef}
             initialValues={{
-              firstName: pasteur?.firstName || '',
-              lastName: pasteur?.lastName || '',
-              title: pasteur?.title || '',
-              email: pasteur?.email || '',
-              phone: pasteur?.phone || '',
-              biography: pasteur?.biography || '',
-              photoUrl: pasteur?.photoUrl || '',
+              firstName: pastor?.firstName || '',
+              lastName: pastor?.lastName || '',
+              title: pastor?.title || '',
+              email: pastor?.email || '',
+              phone: pastor?.phone || '',
+              biography: pastor?.biography || '',
+              photoUrl: pastor?.photoUrl || '',
             }}
             validateOnChange={true}
             validateOnMount={true}
@@ -367,7 +367,7 @@ const PasteurEditorView = React.forwardRef<
                             size={28}
                           />
                         }
-                        onPress={selectPasteurImage}
+                        onPress={selectPastorImage}
                       />
                       <Button
                         buttonStyle={s.imageButton}
@@ -379,7 +379,7 @@ const PasteurEditorView = React.forwardRef<
                             size={28}
                           />
                         }
-                        onPress={deletePasteurImage}
+                        onPress={deletePastorImage}
                       />
                     </Image>
                   </>
@@ -388,7 +388,7 @@ const PasteurEditorView = React.forwardRef<
                     title={'Add a photo'}
                     titleStyle={theme.styles.textPlaceholder}
                     containerStyle={{ borderBottomWidth: 0 }}
-                    onPress={selectPasteurImage}
+                    onPress={selectPastorImage}
                   />
                 )}
               </View>
@@ -435,4 +435,4 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   },
 }));
 
-export default PasteurEditorView;
+export default PastorEditorView;

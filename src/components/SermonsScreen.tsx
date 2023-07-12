@@ -70,7 +70,7 @@ const SermonsScreen = ({ navigation }: Props) => {
     const header =
       bibleReferenceToString(item.bibleReference) +
       (item.bibleReference?.book.length ? ' | ' : '') +
-      item.pasteur;
+      item.pastor;
     const footer =
       date + (item.seriesTitle?.length ? ' | ' : '') + item.seriesTitle;
     const videoShown = item.video && showVideo === item.video.id.videoId;

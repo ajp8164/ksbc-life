@@ -26,7 +26,7 @@ import {
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import { LifeApplication, Sermon, SermonVideo } from 'types/sermon';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { saveSermon as commitSermon, getPasteurs } from 'firebase/firestore';
+import { saveSermon as commitSermon, getPastors } from 'firebase/firestore';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import { BibleReference } from 'types/bible';
@@ -49,7 +49,7 @@ enum Fields {
 
 type FormValues = {
   date: string;
-  pasteur: string;
+  pastor: string;
   title: string;
   seriesTitle: string;
   bibleReference: BibleReference;
@@ -70,14 +70,14 @@ const SermonEditorView = React.forwardRef<
   const s = useStyles(theme);
 
   const bibleReferencePickerModalRef = useRef<ItemPickerModal>(null);
-  const pasteurPickerModalRef = useRef<ItemPickerModal>(null);
+  const pastorPickerModalRef = useRef<ItemPickerModal>(null);
   const sermonDatePickerModalRef = useRef<DatePickerModal>(null);
   const sermonVideoPickerModalRef = useRef<SermonVideoPickerModal>(null);
 
   const [bibleReference, setBibleReference] = useState<BibleReference>(
     {} as BibleReference,
   );
-  const [pasteurItems, setPasteurItems] = useState<PickerItem[]>([]);
+  const [pastorItems, setPastorItems] = useState<PickerItem[]>([]);
   const [sermonVideo, setSermonVideo] = useState<SermonVideo | undefined>();
 
   const formikRef = useRef<FormikProps<FormValues>>(null);
@@ -108,13 +108,13 @@ const SermonEditorView = React.forwardRef<
 
   useEffect(() => {
     (async () => {
-      const items: PickerItem[] = [{ label: 'Select Pasteur', value: '' }];
-      const p = await getPasteurs();
+      const items: PickerItem[] = [{ label: 'Select Pastor', value: '' }];
+      const p = await getPastors();
       p.result.forEach(p => {
         const name = `${p.firstName} ${p.lastName}`;
         items.push({ label: name, value: name });
       });
-      setPasteurItems(items);
+      setPastorItems(items);
     })();
   }, []);
 
@@ -136,7 +136,7 @@ const SermonEditorView = React.forwardRef<
 
     const s: Sermon = {
       date: values.date,
-      pasteur: values.pasteur,
+      pastor: values.pastor,
       title: values.title,
       seriesTitle: values.seriesTitle,
       bibleReference: !lodash.isEmpty(bibleReference)
@@ -169,8 +169,8 @@ const SermonEditorView = React.forwardRef<
     formikRef.current?.setFieldValue('date', date.toISOString());
   };
 
-  const onPasteurChange = (pasteur: string): void => {
-    formikRef.current?.setFieldValue('pasteur', pasteur);
+  const onPastorChange = (pastor: string): void => {
+    formikRef.current?.setFieldValue('pastor', pastor);
   };
 
   const onBibleReferenceChange = (bibleReference?: BibleReference): void => {
@@ -185,7 +185,7 @@ const SermonEditorView = React.forwardRef<
 
   const validationSchema = Yup.object().shape({
     date: Yup.string().required('Date is required'),
-    pasteur: Yup.string().required('Pasteur is required'),
+    pastor: Yup.string().required('Pastor is required'),
     title: Yup.string().required('Title is required'),
     seriesTitle: Yup.string(),
     bibleReference: Yup.object().shape({
@@ -215,7 +215,7 @@ const SermonEditorView = React.forwardRef<
             innerRef={formikRef}
             initialValues={{
               date: sermon?.date || DateTime.now().toISODate() || '',
-              pasteur: sermon?.pasteur || '',
+              pastor: sermon?.pastor || '',
               title: sermon?.title || '',
               seriesTitle: sermon?.seriesTitle || '',
               bibleReference: sermon?.bibleReference || ({} as BibleReference),
@@ -253,16 +253,16 @@ const SermonEditorView = React.forwardRef<
                 />
                 <ListItem
                   title={'Paster'}
-                  value={formik.values.pasteur || 'Pasteur is required'}
+                  value={formik.values.pastor || 'Pastor is required'}
                   valueStyle={
-                    !formik.values.pasteur
+                    !formik.values.pastor
                       ? {
                           ...theme.styles.textTiny,
                           color: theme.colors.assertive,
                         }
                       : {}
                   }
-                  onPress={() => pasteurPickerModalRef.current?.present()}
+                  onPress={() => pastorPickerModalRef.current?.present()}
                 />
                 <Divider text={'MESSAGE'} />
                 <ListItemInput
@@ -502,11 +502,11 @@ const SermonEditorView = React.forwardRef<
         onValueChange={onDateChange}
       />
       <ItemPickerModal
-        ref={pasteurPickerModalRef}
+        ref={pastorPickerModalRef}
         placeholder={'none'}
-        items={pasteurItems}
-        value={formikRef.current?.values.pasteur}
-        onValueChange={onPasteurChange}
+        items={pastorItems}
+        value={formikRef.current?.values.pastor}
+        onValueChange={onPastorChange}
       />
       <BibleReferencePickerModal
         ref={bibleReferencePickerModalRef}

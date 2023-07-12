@@ -19,7 +19,7 @@ import {
 } from 'firebase/firestore';
 
 import { DateTime } from 'luxon';
-import { EditPasteurModal } from 'components/admin/modals/EditPasteurModal';
+import { EditPastorModal } from 'components/admin/modals/EditPastorModal';
 import { EditSermonModal } from 'components/admin/modals/EditSermonModal';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { MoreNavigatorParamList } from 'types/navigation';
@@ -35,10 +35,10 @@ const AdminSermonsScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
-  const editPasteurModalRef = useRef<EditPasteurModal>(null);
+  const editPastorModalRef = useRef<EditPastorModal>(null);
   const editSermonModalRef = useRef<EditSermonModal>(null);
 
-  const [havePasteurs, setHavePasteurs] = useState(false);
+  const [havePastors, setHavePastors] = useState(false);
   const allLoaded = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
   const lastDocument = useRef<FirebaseFirestoreTypes.DocumentData>();
@@ -76,8 +76,8 @@ const AdminSermonsScreen = ({ navigation }: Props) => {
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      const c = await getDocumentCount('Pasteurs');
-      setHavePasteurs(c > 0);
+      const c = await getDocumentCount('Pastors');
+      setHavePastors(c > 0);
       setIsLoading(false);
     })();
   }, []);
@@ -98,7 +98,7 @@ const AdminSermonsScreen = ({ navigation }: Props) => {
                   size={28}
                 />
               }
-              disabled={!havePasteurs}
+              disabled={!havePastors}
               disabledStyle={theme.styles.buttonClearDisabled}
               onPress={() => editSermonModalRef.current?.present('New Sermon')}
             />
@@ -107,7 +107,7 @@ const AdminSermonsScreen = ({ navigation }: Props) => {
       });
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [havePasteurs]);
+  }, [havePastors]);
 
   const confirmDeleteSermon = async (id: string) => {
     Alert.alert(
@@ -200,7 +200,7 @@ const AdminSermonsScreen = ({ navigation }: Props) => {
 
   return (
     <SafeAreaView edges={['left', 'right']} style={theme.styles.view}>
-      {havePasteurs ? (
+      {havePastors ? (
         <FlatList
           data={sermons}
           renderItem={renderSermon}
@@ -219,18 +219,18 @@ const AdminSermonsScreen = ({ navigation }: Props) => {
           contentInsetAdjustmentBehavior={'automatic'}>
           <Divider
             type={'note'}
-            text={'There must be at least one pasteur to create a sermon.'}
+            text={'There must be at least one pastor to create a sermon.'}
           />
           <ListItem
-            title={'Add a pasteur'}
+            title={'Add a pastor'}
             position={['first', 'last']}
             leftImage={'account-outline'}
             leftImageType={'material-community'}
-            onPress={() => editPasteurModalRef.current?.present('New Pasteur')}
+            onPress={() => editPastorModalRef.current?.present('New Pastor')}
           />
         </ScrollView>
       )}
-      <EditPasteurModal ref={editPasteurModalRef} />
+      <EditPastorModal ref={editPastorModalRef} />
       <EditSermonModal ref={editSermonModalRef} />
     </SafeAreaView>
   );

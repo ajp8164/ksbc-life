@@ -11,39 +11,39 @@ import { Button, Icon } from '@rneui/base';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  deletePasteur,
-  getPasteurs,
-  pasteursCollectionChangeListener,
+  deletePastor,
+  getPastors,
+  pastorsCollectionChangeListener,
 } from 'firebase/firestore';
 
-import { EditPasteurModal } from 'components/admin/modals/EditPasteurModal';
+import { EditPastorModal } from 'components/admin/modals/EditPastorModal';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { MoreNavigatorParamList } from 'types/navigation';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Pasteur } from 'types/pasteur';
+import { Pastor } from 'types/pastor';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { makeStyles } from '@rneui/themed';
 
-type Props = NativeStackScreenProps<MoreNavigatorParamList, 'AdminPasteurs'>;
+type Props = NativeStackScreenProps<MoreNavigatorParamList, 'AdminPastors'>;
 
-const AdminPasteursScreen = ({ navigation }: Props) => {
+const AdminPastorsScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
-  const editPasteurModalRef = useRef<EditPasteurModal>(null);
+  const editPastorModalRef = useRef<EditPastorModal>(null);
   const allLoaded = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
   const lastDocument = useRef<FirebaseFirestoreTypes.DocumentData>();
-  const [pasteurs, setPasteurs] = useState<Pasteur[]>([]);
+  const [pastors, setPastors] = useState<Pastor[]>([]);
 
   useEffect(() => {
-    const subscription = pasteursCollectionChangeListener(
+    const subscription = pastorsCollectionChangeListener(
       snapshot => {
-        const updated: Pasteur[] = [];
+        const updated: Pastor[] = [];
         snapshot.docs.forEach(d => {
-          updated.push({ ...d.data(), id: d.id } as Pasteur);
+          updated.push({ ...d.data(), id: d.id } as Pastor);
         });
-        setPasteurs(updated);
+        setPastors(updated);
         lastDocument.current = snapshot.docs[snapshot.docs.length - 1];
         allLoaded.current = false;
       },
@@ -52,12 +52,12 @@ const AdminPasteursScreen = ({ navigation }: Props) => {
     return subscription;
   }, []);
 
-  const getMorePasteurs = async () => {
+  const getMorePastors = async () => {
     if (!allLoaded.current) {
       setIsLoading(true);
-      const s = await getPasteurs({ lastDocument: lastDocument.current });
+      const s = await getPastors({ lastDocument: lastDocument.current });
       lastDocument.current = s.lastDocument;
-      setPasteurs(pasteurs.concat(s.result));
+      setPastors(pastors.concat(s.result));
       allLoaded.current = s.allLoaded;
       setIsLoading(false);
     }
@@ -78,7 +78,7 @@ const AdminPasteursScreen = ({ navigation }: Props) => {
                 size={28}
               />
             }
-            onPress={() => editPasteurModalRef.current?.present('New Pasteur')}
+            onPress={() => editPastorModalRef.current?.present('New Pastor')}
           />
         </>
       ),
@@ -86,14 +86,14 @@ const AdminPasteursScreen = ({ navigation }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const confirmDeletePasteur = async (id: string) => {
+  const confirmDeletePastor = async (id: string) => {
     Alert.alert(
-      'Confirm Delete Pasteur',
-      'Are you sure you want to delete this pasteur?',
+      'Confirm Delete Pastor',
+      'Are you sure you want to delete this pastor?',
       [
         {
           text: 'Yes, delete',
-          onPress: () => deletePasteur(id),
+          onPress: () => deletePastor(id),
           style: 'destructive',
         },
         { text: 'No', style: 'cancel' },
@@ -102,7 +102,7 @@ const AdminPasteursScreen = ({ navigation }: Props) => {
     );
   };
 
-  const renderPasteur: ListRenderItem<Pasteur> = ({ item, index }) => {
+  const renderPastor: ListRenderItem<Pastor> = ({ item, index }) => {
     return (
       <ListItem
         key={index}
@@ -110,7 +110,7 @@ const AdminPasteursScreen = ({ navigation }: Props) => {
         subtitle={item.title ? item.title : undefined}
         position={[
           index === 0 ? 'first' : undefined,
-          index === pasteurs.length - 1 ? 'last' : undefined,
+          index === pastors.length - 1 ? 'last' : undefined,
         ]}
         leftImage={'account-outline'}
         leftImageType={'material-community'}
@@ -130,11 +130,11 @@ const AdminPasteursScreen = ({ navigation }: Props) => {
                 <Text style={s.drawerText}>{'Delete'}</Text>
               </>
             ),
-            onPress: () => confirmDeletePasteur(item.id || ''),
+            onPress: () => confirmDeletePastor(item.id || ''),
           },
         ]}
         onPress={() =>
-          editPasteurModalRef.current?.present('Edit Pasteur', item)
+          editPastorModalRef.current?.present('Edit Pastor', item)
         }
       />
     );
@@ -144,11 +144,11 @@ const AdminPasteursScreen = ({ navigation }: Props) => {
     if (isLoading) return null;
     return (
       <ListItem
-        title={'Add a pasteur'}
+        title={'Add a pastor'}
         position={['first', 'last']}
         leftImage={'cross-outline'}
         leftImageType={'material-community'}
-        onPress={() => editPasteurModalRef.current?.present('New Pasteur')}
+        onPress={() => editPastorModalRef.current?.present('New Pastor')}
       />
     );
   };
@@ -168,18 +168,18 @@ const AdminPasteursScreen = ({ navigation }: Props) => {
   return (
     <SafeAreaView edges={['left', 'right']} style={theme.styles.view}>
       <FlatList
-        data={pasteurs}
-        renderItem={renderPasteur}
+        data={pastors}
+        renderItem={renderPastor}
         keyExtractor={(_item, index) => `${index}`}
         ListEmptyComponent={renderListEmptyComponent}
         ListFooterComponent={renderListFooterComponent}
         ListHeaderComponent={<Divider />}
         contentInsetAdjustmentBehavior={'automatic'}
         showsVerticalScrollIndicator={false}
-        onEndReached={getMorePasteurs}
+        onEndReached={getMorePastors}
         onEndReachedThreshold={0.2}
       />
-      <EditPasteurModal ref={editPasteurModalRef} />
+      <EditPastorModal ref={editPastorModalRef} />
     </SafeAreaView>
   );
 };
@@ -195,4 +195,4 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   },
 }));
 
-export default AdminPasteursScreen;
+export default AdminPastorsScreen;

@@ -139,7 +139,7 @@ const SermonDetailScreen = ({ navigation, route }: Props) => {
                 })}
               {renderDescriptionItem({
                 iconName: 'account-circle-outline',
-                text: sermon.pasteur,
+                text: sermon.pastor,
               })}
               {renderDescriptionItem({
                 iconName: 'calendar-today',

@@ -5,7 +5,7 @@ export * from './groups';
 export * from './listeners';
 export * from './locations';
 export * from './pageContentItems';
-export * from './pasteurs';
+export * from './pastors';
 export * from './sermonVideos';
 export * from './sermons';
 export * from './subscriptions';

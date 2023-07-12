@@ -1,4 +1,4 @@
-export type Pasteur = {
+export type Pastor = {
   id?: string;
   firstName: string;
   lastName: string;

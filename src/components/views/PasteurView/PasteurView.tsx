@@ -1,5 +1,5 @@
 import { AppTheme, useTheme } from 'theme';
-import { PasteurViewMethods, PasteurViewProps } from './types';
+import { PastorViewMethods, PastorViewProps } from './types';
 import { ScrollView, Text } from 'react-native';
 
 import { Image } from '@rneui/base';
@@ -7,11 +7,11 @@ import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { makeStyles } from '@rneui/themed';
 
-type PasteurView = PasteurViewMethods;
+type PastorView = PastorViewMethods;
 
-const PasteurView = React.forwardRef<PasteurView, PasteurViewProps>(
+const PastorView = React.forwardRef<PastorView, PastorViewProps>(
   (props, _ref) => {
-    const { pasteur } = props;
+    const { pastor } = props;
     const theme = useTheme();
     const s = useStyles(theme);
 
@@ -22,13 +22,13 @@ const PasteurView = React.forwardRef<PasteurView, PasteurViewProps>(
           contentContainerStyle={{ marginTop: 15 }}
           contentInsetAdjustmentBehavior={'automatic'}>
           <Text
-            style={s.text}>{`${pasteur.firstName} ${pasteur.lastName}`}</Text>
-          <Text style={s.text}>{pasteur.title}</Text>
-          <Text style={s.text}>{pasteur.email}</Text>
-          <Text style={s.text}>{pasteur.phone}</Text>
-          <Text style={s.bioText}>{pasteur.biography}</Text>
+            style={s.text}>{`${pastor.firstName} ${pastor.lastName}`}</Text>
+          <Text style={s.text}>{pastor.title}</Text>
+          <Text style={s.text}>{pastor.email}</Text>
+          <Text style={s.text}>{pastor.phone}</Text>
+          <Text style={s.bioText}>{pastor.biography}</Text>
           <Image
-            source={{ uri: pasteur.photoUrl }}
+            source={{ uri: pastor.photoUrl }}
             containerStyle={{ width: 100, height: 100 }}
           />
         </ScrollView>
@@ -47,4 +47,4 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   },
 }));
 
-export default PasteurView;
+export default PastorView;

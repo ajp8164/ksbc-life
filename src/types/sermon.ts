@@ -10,7 +10,7 @@ export type Sermon = {
   id?: string;
   date: ISODateString;
   title: string;
-  pasteur: string;
+  pastor: string;
   seriesTitle?: string;
   bibleReference?: BibleReference;
   lifeApplication?: LifeApplication;

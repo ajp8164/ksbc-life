@@ -31,7 +31,7 @@ export type MoreNavigatorParamList = {
   AdminPageContent: {
     pageName: PageContentItemAssignment;
   };
-  AdminPasteurs: undefined;
+  AdminPastors: undefined;
   AdminSermons: undefined;
   AdminSermonVideos: undefined;
   AdminUsers: undefined;

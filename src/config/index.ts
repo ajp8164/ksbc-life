@@ -21,7 +21,7 @@ export interface AppConfig
   storageImageChurch: string;
   storageImageGroups: string;
   storageImageLocations: string;
-  storageImagePasteurs: string;
+  storageImagePastors: string;
   storageImagePageContentItems: string;
   storageSchemaVersion: number;
   storageVideoChat: string;
@@ -53,7 +53,7 @@ export const appConfig: AppConfig = {
   storageImageChurch: Config.STORAGE_IMAGE_CHURCH || '',
   storageImageGroups: Config.STORAGE_IMAGE_GROUPS || '',
   storageImageLocations: Config.STORAGE_IMAGE_LOCATIONS || '',
-  storageImagePasteurs: Config.STORAGE_IMAGE_PASTEURS || '',
+  storageImagePastors: Config.STORAGE_IMAGE_PASTORS || '',
   storageImagePageContentItems: Config.STORAGE_IMAGE_SCREEN_CONTENT_ITEMS || '',
   storageSchemaVersion: Number(Config.STORAGE_SCHEMA_VERSION) || 0,
   storageVideoChat: Config.STORAGE_VIDEO_CHAT || '',

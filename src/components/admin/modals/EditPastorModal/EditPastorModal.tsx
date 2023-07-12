@@ -1,24 +1,24 @@
-import { EditPasteurModalMethods, EditPasteurModalProps } from './types';
+import { EditPastorModalMethods, EditPastorModalProps } from './types';
 import { Modal, ModalHeader } from '@react-native-ajp-elements/ui';
-import PasteurEditorView, {
+import PastorEditorView, {
   EditorState,
-} from 'components/admin/views/PasteurEditorView';
+} from 'components/admin/views/PastorEditorView';
 import React, { useImperativeHandle, useRef, useState } from 'react';
 
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
-import { Pasteur } from 'types/pasteur';
+import { Pastor } from 'types/pastor';
 
-type EditPasteurModal = EditPasteurModalMethods;
+type EditPastorModal = EditPastorModalMethods;
 
-const EditPasteurModal = React.forwardRef<
-  EditPasteurModal,
-  EditPasteurModalProps
+const EditPastorModal = React.forwardRef<
+  EditPastorModal,
+  EditPastorModalProps
 >((_props, ref) => {
   const innerRef = useRef<BottomSheetModalMethods>(null);
-  const pasteurEditorViewRef = useRef<PasteurEditorView>(null);
+  const pastorEditorViewRef = useRef<PastorEditorView>(null);
 
   const [editorState, setEditorState] = useState({} as EditorState);
-  const [pasteur, setPasteur] = useState<Pasteur>();
+  const [pastor, setPastor] = useState<Pastor>();
   const [title, setTitle] = useState('');
 
   useImperativeHandle(ref, () => ({
@@ -31,9 +31,9 @@ const EditPasteurModal = React.forwardRef<
     innerRef.current?.dismiss();
   };
 
-  const present = (title: string, pasteur?: Pasteur) => {
+  const present = (title: string, pastor?: Pastor) => {
     setTitle(title);
-    setPasteur(pasteur);
+    setPastor(pastor);
     innerRef.current?.present();
   };
 
@@ -44,21 +44,21 @@ const EditPasteurModal = React.forwardRef<
         rightButtonText={'Save'}
         rightButtonDisabled={!editorState.changed}
         onRightButtonPress={() =>
-          pasteurEditorViewRef.current
-            ?.savePasteur()
+          pastorEditorViewRef.current
+            ?.savePastor()
             .then(dismiss)
             .catch(() => {
               // Nothing to do. Prevent unhandled promise.
             })
         }
       />
-      <PasteurEditorView
-        ref={pasteurEditorViewRef}
-        pasteur={pasteur}
+      <PastorEditorView
+        ref={pastorEditorViewRef}
+        pastor={pastor}
         onEditorStateChange={setEditorState}
       />
     </Modal>
   );
 });
 
-export { EditPasteurModal };
+export { EditPastorModal };
