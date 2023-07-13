@@ -9,7 +9,6 @@ import { store } from 'store';
 export const getGroupAvatarColor = (groupId: string, colors: string[]) =>
   colors[hash(groupId) % colors.length];
 
-// Returns a group name using cached user profiles.
 export const getGroupName = (
   group: Group,
   userProfiles: UserProfile[],

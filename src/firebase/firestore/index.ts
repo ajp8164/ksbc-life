@@ -2,7 +2,6 @@ export * from './base';
 export * from './chatMessages';
 export * from './churches';
 export * from './groups';
-export * from './listeners';
 export * from './locations';
 export * from './pageContentItems';
 export * from './pastors';
