@@ -1,21 +1,21 @@
-import { EditGroupModalMethods, EditGroupModalProps } from './types';
-import GroupEditorView, {
+import { GroupModalMethods, GroupModalProps } from './types';
+import GroupView, {
   EditorState,
-  GroupEditorViewMethods,
-} from 'components/views/GroupEditorView';
+  GroupViewMethods,
+} from 'components/views/GroupView';
 import { Modal, ModalHeader } from '@react-native-ajp-elements/ui';
 import React, { useImperativeHandle, useRef, useState } from 'react';
 
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 
-type EditGroupModal = EditGroupModalMethods;
+type GroupModal = GroupModalMethods;
 
-const EditGroupModal = React.forwardRef<EditGroupModal, EditGroupModalProps>(
+const GroupModal = React.forwardRef<GroupModal, GroupModalProps>(
   (props, ref) => {
     const { group, snapPoints = ['92%'] } = props;
 
     const innerRef = useRef<BottomSheetModalMethods>(null);
-    const groupEditorViewRef = useRef<GroupEditorViewMethods>(null);
+    const groupEditorViewRef = useRef<GroupViewMethods>(null);
 
     const [editorState, setEditorState] = useState({} as EditorState);
 
@@ -41,7 +41,7 @@ const EditGroupModal = React.forwardRef<EditGroupModal, EditGroupModalProps>(
           rightButtonBusy={editorState.isSubmitting}
           onRightButtonPress={dismiss}
         />
-        <GroupEditorView
+        <GroupView
           ref={groupEditorViewRef}
           group={group}
           onEditorStateChange={setEditorState}
@@ -51,4 +51,4 @@ const EditGroupModal = React.forwardRef<EditGroupModal, EditGroupModalProps>(
   },
 );
 
-export { EditGroupModal };
+export { GroupModal };

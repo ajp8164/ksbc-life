@@ -4,8 +4,8 @@ import { getGroupName, getGroupUserProfiles } from 'lib/group';
 import { useEffect, useRef, useState } from 'react';
 
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
-import { EditGroupModal } from 'components/modals/EditGroupModal';
 import { ExtendedGroup } from 'types/group';
+import { GroupModal } from 'components/modals/GroupModal';
 import { Icon } from '@rneui/base';
 import { ellipsis } from '@react-native-ajp-elements/core';
 import { makeStyles } from '@rneui/themed';
@@ -18,7 +18,7 @@ export const ChatHeaderTitle = ({ group }: ChatHeaderTitleInterface) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
-  const editGroupModalRef = useRef<EditGroupModal>(null);
+  const groupModalRef = useRef<GroupModal>(null);
   const [groupName, setGroupName] = useState('');
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export const ChatHeaderTitle = ({ group }: ChatHeaderTitleInterface) => {
       <TouchableWithoutFeedback
         onPress={() => {
           Keyboard.dismiss();
-          editGroupModalRef.current?.present();
+          groupModalRef.current?.present();
         }}>
         <View style={s.container}>
           <ChatAvatar
@@ -57,7 +57,7 @@ export const ChatHeaderTitle = ({ group }: ChatHeaderTitleInterface) => {
           </View>
         </View>
       </TouchableWithoutFeedback>
-      <EditGroupModal ref={editGroupModalRef} group={group} />
+      <GroupModal ref={groupModalRef} group={group} />
     </>
   );
 };

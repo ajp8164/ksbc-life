@@ -1,19 +1,19 @@
 import React from 'react';
 
-export declare type EditGroupModal = EditGroupModalMethods;
+export declare type GroupModal = GroupModalMethods;
 
 declare const LegalModal: React.MemoExoticComponent<
   React.ForwardRefExoticComponent<
-    EditGroupModalProps & React.RefAttributes<EditGroupModalMethods>
+    GroupModalProps & React.RefAttributes<GroupModalMethods>
   >
 >;
 
-export interface EditGroupModalProps {
+export interface GroupModalProps {
   group: Group;
   snapPoints?: (string | number)[];
 }
 
-export interface EditGroupModalMethods {
+export interface GroupModalMethods {
   dismiss: () => void;
   present: () => void;
 }

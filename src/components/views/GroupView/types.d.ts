@@ -1,21 +1,21 @@
 import { Group } from 'types/group';
 import React from 'react';
 
-export declare type GroupEditorView = GroupEditorViewMethods;
+export declare type GroupView = GroupViewMethods;
 
-declare const GroupEditorView: React.MemoExoticComponent<
+declare const GroupView: React.MemoExoticComponent<
   React.ForwardRefExoticComponent<
-    GroupEditorViewProps & React.RefAttributes<GroupEditorViewMethods>
+    GroupViewProps & React.RefAttributes<GroupViewMethods>
   >
 >;
 
-export interface GroupEditorViewProps {
+export interface GroupViewProps {
   group: Group;
   onEditorStateChange?: (editorState: EditorState) => void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface GroupEditorViewMethods {}
+export interface GroupViewMethods {}
 
 export interface EditorState {
   isSubmitting: boolean;
