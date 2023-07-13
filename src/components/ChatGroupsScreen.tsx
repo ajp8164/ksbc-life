@@ -129,13 +129,13 @@ const ChatGroupsScreen = ({ navigation }: Props) => {
     );
   };
 
-  const cleanGroup = (extendedGroup: ExtendedGroup) => {
-    // Removes any extended properties from the group.
-    const cleanGroup = Object.assign({}, extendedGroup);
-    delete cleanGroup.calculatedName;
-    delete cleanGroup.userProfiles;
-    return cleanGroup as Group;
-  };
+  // const cleanGroup = (extendedGroup: ExtendedGroup) => {
+  //   // Removes any extended properties from the group.
+  //   const cleanGroup = Object.assign({}, extendedGroup);
+  //   delete cleanGroup.calculatedName;
+  //   delete cleanGroup.userProfiles;
+  //   return cleanGroup as Group;
+  // };
 
   const renderGroup: ListRenderItem<ExtendedGroup> = ({
     item: group,
@@ -175,11 +175,7 @@ const ChatGroupsScreen = ({ navigation }: Props) => {
           index === 0 ? 'first' : undefined,
           index === groups.length - 1 ? 'last' : undefined,
         ]}
-        onPress={() =>
-          navigation.navigate('ChatThread', {
-            group: cleanGroup(group),
-          })
-        }
+        onPress={() => navigation.navigate('ChatThread', { group })}
       />
     );
   };

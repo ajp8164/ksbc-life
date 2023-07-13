@@ -1,5 +1,6 @@
+import { ExtendedGroup, Group } from 'types/group';
+
 import { ContentView } from 'types/content';
-import { Group } from 'types/group';
 import { NavigatorScreenParams } from '@react-navigation/core';
 import { PageContentItemAssignment } from 'types/pageContentItem';
 import { Sermon } from 'types/sermon';
@@ -13,7 +14,7 @@ export enum StartupScreen {
 export type ChatNavigatorParamList = {
   ChatGroups: undefined;
   ChatThread: {
-    group?: Group;
+    group?: ExtendedGroup;
     myGroups?: Group[];
   };
 };

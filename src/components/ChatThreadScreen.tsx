@@ -2,6 +2,7 @@ import Animated, { SlideOutUp } from 'react-native-reanimated';
 import { AppTheme, useTheme } from 'theme';
 import { Button, Icon } from '@rneui/base';
 import { Chat, MessageType } from '@flyerhq/react-native-chat-ui';
+import { ExtendedGroup, Group } from 'types/group';
 import { FirestoreMessageType, SearchCriteria, SearchScope } from 'types/chat';
 import { FlatList, Keyboard, ListRenderItem, Text, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
@@ -28,7 +29,6 @@ import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { ChatHeaderTitle } from 'components/molecules/ChatHeaderTitle';
 import { ChatNavigatorParamList } from 'types/navigation';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
-import { Group } from 'types/group';
 import { Incubator } from 'react-native-ui-lib';
 import { ListItem } from '@react-native-ajp-elements/ui';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -299,7 +299,6 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
           lodash.sortBy(g.members),
         );
       });
-      console.log('group', group);
 
       if (group) {
         setGroup(group);
@@ -472,7 +471,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
     return getMoreChatMessages();
   };
 
-  const renderHeaderTitle = (group: Group) => {
+  const renderHeaderTitle = (group: ExtendedGroup) => {
     return <ChatHeaderTitle group={group} />;
   };
 
