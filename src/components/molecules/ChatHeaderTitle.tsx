@@ -1,13 +1,14 @@
 import { AppTheme, useTheme } from 'theme';
 import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { getGroupName, getGroupUserProfiles } from 'lib/group';
+import { useRef, useState } from 'react';
 
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { EditGroupModal } from 'components/modals/EditGroupModal';
 import { Group } from 'types/group';
 import { Icon } from '@rneui/base';
-import { getGroupName } from 'lib/group';
+import { ellipsis } from '@react-native-ajp-elements/core';
 import { makeStyles } from '@rneui/themed';
-import { useRef } from 'react';
 
 interface ChatHeaderTitleInterface {
   group: Group;
@@ -18,6 +19,12 @@ export const ChatHeaderTitle = ({ group }: ChatHeaderTitleInterface) => {
   const s = useStyles(theme);
 
   const editGroupModalRef = useRef<EditGroupModal>(null);
+  const [groupName, setGroupName] = useState('');
+
+  getGroupUserProfiles(group.members).then(userProfiles => {
+    const name = getGroupName(group, userProfiles, { type: 'short' });
+    setGroupName(name);
+  });
 
   return (
     <>
@@ -34,9 +41,7 @@ export const ChatHeaderTitle = ({ group }: ChatHeaderTitleInterface) => {
           />
           <View style={s.titleStatusContainer}>
             <View style={{ flexDirection: 'row' }}>
-              <Text style={s.title}>
-                {group && `${getGroupName(group, { type: 'short' })}`}
-              </Text>
+              <Text style={s.title}>{ellipsis(groupName, 25)}</Text>
               <Icon
                 name="chevron-down"
                 type={'material-community'}

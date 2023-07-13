@@ -28,6 +28,7 @@ import {
   uploadImage,
 } from 'firebase/storage';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { getGroupName, getGroupUserProfiles } from 'lib/group';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
@@ -35,12 +36,8 @@ import { Group } from 'types/group';
 import { UserProfile } from 'types/user';
 import { appConfig } from 'config';
 import { saveGroup as commitGroup } from 'firebase/firestore';
-import { getGroupName } from 'lib/group';
 import { makeStyles } from '@rneui/themed';
 import { openComposer } from 'react-native-email-link';
-import { selectUserProfile } from 'store/selectors/userSelectors';
-import { selectUserProfilesCache } from 'store/selectors/cacheSelectors';
-import { useSelector } from 'react-redux';
 import { useSetState } from '@react-native-ajp-elements/core';
 
 type GroupEditorView = GroupEditorViewMethods;
@@ -55,9 +52,6 @@ const GroupEditorView = React.forwardRef<GroupEditorView, GroupEditorViewProps>(
     const groupImageAsset = useRef<ImagePicker.Asset>();
     const groupImageUrl = useRef(group.photoUrl);
     const [groupName, setGroupName] = useState(group.name);
-
-    const me = useSelector(selectUserProfile);
-    const userProfiles = useSelector(selectUserProfilesCache);
     const [groupUserProfiles, setGroupUserProfiles] = useState<UserProfile[]>();
 
     const [editorState, setEditorState] = useSetState<EditorState>({
@@ -80,7 +74,9 @@ const GroupEditorView = React.forwardRef<GroupEditorView, GroupEditorViewProps>(
     }, [group]);
 
     useEffect(() => {
-      setGroupUserProfiles(getGroupUserProfiles());
+      getGroupUserProfiles(group.members).then(userProfiles => {
+        setGroupUserProfiles(userProfiles);
+      });
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -93,6 +89,7 @@ const GroupEditorView = React.forwardRef<GroupEditorView, GroupEditorViewProps>(
 
       try {
         await commitGroup(g);
+        setEditorState({ isSubmitting: false });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
         setEditorState({ isSubmitting: false });
@@ -165,19 +162,6 @@ const GroupEditorView = React.forwardRef<GroupEditorView, GroupEditorViewProps>(
       }).catch(() => {
         //
       });
-    };
-
-    const getGroupUserProfiles = () => {
-      const u: UserProfile[] = [];
-      group.members.forEach(id => {
-        if (id !== me?.id) {
-          const p = userProfiles.find(u => id === u.id);
-          if (p) {
-            u.push(p);
-          }
-        }
-      });
-      return u;
     };
 
     const renderGroupMember: ListRenderItem<UserProfile> = ({
@@ -264,7 +248,11 @@ const GroupEditorView = React.forwardRef<GroupEditorView, GroupEditorViewProps>(
                   size={'giant'}
                   avatarStyle={s.avatar}
                 />
-                <Text style={s.groupNameText}>{getGroupName(group)}</Text>
+                <Text style={s.groupNameText}>
+                  {groupUserProfiles
+                    ? getGroupName(group, groupUserProfiles)
+                    : ''}
+                </Text>
               </View>
             )}
             <Divider text={'GROUP MEMBERS'} style={{ marginTop: 30 }} />
@@ -292,6 +280,7 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
     ...theme.styles.textXL,
     ...theme.styles.textBold,
     textAlign: 'center',
+    height: 50,
   },
 }));
 

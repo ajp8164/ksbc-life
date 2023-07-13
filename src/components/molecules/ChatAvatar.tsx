@@ -2,19 +2,18 @@ import { AppTheme, useTheme } from 'theme';
 import { Avatar, Icon } from '@rneui/base';
 import { TextStyle, ViewStyle } from 'react-native';
 
-import { Group } from 'types/group';
+import { ExtendedGroup } from 'types/group';
 import { UserProfile } from 'types/user';
 import { fontFamily } from '@react-native-ajp-elements/ui';
 import { fontSizes } from 'theme/styles';
 import lodash from 'lodash';
 import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
-import { selectUserProfilesCache } from 'store/selectors/cacheSelectors';
 import { useSelector } from 'react-redux';
 
 interface ChatAvatarInterface {
   avatarStyle?: ViewStyle;
-  group?: Group;
+  group?: ExtendedGroup;
   onPress?: () => void;
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'giant';
   titleStyle?: TextStyle;
@@ -33,7 +32,6 @@ export const ChatAvatar = ({
   const s = useStyles(theme);
 
   const me = useSelector(selectUserProfile);
-  const userProfiles = useSelector(selectUserProfilesCache);
 
   const _avatarStyle =
     size === 'tiny'
@@ -69,7 +67,25 @@ export const ChatAvatar = ({
       : 42;
 
   const renderUserAvatar = (userProfile?: UserProfile) => {
-    if (userProfile?.photoUrl.length) {
+    if (!userProfile) {
+      return (
+        <Avatar
+          icon={{
+            name: 'account-outline',
+            type: 'material-community',
+            size: 30,
+            color: theme.colors.white,
+          }}
+          imageProps={{ resizeMode: 'contain' }}
+          containerStyle={{
+            ..._avatarStyle,
+            backgroundColor: theme.colors.subtleGray,
+            ...avatarStyle,
+          }}
+          onPress={onPress}
+        />
+      );
+    } else if (userProfile?.photoUrl.length) {
       return (
         <Avatar
           source={{ uri: userProfile.photoUrl }}
@@ -159,7 +175,7 @@ export const ChatAvatar = ({
       return id !== u?.id;
     })[0];
 
-    u = lodash.find(userProfiles, u => {
+    u = lodash.find(group.userProfiles, u => {
       return u.id === uid;
     });
   }

@@ -4,7 +4,7 @@ import { dispatch } from 'store';
 import { groupsCollectionChangeListener } from 'firebase/firestore';
 import { log } from '@react-native-ajp-elements/core';
 
-export const addGroupsCollectionListener = async () => {
+export const addGroupsCollectionListener = () => {
   groupsCollectionChangeListener(snapshot => {
     if (snapshot.docChanges().length === 0) return;
 

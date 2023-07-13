@@ -1,3 +1,5 @@
+import { UserProfile } from 'types/user';
+
 export type GroupNameSize = 'short' | 'long';
 
 export type Group = {
@@ -22,4 +24,9 @@ export type Group = {
     //List of group member ids that have read this message
     readBy: string[];
   };
+};
+
+export type ExtendedGroup = Group & {
+  calculatedName?: string;
+  userProfiles?: UserProfile[];
 };

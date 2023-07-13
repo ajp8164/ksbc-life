@@ -50,9 +50,12 @@ import { useSelector } from 'react-redux';
 const initialSearchCriteria = { text: '', scope: SearchScope.Username };
 const minimumRequiredCharsForSearch = 2;
 
-export type Props = NativeStackScreenProps<ChatNavigatorParamList, 'ChatGroup'>;
+export type Props = NativeStackScreenProps<
+  ChatNavigatorParamList,
+  'ChatThread'
+>;
 
-const ChatGroupScreen = ({ navigation, route }: Props) => {
+const ChatThreadScreen = ({ navigation, route }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
@@ -290,7 +293,7 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
 
     if (added.length) {
       // All members of the group include me.
-      // Uniqu covers case when I added myself (avoiding adding myself twice).
+      // Uniq covers case when I added myself (avoiding adding myself twice).
       const members = lodash.uniq(added.concat(userProfile?.id)).sort();
       const groupsCache = store.getState().cache.groups;
       const group = groupsCache.find(g => {
@@ -333,11 +336,12 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
         return u.id;
       }),
     ) as string[];
-    const groupName = getGroupMembersLongStr(memberIds);
+
+    const groupName = getGroupMembersLongStr(members);
 
     const newGroup = {
       createdBy: userProfile?.id,
-      name: '', // A custom name other than a list of members.
+      name: groupName,
       type: 'private',
       members: memberIds,
       leaders: [userProfile?.id],
@@ -598,7 +602,9 @@ const ChatGroupScreen = ({ navigation, route }: Props) => {
 };
 
 const useStyles = makeStyles((_theme, theme: AppTheme) => ({
-  emptyListContainer: {},
+  emptyListContainer: {
+    marginTop: '50%',
+  },
   groupComposerContainer: {
     position: 'absolute',
     width: '100%',
@@ -630,4 +636,4 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   },
 }));
 
-export default ChatGroupScreen;
+export default ChatThreadScreen;

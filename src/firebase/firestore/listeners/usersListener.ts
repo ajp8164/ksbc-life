@@ -6,7 +6,7 @@ import { log } from '@react-native-ajp-elements/core';
 import { updateUserProfile } from 'store/slices/user';
 import { usersCollectionChangeListener } from 'firebase/firestore';
 
-export const addUsersCollectionListener = async () => {
+export const addUsersCollectionListener = () => {
   usersCollectionChangeListener(snapshot => {
     if (snapshot.docChanges().length === 0) return;
 

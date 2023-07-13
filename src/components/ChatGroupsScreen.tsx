@@ -1,33 +1,31 @@
 import { AppTheme, useTheme } from 'theme';
 import { Button, Icon } from '@rneui/base';
 import { Divider, ListItem } from '@react-native-ajp-elements/ui';
+import { ExtendedGroup, Group } from 'types/group';
 import { FlatList, ListRenderItem, ScrollView, View } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
+import { getGroupName, getGroupUserProfiles } from 'lib/group';
 
 import { AuthContext } from 'lib/auth';
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { ChatNavigatorParamList } from 'types/navigation';
 import { DateTime } from 'luxon';
-import { Group } from 'types/group';
 import InfoMessage from 'components/atoms/InfoMessage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import NoItems from 'components/atoms/NoItems';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getGroupName } from 'lib/group';
 import { getRelativeDate } from 'lib/relativeDate';
 import { groupsCollectionChangeListener } from 'firebase/firestore';
 import { makeStyles } from '@rneui/themed';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { useSelector } from 'react-redux';
 
-type ExtendedGroup = Group & { calculatedName?: string };
-
 export type Props = NativeStackScreenProps<
   ChatNavigatorParamList,
-  'ChatGroupList'
+  'ChatGroups'
 >;
 
-const ChatGroupListScreen = ({ navigation }: Props) => {
+const ChatGroupsScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
@@ -52,7 +50,7 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
               size={28}
             />
           }
-          onPress={() => navigation.navigate('ChatGroup', {})}
+          onPress={() => navigation.navigate('ChatThread', {})}
         />
       ),
     });
@@ -66,9 +64,9 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
     setGroups([]);
 
     const subscription = groupsCollectionChangeListener(
-      snapshot => {
+      async snapshot => {
         if (snapshot.docChanges().length === 0) {
-          isLoading ? setIsLoading(false) : null;
+          // isLoading ? setIsLoading(false) : null;
           return;
         }
 
@@ -76,8 +74,10 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
         snapshot.docs.forEach(d => {
           updated.push({ ...d.data(), id: d.id } as Group);
         });
-        setGroups(prepareGroups(updated));
-        isLoading ? setIsLoading(false) : null;
+        prepareGroups(updated).then(exGroups => {
+          setGroups(exGroups);
+          isLoading ? setIsLoading(false) : null;
+        });
       },
       {
         where: [
@@ -94,16 +94,21 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userProfile?.role]);
 
-  const prepareGroups = (groups: Group[]): ExtendedGroup[] => {
+  const prepareGroups = async (groups: Group[]): Promise<ExtendedGroup[]> => {
+    const exGroups = await Promise.all(
+      (groups as ExtendedGroup[]).map(async g => {
+        const groupUserProfiles = await getGroupUserProfiles(g.members);
+        return {
+          ...g,
+          calculatedName: getGroupName(g, groupUserProfiles),
+          userProfiles: groupUserProfiles,
+        };
+      }),
+    );
+
+    // Sort by latest message time.
     return (
-      (groups as ExtendedGroup[])
-        .map(g => {
-          return {
-            ...g,
-            calculatedName: getGroupName(g),
-          };
-        })
-        // Sort by latest message time.
+      exGroups
         .sort((a, b) => {
           return a.latestMessageSnippet?.createdAt &&
             b.latestMessageSnippet?.createdAt
@@ -123,9 +128,10 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
   };
 
   const cleanGroup = (extendedGroup: ExtendedGroup) => {
-    // Removes any locally defined properties from the group.
+    // Removes any extended properties from the group.
     const cleanGroup = Object.assign({}, extendedGroup);
     delete cleanGroup.calculatedName;
+    delete cleanGroup.userProfiles;
     return cleanGroup as Group;
   };
 
@@ -168,7 +174,7 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
           index === groups.length - 1 ? 'last' : undefined,
         ]}
         onPress={() =>
-          navigation.navigate('ChatGroup', {
+          navigation.navigate('ChatThread', {
             group: cleanGroup(group),
           })
         }
@@ -177,10 +183,9 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
   };
 
   const renderListEmptyComponent = () => {
-    if (isLoading) return null;
     return (
       <View style={s.emptyListContainer}>
-        <NoItems title={'No groups'} />
+        {isLoading ? <NoItems isLoading /> : <NoItems title={'No groups'} />}
       </View>
     );
   };
@@ -222,7 +227,9 @@ const ChatGroupListScreen = ({ navigation }: Props) => {
 };
 
 const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
-  emptyListContainer: {},
+  emptyListContainer: {
+    marginTop: '50%',
+  },
   title: {
     left: 20,
     width: '78%',
@@ -232,4 +239,4 @@ const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
   },
 }));
 
-export default ChatGroupListScreen;
+export default ChatGroupsScreen;
