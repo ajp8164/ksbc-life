@@ -43,7 +43,6 @@ import { makeStyles } from '@rneui/themed';
 import notifee from '@notifee/react-native';
 import { resolveUrl } from 'lib/fileCache';
 import { selectUserProfile } from 'store/selectors/userSelectors';
-import { store } from 'store';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useSelector } from 'react-redux';
 
@@ -63,6 +62,7 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
 
   const tabBarHeight = useBottomTabBarHeight();
   const [group, setGroup] = useState(route.params.group);
+  const myGroups = useRef(route.params.myGroups);
   const composingGroup = useRef(lodash.isEmpty(route.params.group));
   const userProfile = useSelector(selectUserProfile);
   const [isTyping, setIsTyping] = useState(false);
@@ -292,13 +292,14 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
     });
 
     if (added.length) {
-      // All members of the group include me.
-      // Uniq covers case when I added myself (avoiding adding myself twice).
-      const members = lodash.uniq(added.concat(userProfile?.id)).sort();
-      const groupsCache = store.getState().cache.groups;
-      const group = groupsCache.find(g => {
-        return lodash.isEqual(lodash.sortBy(g.members), members);
+      const group = myGroups.current?.find(g => {
+        // This test requires my user id since stored members includes me.
+        return lodash.isEqual(
+          lodash.sortBy(added.concat(userProfile?.id)),
+          lodash.sortBy(g.members),
+        );
       });
+      console.log('group', group);
 
       if (group) {
         setGroup(group);

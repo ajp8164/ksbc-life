@@ -50,12 +50,14 @@ const ChatGroupsScreen = ({ navigation }: Props) => {
               size={28}
             />
           }
-          onPress={() => navigation.navigate('ChatThread', {})}
+          onPress={() =>
+            navigation.navigate('ChatThread', { myGroups: groups })
+          }
         />
       ),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [groups]);
 
   // Groups collection listener
   useEffect(() => {

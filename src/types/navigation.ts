@@ -14,6 +14,7 @@ export type ChatNavigatorParamList = {
   ChatGroups: undefined;
   ChatThread: {
     group?: Group;
+    myGroups?: Group[];
   };
 };
 
