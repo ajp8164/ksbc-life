@@ -15,7 +15,7 @@ const GroupModal = React.forwardRef<GroupModal, GroupModalProps>(
     const { group, snapPoints = ['92%'] } = props;
 
     const innerRef = useRef<BottomSheetModalMethods>(null);
-    const groupEditorViewRef = useRef<GroupViewMethods>(null);
+    const groupViewRef = useRef<GroupViewMethods>(null);
 
     const [editorState, setEditorState] = useState({} as EditorState);
 
@@ -42,7 +42,7 @@ const GroupModal = React.forwardRef<GroupModal, GroupModalProps>(
           onRightButtonPress={dismiss}
         />
         <GroupView
-          ref={groupEditorViewRef}
+          ref={groupViewRef}
           group={group}
           onEditorStateChange={setEditorState}
         />
