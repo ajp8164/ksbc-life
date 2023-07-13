@@ -319,7 +319,7 @@ const GroupView = React.forwardRef<GroupView, GroupViewProps>((props, ref) => {
       <AvoidSoftInputView style={theme.styles.viewAlt}>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 50 }}>
+          contentContainerStyle={s.container}>
           {group.members.length > 2 ? renderGroupHeader() : renderUserHeader()}
           {groupUserProfiles && groupUserProfiles.length > 2
             ? renderGroupList()
@@ -336,6 +336,9 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
     marginTop: 15,
     marginBottom: 15,
     overflow: 'hidden',
+  },
+  container: {
+    paddingBottom: 50,
   },
   groupAvatar: {
     resizeMode: 'contain',
