@@ -1,10 +1,6 @@
 import '@react-native-firebase/app';
 
 import { AJPElements, log } from '@react-native-ajp-elements/core';
-import {
-  addGroupsCollectionListener,
-  addUsersCollectionListener,
-} from 'firebase/firestore';
 
 import { AppError } from 'lib/errors';
 import { BackHandler } from 'react-native';
@@ -55,10 +51,6 @@ export const initApp = async (): Promise<InitStatus> => {
     GoogleSignin.configure({
       webClientId: appConfig.firebaseOauthClientId,
     });
-
-    // Add firestore collection listeners.
-    addGroupsCollectionListener();
-    addUsersCollectionListener();
 
     // Load cached file indexes.
     RNFileCache.load();
