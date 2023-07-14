@@ -46,7 +46,7 @@ const MoreScreen = ({ navigation, route }: Props) => {
       <Divider />
       {userProfile ? (
         <ListItem
-          title={userProfile.name || userProfile.email || 'My Profile'}
+          title={userProfile.name || userProfile.email || 'My Account'}
           leftImage={
             <ChatAvatar userProfile={userProfile} avatarStyle={s.avatar} />
           }

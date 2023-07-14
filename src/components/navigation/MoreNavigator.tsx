@@ -13,6 +13,7 @@ import { MoreNavigatorParamList } from 'types/navigation';
 import MoreScreen from 'components/MoreScreen';
 import React from 'react';
 import UserAccountScreen from 'components/UserAccountScreen';
+import UserProfileScreen from 'components/UserProfileScreen';
 import { appConfig } from 'config';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from 'theme';
@@ -52,6 +53,13 @@ const MoreNavigator = () => {
         component={UserAccountScreen}
         options={{
           headerLargeTitle: true,
+        }}
+      />
+      <MoreStack.Screen
+        name="UserProfile"
+        component={UserProfileScreen}
+        options={{
+          title: '',
         }}
       />
       <MoreStack.Screen

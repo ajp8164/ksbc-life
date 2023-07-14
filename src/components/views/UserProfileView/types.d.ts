@@ -12,6 +12,7 @@ declare const UserProfileView: React.MemoExoticComponent<
 export interface UserProfileViewProps {
   userProfile: UserProfile;
   onEditorStateChange?: (editorState: EditorState) => void;
+  style?: 'modal' | 'screen';
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

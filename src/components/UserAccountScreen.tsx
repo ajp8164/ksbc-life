@@ -30,8 +30,7 @@ const UserAccountScreen = ({ navigation }: Props) => {
 
   useEffect(() => {
     navigation.setOptions({
-      // headerTitle: user?.displayName || 'My Profile',
-      headerTitle: 'My Profile',
+      headerTitle: 'My Account',
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -84,6 +83,19 @@ const UserAccountScreen = ({ navigation }: Props) => {
         {userProfile?.email && (
           <Text style={s.profileEmail}>{userProfile.email}</Text>
         )}
+        <Divider />
+        <ListItem
+          title={'Edit Profile'}
+          leftImage={'account-circle-outline'}
+          leftImageType={'material-community'}
+          position={['first', 'last']}
+          onPress={() =>
+            navigation.navigate('UserProfile', {
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              userProfile: userProfile!,
+            })
+          }
+        />
         <Divider />
         <ListItem
           title={'Sign Out'}

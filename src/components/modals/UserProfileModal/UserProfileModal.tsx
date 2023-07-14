@@ -51,6 +51,7 @@ const UserProfileModal = React.forwardRef<
         ref={userProfileViewRef}
         userProfile={userProfile || userProfileOnPresent}
         onEditorStateChange={setEditorState}
+        style={'modal'}
       />
     </Modal>
   );

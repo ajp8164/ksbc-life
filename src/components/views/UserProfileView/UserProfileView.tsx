@@ -37,7 +37,11 @@ type UserProfileView = UserProfileViewMethods;
 
 const UserProfileView = React.forwardRef<UserProfileView, UserProfileViewProps>(
   (props, ref) => {
-    const { userProfile: userProfileProp, onEditorStateChange } = props;
+    const {
+      userProfile: userProfileProp,
+      onEditorStateChange,
+      style = 'screen',
+    } = props;
 
     const theme = useTheme();
     const s = useStyles(theme);
@@ -205,7 +209,7 @@ const UserProfileView = React.forwardRef<UserProfileView, UserProfileViewProps>(
           <ListItem
             title={userProfile.email}
             position={['first', 'last']}
-            containerStyle={{ backgroundColor: theme.colors.subtleGray }}
+            containerStyle={style === 'modal' ? s.modalListContainer : {}}
             onPress={() => openEmail(userProfile.email)}
           />
         </>
@@ -214,7 +218,8 @@ const UserProfileView = React.forwardRef<UserProfileView, UserProfileViewProps>(
 
     return (
       <>
-        <AvoidSoftInputView style={theme.styles.viewAlt}>
+        <AvoidSoftInputView
+          style={style === 'screen' ? theme.styles.view : theme.styles.viewAlt}>
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={s.container}>
@@ -238,6 +243,9 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   },
   container: {
     paddingBottom: 50,
+  },
+  modalListContainer: {
+    backgroundColor: theme.colors.subtleGray,
   },
   userProfileHeaderContainer: {
     alignSelf: 'center',
