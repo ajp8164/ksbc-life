@@ -64,7 +64,7 @@ export const ChatAvatar = ({
       ? 28
       : size === 'large'
       ? 36
-      : 42;
+      : 60;
 
   const renderUserAvatar = (userProfile?: UserProfile) => {
     if (!userProfile) {
@@ -73,7 +73,7 @@ export const ChatAvatar = ({
           icon={{
             name: 'account-outline',
             type: 'material-community',
-            size: 30,
+            size: _iconSize,
             color: theme.colors.white,
           }}
           imageProps={{ resizeMode: 'contain' }}

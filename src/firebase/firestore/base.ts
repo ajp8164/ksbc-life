@@ -237,17 +237,18 @@ export const documentChangeListener = (
     snapshot: FirebaseFirestoreTypes.DocumentSnapshot<FirebaseFirestoreTypes.DocumentData>,
   ) => void,
 ): (() => void) => {
-  return (
-    firestore()
-      .collection(collectionPath)
-      .doc(documentPath)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .onSnapshot({ includeMetadataChanges: true }, handler, (e: any) => {
-        if (!e.message.includes('firestore/permission-denied')) {
-          log.error(
-            `Failed onSnapshot for ${collectionPath}.${documentPath} document: ${e.message}`,
-          );
-        }
-      })
-  );
+  const subscription = firestore()
+    .collection(collectionPath)
+    .doc(documentPath)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .onSnapshot({ includeMetadataChanges: true }, handler, (e: any) => {
+      if (!e.message.includes('firestore/permission-denied')) {
+        log.error(
+          `Failed onSnapshot for ${collectionPath}.${documentPath} document: ${e.message}`,
+        );
+      }
+    });
+
+  addFirestoreSubscription(subscription, collectionPath);
+  return subscription;
 };

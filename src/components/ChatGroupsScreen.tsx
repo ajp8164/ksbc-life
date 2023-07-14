@@ -67,10 +67,7 @@ const ChatGroupsScreen = ({ navigation }: Props) => {
 
     const subscription = groupsCollectionChangeListener(
       async snapshot => {
-        if (snapshot.docChanges().length === 0) {
-          // isLoading ? setIsLoading(false) : null;
-          return;
-        }
+        if (snapshot.docChanges().length === 0) return;
 
         const updated: Group[] = [];
         snapshot.docs.forEach(d => {

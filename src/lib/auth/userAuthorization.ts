@@ -12,6 +12,7 @@ import {
 } from 'lib/notifications';
 
 import { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import { listenForChangesToMyUserProfile } from 'lib/listeners';
 import lodash from 'lodash';
 import { log } from '@react-native-ajp-elements/core';
 import { revertAll } from 'store/actions';
@@ -64,7 +65,12 @@ export const useAuthorizeUser = () => {
             // User exists. Update user in firestore (if needed) and set user.
             if (userProfile.status === UserStatus.Active) {
               const updatedProfile = Object.assign({}, userProfile, {
-                photoUrl:
+                photoUrl: userProfile.photoUrl.length
+                  ? userProfile.photoUrl
+                  : credentials?.photoURL !== null
+                  ? credentials?.photoURL
+                  : '',
+                photoUrlDefault:
                   credentials?.photoURL !== null ? credentials?.photoURL : '',
               }) as UserProfile;
 
@@ -131,6 +137,7 @@ const createProfile = (
     lastName,
     email: credentials.email,
     photoUrl: credentials.photoURL !== null ? credentials.photoURL : '',
+    photoUrlDefault: credentials.photoURL !== null ? credentials.photoURL : '',
     avatar: {
       color: getUserAvatarColor(`${firstName}${lastName}`, colors),
       title: getUserInitials(firstName || credentials.email || '', lastName),
@@ -164,6 +171,7 @@ const useSetUser = () => {
 const postSignInActions = async (
   userProfile: UserProfile,
 ): Promise<UserProfile> => {
+  listenForChangesToMyUserProfile();
   return await setupPushNotificationsForUser(userProfile);
 };
 

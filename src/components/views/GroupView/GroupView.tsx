@@ -25,14 +25,19 @@ import {
   selectImage,
 } from '@react-native-ajp-elements/ui';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import {
+  saveGroup as commitGroup,
+  groupsDocumentChangeListener,
+  usersDocumentChangeListener,
+} from 'firebase/firestore';
 import { getGroupName, getGroupUserProfiles } from 'lib/group';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
 import { Group } from 'types/group';
 import { UserProfile } from 'types/user';
+import { UserProfileModal } from 'components/modals/UserProfileModal';
 import { appConfig } from 'config';
-import { saveGroup as commitGroup } from 'firebase/firestore';
 import { makeStyles } from '@rneui/themed';
 import { openComposer } from 'react-native-email-link';
 import { selectUserProfile } from 'store/selectors/userSelectors';
@@ -42,20 +47,22 @@ import { useSetState } from '@react-native-ajp-elements/core';
 type GroupView = GroupViewMethods;
 
 const GroupView = React.forwardRef<GroupView, GroupViewProps>((props, ref) => {
-  const { group, onEditorStateChange } = props;
+  const { group: groupProp, onEditorStateChange } = props;
 
   const theme = useTheme();
   const s = useStyles(theme);
 
-  const groupImageAsset = useRef<ImagePicker.Asset>();
-  const groupImageUrl = useRef(group.photoUrl);
-  const [groupName, setGroupName] = useState(group.name);
+  const [group, setGroup] = useState(groupProp);
+  const groupImageUrl = useRef(groupProp.photoUrl);
+  const [groupName, setGroupName] = useState(groupProp.name);
   const [groupUserProfiles, setGroupUserProfiles] = useState<UserProfile[]>();
-  const userProfile = useSelector(selectUserProfile);
+  const myUserProfile = useSelector(selectUserProfile);
 
   const [editorState, setEditorState] = useSetState<EditorState>({
     isSubmitting: false,
   });
+
+  const userProfileModalRef = useRef<UserProfileModal>(null);
 
   useImperativeHandle(ref, () => ({
     //  These functions exposed to the parent component through the ref.
@@ -74,13 +81,32 @@ const GroupView = React.forwardRef<GroupView, GroupViewProps>((props, ref) => {
 
   useEffect(() => {
     getGroupUserProfiles(group.members).then(userProfiles => {
-      setGroupUserProfiles(
-        userProfiles,
-        // userProfiles.filter(u => {
-        //   return u.id !== userProfile?.id;
-        // }),
-      );
+      setGroupUserProfiles(userProfiles);
+
+      const uid = userProfiles?.[0].id;
+      if (userProfiles?.length !== 1 || !uid) return;
+
+      // User document listener for group with single user.
+      const subscription = usersDocumentChangeListener(uid, async snapshot => {
+        const u = snapshot.data() as UserProfile;
+        setGroupUserProfiles([u]);
+      });
+      return subscription;
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Group document listener.
+  useEffect(() => {
+    if (!group?.id) return;
+
+    const subscription = groupsDocumentChangeListener(
+      group.id,
+      async snapshot => {
+        setGroup(snapshot.data() as Group);
+      },
+    );
+    return subscription;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -111,31 +137,28 @@ const GroupView = React.forwardRef<GroupView, GroupViewProps>((props, ref) => {
   const selectGroupImage = () => {
     selectImage({
       onSuccess: imageAssets => {
-        groupImageAsset.current = imageAssets[0];
-        saveGroupImage();
+        saveGroupImage(imageAssets[0]);
       },
     });
   };
 
-  const saveGroupImage = async () => {
-    if (groupImageAsset.current) {
-      setEditorState({ isSubmitting: true });
-      await uploadImage({
-        image: {
-          mimeType: groupImageAsset.current.type,
-          uri: groupImageAsset.current.uri,
-        } as ImageUpload,
-        storagePath: appConfig.storageImageGroups,
-        oldImage: group?.photoUrl,
-        onSuccess: url => {
-          groupImageUrl.current = url;
-          saveGroup();
-        },
-        onError: () => {
-          return;
-        },
-      });
-    }
+  const saveGroupImage = async (imageAsset: ImagePicker.Asset) => {
+    setEditorState({ isSubmitting: true });
+    await uploadImage({
+      image: {
+        mimeType: imageAsset.type,
+        uri: imageAsset.uri,
+      } as ImageUpload,
+      storagePath: appConfig.storageImageGroups,
+      oldImage: group?.photoUrl,
+      onSuccess: url => {
+        groupImageUrl.current = url;
+        saveGroup();
+      },
+      onError: () => {
+        return;
+      },
+    });
   };
 
   const deleteGroupImage = async () => {
@@ -208,9 +231,21 @@ const GroupView = React.forwardRef<GroupView, GroupViewProps>((props, ref) => {
   };
 
   const renderUserHeader = () => {
+    let profile = myUserProfile;
+
+    if (groupUserProfiles && groupUserProfiles.length > 1) {
+      profile = groupUserProfiles?.filter(u => {
+        return u.id !== myUserProfile?.id;
+      })?.[0];
+    }
+
     return (
       <View style={s.userHeaderContainer}>
-        <ChatAvatar group={group} size={'giant'} avatarStyle={s.avatar} />
+        <ChatAvatar
+          userProfile={profile}
+          size={'giant'}
+          avatarStyle={s.avatar}
+        />
         <Text style={s.groupNameText}>
           {getGroupName(group, groupUserProfiles || [])}
         </Text>
@@ -242,7 +277,7 @@ const GroupView = React.forwardRef<GroupView, GroupViewProps>((props, ref) => {
         <FlatList
           // I am included in the groupUserProfiles but we don't include me in this list.
           data={groupUserProfiles?.filter(u => {
-            return u.id !== userProfile?.id;
+            return u.id !== myUserProfile?.id;
           })}
           renderItem={renderGroupMember}
           keyExtractor={item => `${item.id}`}
@@ -268,15 +303,20 @@ const GroupView = React.forwardRef<GroupView, GroupViewProps>((props, ref) => {
             ? 'last'
             : undefined,
         ]}
-        onPress={() => openEmail(userProfile.email)}
+        onPress={() => userProfileModalRef.current?.present(userProfile)}
       />
     );
   };
 
   const renderUserActions = () => {
-    const profile = groupUserProfiles?.filter(u => {
-      return u.id !== userProfile?.id;
-    })?.[0];
+    // This group is composed of only me when there is one user in then group.
+    let profile = myUserProfile;
+
+    if (groupUserProfiles && groupUserProfiles.length > 1) {
+      profile = groupUserProfiles?.filter(u => {
+        return u.id !== myUserProfile?.id;
+      })?.[0];
+    }
 
     return (
       <View style={s.userActionsContainer}>
@@ -296,8 +336,10 @@ const GroupView = React.forwardRef<GroupView, GroupViewProps>((props, ref) => {
           <Text style={s.userActionText}>{'Email'}</Text>
         </Pressable>
         <Pressable
-          style={s.userAction}
-          onPress={() => profile && openEmail(profile.email)}>
+          style={[s.userAction, !profile && { opacity: 0.4 }]}
+          onPress={() =>
+            profile && userProfileModalRef.current?.present(profile)
+          }>
           <Avatar
             icon={{
               name: 'card-account-details-outline',
@@ -308,7 +350,7 @@ const GroupView = React.forwardRef<GroupView, GroupViewProps>((props, ref) => {
             imageProps={s.userActionAvatar}
             containerStyle={s.userActionAvatarContainer}
           />
-          <Text style={s.userActionText}>{'Contact'}</Text>
+          <Text style={s.userActionText}>{'Info'}</Text>
         </Pressable>
       </View>
     );
@@ -326,6 +368,7 @@ const GroupView = React.forwardRef<GroupView, GroupViewProps>((props, ref) => {
             : renderUserActions()}
         </ScrollView>
       </AvoidSoftInputView>
+      <UserProfileModal ref={userProfileModalRef} />
     </>
   );
 });
@@ -368,7 +411,7 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   },
   groupImageDeleteTitle: {
     ...theme.styles.textSmall,
-    color: theme.colors.textLink,
+    color: theme.colors.assertive,
   },
   groupMemberContainer: {
     backgroundColor: theme.colors.listItemBackgroundAlt,

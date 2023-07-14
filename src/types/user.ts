@@ -18,6 +18,7 @@ export type UserProfile = {
   lastName: string;
   email: string;
   photoUrl: string;
+  photoUrlDefault: string;
   avatar: {
     color: string;
     title: string;
