@@ -101,7 +101,7 @@ const HomeScreen = ({ navigation }: Props) => {
       navigation.navigate('MoreTab', {
         screen: 'More',
         params: {
-          subNav: 'UserProfile',
+          subNav: 'UserAccount',
         },
       });
     } else {

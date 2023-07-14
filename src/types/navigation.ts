@@ -44,7 +44,7 @@ export type MoreNavigatorParamList = {
   More: {
     subNav?: string;
   };
-  UserProfile: undefined;
+  UserAccount: undefined;
 };
 
 export type MainNavigatorParamList = {

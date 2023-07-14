@@ -51,7 +51,7 @@ const MoreScreen = ({ navigation, route }: Props) => {
             <ChatAvatar userProfile={userProfile} avatarStyle={s.avatar} />
           }
           position={['first', 'last']}
-          onPress={() => navigation.navigate('UserProfile')}
+          onPress={() => navigation.navigate('UserAccount')}
         />
       ) : (
         <ListItem

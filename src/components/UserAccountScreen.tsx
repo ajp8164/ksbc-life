@@ -18,11 +18,11 @@ import { signOut } from 'lib/auth';
 import { useSelector } from 'react-redux';
 
 type Props = CompositeScreenProps<
-  NativeStackScreenProps<MoreNavigatorParamList, 'UserProfile'>,
+  NativeStackScreenProps<MoreNavigatorParamList, 'UserAccount'>,
   NativeStackScreenProps<MainNavigatorParamList>
 >;
 
-const UserProfileScreen = ({ navigation }: Props) => {
+const UserAccountScreen = ({ navigation }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
 
@@ -126,4 +126,4 @@ const useStyles = makeStyles((_theme, theme: AppTheme) => ({
   },
 }));
 
-export default UserProfileScreen;
+export default UserAccountScreen;
