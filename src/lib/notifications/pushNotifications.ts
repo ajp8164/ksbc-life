@@ -70,7 +70,9 @@ export const setupPushNotificationsForUser = async (
   }
   subscribeToTopic('all-users');
 
-  // Restore badge count to app icon.
+  // Restore badge count to app icon. Signing in from a signed out state
+  // reapplys the badge count. If already signed in then the badge count is
+  // simply reasserted.
   notifee.setBadgeCount(userProfile.notifications.badgeCount);
 
   return updatedProfile;
