@@ -25,12 +25,12 @@ import {
   selectImage,
 } from '@react-native-ajp-elements/ui';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { calculateGroupName, getGroupUserProfiles } from 'lib/group';
 import {
   saveGroup as commitGroup,
   groupsDocumentChangeListener,
   usersDocumentChangeListener,
 } from 'firebase/firestore';
-import { getGroupName, getGroupUserProfiles } from 'lib/group';
 
 import { AvoidSoftInputView } from 'react-native-avoid-softinput';
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
@@ -88,8 +88,7 @@ const GroupView = React.forwardRef<GroupView, GroupViewProps>((props, ref) => {
 
       // User document listener for group with single user.
       const subscription = usersDocumentChangeListener(uid, async snapshot => {
-        const u = snapshot.data() as UserProfile;
-        setGroupUserProfiles([u]);
+        setGroupUserProfiles([snapshot.data() as UserProfile]);
       });
       return subscription;
     });
@@ -247,7 +246,7 @@ const GroupView = React.forwardRef<GroupView, GroupViewProps>((props, ref) => {
           avatarStyle={s.avatar}
         />
         <Text style={s.groupNameText}>
-          {getGroupName(group, groupUserProfiles || [])}
+          {calculateGroupName({ ...group, extended: { groupUserProfiles } })}
         </Text>
       </View>
     );

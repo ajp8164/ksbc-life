@@ -4,7 +4,7 @@ import { Divider, ListItem } from '@react-native-ajp-elements/ui';
 import { ExtendedGroup, Group } from 'types/group';
 import { FlatList, ListRenderItem, ScrollView, View } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
-import { getGroupName, getGroupUserProfiles } from 'lib/group';
+import { calculateGroupName, getGroupUserProfiles } from 'lib/group';
 
 import { AuthContext } from 'lib/auth';
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
@@ -30,10 +30,10 @@ const ChatGroupsScreen = ({ navigation }: Props) => {
   const s = useStyles(theme);
 
   const auth = useContext(AuthContext);
-  const userProfile = useSelector(selectUserProfile);
+  const myUserProfile = useSelector(selectUserProfile);
 
   const [isLoading, setIsLoading] = useState(true);
-  const [groups, setGroups] = useState<ExtendedGroup[]>([]);
+  const [exGroups, setExGroups] = useState<ExtendedGroup[]>([]);
 
   // Set header
   useEffect(() => {
@@ -51,19 +51,19 @@ const ChatGroupsScreen = ({ navigation }: Props) => {
             />
           }
           onPress={() =>
-            navigation.navigate('ChatThread', { myGroups: groups })
+            navigation.navigate('ChatThread', { myGroups: exGroups })
           }
         />
       ),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groups]);
+  }, [exGroups]);
 
   // Groups collection listener
   useEffect(() => {
     // Clear state in anticipation of another sign in without restating the app.
     // Prevents the new user from accessing the old users data.
-    setGroups([]);
+    setExGroups([]);
 
     const subscription = groupsCollectionChangeListener(
       async snapshot => {
@@ -74,7 +74,7 @@ const ChatGroupsScreen = ({ navigation }: Props) => {
           updated.push({ ...d.data(), id: d.id } as Group);
         });
         prepareGroups(updated).then(exGroups => {
-          setGroups(exGroups);
+          setExGroups(exGroups);
           isLoading ? setIsLoading(false) : null;
         });
       },
@@ -83,25 +83,23 @@ const ChatGroupsScreen = ({ navigation }: Props) => {
           {
             fieldPath: 'members',
             opStr: 'array-contains',
-            value: userProfile?.id,
+            value: myUserProfile?.id,
           },
         ],
-        auth: { userRole: userProfile?.role },
+        auth: { userRole: myUserProfile?.role },
       },
     );
     return subscription;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userProfile?.role]);
+  }, [myUserProfile?.role]);
 
   const prepareGroups = async (groups: Group[]): Promise<ExtendedGroup[]> => {
     const exGroups = await Promise.all(
-      (groups as ExtendedGroup[]).map(async g => {
+      groups.map(async g => {
         const groupUserProfiles = await getGroupUserProfiles(g.members);
-        return {
-          ...g,
-          calculatedName: getGroupName(g, groupUserProfiles),
-          userProfiles: groupUserProfiles,
-        };
+        const exGroup = { ...g, extended: { groupUserProfiles } };
+        calculateGroupName(exGroup);
+        return exGroup;
       }),
     );
 
@@ -118,8 +116,8 @@ const ChatGroupsScreen = ({ navigation }: Props) => {
         // Sort unread groups to the top.
         .sort((a, b) => {
           return b.latestMessageSnippet?.readBy.includes(
-            userProfile?.id || '',
-          ) && !a.latestMessageSnippet?.readBy.includes(userProfile?.id || '')
+            myUserProfile?.id || '',
+          ) && !a.latestMessageSnippet?.readBy.includes(myUserProfile?.id || '')
             ? -1
             : 1;
         })
@@ -132,7 +130,7 @@ const ChatGroupsScreen = ({ navigation }: Props) => {
   }) => {
     return (
       <ListItem
-        title={group.calculatedName}
+        title={group.extended?.calculatedName}
         titleStyle={s.title}
         titleNumberOfLines={1}
         subtitle={group.latestMessageSnippet?.text}
@@ -148,8 +146,8 @@ const ChatGroupsScreen = ({ navigation }: Props) => {
           <View
             style={{
               borderColor:
-                userProfile?.id &&
-                !group.latestMessageSnippet?.readBy.includes(userProfile.id)
+                myUserProfile?.id &&
+                !group.latestMessageSnippet?.readBy.includes(myUserProfile.id)
                   ? theme.colors.brandSecondary
                   : theme.colors.transparent,
               borderWidth: 3,
@@ -162,7 +160,7 @@ const ChatGroupsScreen = ({ navigation }: Props) => {
         }
         position={[
           index === 0 ? 'first' : undefined,
-          index === groups.length - 1 ? 'last' : undefined,
+          index === exGroups.length - 1 ? 'last' : undefined,
         ]}
         onPress={() => navigation.navigate('ChatThread', { group })}
       />
@@ -181,9 +179,9 @@ const ChatGroupsScreen = ({ navigation }: Props) => {
     <SafeAreaView
       edges={['left', 'right']}
       style={[theme.styles.view, { paddingHorizontal: 0 }]}>
-      {userProfile ? (
+      {myUserProfile ? (
         <FlatList
-          data={groups}
+          data={exGroups}
           renderItem={renderGroup}
           ListEmptyComponent={renderListEmptyComponent}
           keyExtractor={item => `${item.id}`}

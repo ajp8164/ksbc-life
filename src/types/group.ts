@@ -27,6 +27,8 @@ export type Group = {
 };
 
 export type ExtendedGroup = Group & {
-  calculatedName?: string;
-  userProfiles?: UserProfile[];
+  extended?: {
+    calculatedName?: string;
+    groupUserProfiles?: UserProfile[];
+  };
 };

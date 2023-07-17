@@ -1,4 +1,4 @@
-import { Group, GroupNameSize } from 'types/group';
+import { ExtendedGroup, GroupNameSize } from 'types/group';
 
 import { UserProfile } from 'types/user';
 import { getUsers } from 'firebase/firestore';
@@ -9,21 +9,45 @@ import { store } from 'store';
 export const getGroupAvatarColor = (groupId: string, colors: string[]) =>
   colors[hash(groupId) % colors.length];
 
-export const getGroupName = (
-  group: Group,
-  userProfiles: UserProfile[],
+export const calculateGroupName = (
+  group: ExtendedGroup,
   opts?: { type?: GroupNameSize },
 ) => {
   const type = opts?.type || 'long';
 
   if (group.name.length > 0) {
-    return group.name;
+    group.extended = {
+      ...group.extended,
+      calculatedName: group.name,
+    };
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return group.extended.calculatedName!;
+  }
+
+  // Default group name if user profiles not specified.
+  if (!group.extended?.groupUserProfiles) {
+    group.extended = {
+      ...group.extended,
+      calculatedName: `${group.members.length} ${
+        group.members.length === 1 ? 'Person' : 'People'
+      }`,
+    };
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return group.extended.calculatedName!;
   }
 
   if (type === 'short') {
-    return getGroupMembersShortStr(userProfiles);
+    group.extended.calculatedName = getGroupMembersShortStr(
+      group.extended.groupUserProfiles,
+    );
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return group.extended.calculatedName!;
   } else {
-    return getGroupMembersLongStr(userProfiles);
+    group.extended.calculatedName = getGroupMembersLongStr(
+      group.extended.groupUserProfiles,
+    );
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return group.extended.calculatedName!;
   }
 };
 

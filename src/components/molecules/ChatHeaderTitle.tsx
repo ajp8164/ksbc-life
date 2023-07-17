@@ -1,7 +1,7 @@
 import { AppTheme, useTheme } from 'theme';
 import { ExtendedGroup, Group } from 'types/group';
 import { Keyboard, Text, TouchableWithoutFeedback, View } from 'react-native';
-import { getGroupName, getGroupUserProfiles } from 'lib/group';
+import { calculateGroupName, getGroupUserProfiles } from 'lib/group';
 import { useEffect, useRef, useState } from 'react';
 
 import { ChatAvatar } from 'components/molecules/ChatAvatar';
@@ -26,8 +26,11 @@ export const ChatHeaderTitle = ({
   const [groupName, setGroupName] = useState('');
 
   useEffect(() => {
-    getGroupUserProfiles(group.members).then(userProfiles => {
-      const name = getGroupName(group, userProfiles, { type: 'short' });
+    getGroupUserProfiles(group.members).then(groupUserProfiles => {
+      const name = calculateGroupName(
+        { ...group, extended: { groupUserProfiles } },
+        { type: 'short' },
+      );
       setGroupName(name);
     });
   }, [group]);

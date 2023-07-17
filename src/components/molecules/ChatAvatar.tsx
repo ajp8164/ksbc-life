@@ -31,7 +31,7 @@ export const ChatAvatar = ({
   const theme = useTheme();
   const s = useStyles(theme);
 
-  const me = useSelector(selectUserProfile);
+  const myUserProfile = useSelector(selectUserProfile);
 
   const _avatarStyle =
     size === 'tiny'
@@ -76,7 +76,7 @@ export const ChatAvatar = ({
             size: _iconSize,
             color: theme.colors.white,
           }}
-          imageProps={{ resizeMode: 'contain' }}
+          imageProps={{ resizeMode: 'cover' }}
           containerStyle={{
             ..._avatarStyle,
             backgroundColor: theme.colors.subtleGray,
@@ -89,7 +89,7 @@ export const ChatAvatar = ({
       return (
         <Avatar
           source={{ uri: userProfile.photoUrl }}
-          imageProps={{ resizeMode: 'contain' }}
+          imageProps={{ resizeMode: 'cover' }}
           containerStyle={[_avatarStyle, avatarStyle]}
           onPress={onPress}
         />
@@ -131,23 +131,20 @@ export const ChatAvatar = ({
     return renderUserAvatar(userProfile);
   }
 
-  // Remove possible duplicates.
-  const members = lodash.uniq(group.members);
-
   // Large group selection
 
-  if (members.length > 2 && group.photoUrl.length) {
-    return (
-      <Avatar
-        source={{ uri: group.photoUrl }}
-        imageProps={{ resizeMode: 'cover' }}
-        containerStyle={[_avatarStyle, avatarStyle]}
-        onPress={onPress}
-      />
-    );
-  }
+  if (group.members.length > 2) {
+    if (group.photoUrl.length) {
+      return (
+        <Avatar
+          source={{ uri: group.photoUrl }}
+          imageProps={{ resizeMode: 'cover' }}
+          containerStyle={[_avatarStyle, avatarStyle]}
+          onPress={onPress}
+        />
+      );
+    }
 
-  if (members.length > 2) {
     return (
       <Avatar
         title={group?.avatar.title}
@@ -168,14 +165,14 @@ export const ChatAvatar = ({
   }
 
   // Group individual selection
-  let u = me;
-  if (members.length === 2) {
+  let u = myUserProfile;
+  if (group.members.length === 2) {
     // Filter me out
-    const uid = lodash.filter(members, id => {
+    const uid = lodash.filter(group.members, id => {
       return id !== u?.id;
     })[0];
 
-    u = lodash.find(group.userProfiles, u => {
+    u = lodash.find(group.extended?.groupUserProfiles, u => {
       return u.id === uid;
     });
   }
