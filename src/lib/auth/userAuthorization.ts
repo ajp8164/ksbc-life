@@ -1,4 +1,4 @@
-import { UserProfile, UserRole, UserStatus } from 'types/user';
+import { User, UserProfile, UserRole, UserStatus } from 'types/user';
 import {
   addUser,
   cancelAllFirestoreSubscriptions,
@@ -161,7 +161,7 @@ const useSetUser = () => {
         ...profile,
         id: credentials.uid, // Store the user id locally.
       },
-    };
+    } as User;
 
     dispatch(saveUser({ user }));
     return user;

@@ -33,6 +33,6 @@ export type UserProfile = {
 };
 
 export type User = {
-  credentials: FirebaseAuthTypes.User | null | undefined;
-  profile: UserProfile | undefined;
+  credentials: FirebaseAuthTypes.User;
+  profile: UserProfile;
 };
