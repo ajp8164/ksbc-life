@@ -107,6 +107,28 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myUserProfile]);
 
+  // Group listener - listen for group message snippet changes while viewing this thread so
+  // we can mark any messages that arrive as being read by me.
+  useEffect(() => {
+    if (!group?.id) return;
+    const subscription = groupsDocumentChangeListener(
+      group.id,
+      async snapshot => {
+        setGroup({
+          ...group,
+          latestMessageSnippet: (snapshot.data() as Group).latestMessageSnippet,
+        });
+      },
+    );
+    return subscription;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    setLatestMessageAsReadByMe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [group?.latestMessageSnippet]);
+
   // Messages listener
   useEffect(() => {
     if (!group?.id) return;
@@ -306,8 +328,11 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
   };
 
   const sendMessage = async (message: MessageType.PartialAny[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const { extended: _extended, ...g } = group!; // Remove extended properties.
+
     const targetGroup =
-      group || (await chatGroupComposerRef.current?.createGroup());
+      g || (await chatGroupComposerRef.current?.createGroup());
 
     if (!myUserProfile || !targetGroup) return;
 
