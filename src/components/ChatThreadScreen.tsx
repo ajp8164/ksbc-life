@@ -1,15 +1,11 @@
-import Animated, { SlideOutUp } from 'react-native-reanimated';
 import { AppTheme, useTheme } from 'theme';
 import { Button, Icon } from '@rneui/base';
 import { Chat, MessageType } from '@flyerhq/react-native-chat-ui';
-import { FirestoreMessageType, SearchCriteria, SearchScope } from 'types/chat';
-import { FlatList, Keyboard, ListRenderItem, Text, View } from 'react-native';
+import { Keyboard, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  addGroup,
   chatMessagesCollectionChangeListener,
   getChatMessages,
-  getUsers,
   groupsDocumentChangeListener,
   sendTypingState,
   updateChatMessage,
@@ -22,21 +18,19 @@ import {
   sendMessages,
   useSelectAttachments,
 } from 'lib/chat';
-import { getGroupAvatarColor, getGroupMembersLongStr } from 'lib/group';
 
-import { ChatAvatar } from 'components/molecules/ChatAvatar';
+import ChatGroupComposer from 'components/views/ChatGroupComposer';
+import { ChatGroupComposerMethods } from 'components/views/ChatGroupComposer';
 import { ChatHeaderTitle } from 'components/molecules/ChatHeaderTitle';
 import { ChatNavigatorParamList } from 'types/navigation';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+import { FirestoreMessageType } from 'types/chat';
 import { Group } from 'types/group';
-import { Incubator } from 'react-native-ui-lib';
-import { ListItem } from '@react-native-ajp-elements/ui';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import NoItems from 'components/atoms/NoItems';
 import { PreviewData } from '@flyerhq/react-native-link-preview';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StackActions } from '@react-navigation/native';
-import { UserPickerModal } from 'components/modals/UserPickerModal';
 import { UserProfile } from 'types/user';
 import lodash from 'lodash';
 import { makeStyles } from '@rneui/themed';
@@ -46,9 +40,6 @@ import { selectUserProfile } from 'store/selectors/userSelectors';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useSelector } from 'react-redux';
 
-const initialSearchCriteria = { text: '', scope: SearchScope.Username };
-const minimumRequiredCharsForSearch = 2;
-
 export type Props = NativeStackScreenProps<
   ChatNavigatorParamList,
   'ChatThread'
@@ -57,13 +48,16 @@ export type Props = NativeStackScreenProps<
 const ChatThreadScreen = ({ navigation, route }: Props) => {
   const theme = useTheme();
   const s = useStyles(theme);
+  const tabBarHeight = useBottomTabBarHeight();
 
+  const chatGroupComposerRef = useRef<ChatGroupComposerMethods>(null);
   const selectAttachments = useSelectAttachments();
 
-  const tabBarHeight = useBottomTabBarHeight();
   const [group, setGroup] = useState(route.params.group);
   const myGroups = useRef(route.params.myGroups);
   const composingGroup = useRef(lodash.isEmpty(route.params.group));
+  const [groupComposerHasRecipients, setGroupComposerHasRecipients] =
+    useState(false);
   const myUserProfile = useSelector(selectUserProfile);
   const [isTyping, setIsTyping] = useState(false);
   const typingNames = useRef<string | undefined>();
@@ -75,15 +69,39 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const lastDocument = useRef<FirebaseFirestoreTypes.DocumentData>();
 
-  const [searchFocused, setSearchFocused] = useState(false);
-  const [searchCriteria, setSearchCriteria] = useState<SearchCriteria>(
-    initialSearchCriteria,
-  );
-  const [addedUsers, setAddedUsers] = useState<UserProfile[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<UserProfile[]>([]);
-  const [userSearchSet, setUserSearchSet] = useState<UserProfile[]>([]);
-  const userPickerModalRef = useRef<UserPickerModal>(null);
+  // Set the group header or composer header.
+  useEffect(() => {
+    if (composingGroup.current) {
+      navigation.setOptions({
+        title: 'New Message',
+        // eslint-disable-next-line react/no-unstable-nested-components
+        headerRight: () => (
+          <Button
+            type={'clear'}
+            icon={
+              <Icon
+                name={'plus-circle-outline'}
+                type={'material-community'}
+                color={theme.colors.brandSecondary}
+                size={28}
+              />
+            }
+            onPress={() => {
+              Keyboard.dismiss();
+              chatGroupComposerRef.current?.presentUserPicker();
+            }}
+          />
+        ),
+      });
+    } else {
+      navigation.setOptions({
+        headerTitle: renderHeaderTitle,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [composingGroup.current]);
 
+  // If this view is visible during sign out then we pop it off the navigation stack.
   useEffect(() => {
     if (!myUserProfile) {
       navigation.dispatch(StackActions.popToTop());
@@ -262,162 +280,6 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [group?.id]);
 
-  // Set the group header or composer header.
-  useEffect(() => {
-    if (composingGroup.current) {
-      // Get the list of users for search.
-      getUsers().then(users => {
-        setUserSearchSet(users.result);
-      });
-
-      navigation.setOptions({
-        title: 'New Message',
-        // eslint-disable-next-line react/no-unstable-nested-components
-        headerRight: () => (
-          <Button
-            type={'clear'}
-            icon={
-              <Icon
-                name={'plus-circle-outline'}
-                type={'material-community'}
-                color={theme.colors.brandSecondary}
-                size={28}
-              />
-            }
-            onPress={() => {
-              Keyboard.dismiss();
-              userPickerModalRef.current?.present();
-            }}
-          />
-        ),
-      });
-    } else {
-      navigation.setOptions({
-        headerTitle: renderHeaderTitle,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [composingGroup.current]);
-
-  // Select and set/unset a group (shows messages) while adding users during composing a group.
-  useEffect(() => {
-    if (!composingGroup.current) return;
-
-    const added = addedUsers.map(u => {
-      return u.id;
-    });
-
-    if (added.length) {
-      const group = myGroups.current?.find(g => {
-        // This test requires my user id since stored members includes me.
-        return lodash.isEqual(
-          lodash.sortBy(added.concat(myUserProfile?.id)),
-          lodash.sortBy(g.members),
-        );
-      });
-
-      if (group) {
-        setGroup(group);
-      } else {
-        setGroup(undefined);
-        setChatMessages([]);
-      }
-    } else {
-      setGroup(undefined);
-      setChatMessages([]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addedUsers]);
-
-  // Filter users while typing.
-  useEffect(() => {
-    // On initial entry to search (user tapped search input)...
-    // clear filtered data so only filtered results will display when search text is set.
-    if (searchFocused && searchCriteria.text === '') {
-      setFilteredUsers([]);
-    }
-  }, [searchFocused, searchCriteria]);
-
-  const resetSearch = () => {
-    setSearchFocused(false);
-    searchFilter(initialSearchCriteria);
-  };
-
-  const createGroup = async (): Promise<Group> => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const members = [myUserProfile!].concat(addedUsers);
-    // Uniq allows for a group of one - chat with myself.
-    const memberIds = lodash.uniq(
-      members.map(u => {
-        return u.id;
-      }),
-    ) as string[];
-
-    const groupName = getGroupMembersLongStr(members);
-
-    const newGroup = {
-      createdBy: myUserProfile?.id,
-      name: groupName,
-      type: 'private',
-      members: memberIds,
-      leaders: [myUserProfile?.id],
-      photoUrl: '',
-      avatar: {
-        color: getGroupAvatarColor(`${groupName}`, theme.colors.avatarColors),
-        title: '',
-      },
-    } as Group;
-
-    const addedGroup = await addGroup(newGroup);
-    setGroup(addedGroup);
-
-    // Add group membership to each user (including myself).
-    members.forEach(u => {
-      if (addedGroup.id) {
-        u.groups = u.groups.concat(addedGroup.id);
-        updateUser(u);
-      }
-    });
-
-    return addedGroup;
-  };
-
-  const searchFilter = async ({ text, scope }: SearchCriteria) => {
-    setSearchCriteria({ text, scope });
-    if (text.length >= minimumRequiredCharsForSearch) {
-      if (scope === SearchScope.Username) {
-        //Case insensitive match.
-        const usersByFirstName =
-          lodash.filter(userSearchSet, u =>
-            u.firstName.toLowerCase().includes(text.toLowerCase()),
-          ) || [];
-        const usersByLastName =
-          lodash.filter(userSearchSet, u =>
-            u.lastName.toLowerCase().includes(text.toLowerCase()),
-          ) || [];
-        const usersByEmail =
-          lodash.filter(userSearchSet, u =>
-            u.email.toLowerCase().includes(text.toLowerCase()),
-          ) || [];
-
-        // Ensure no duplicates in the result.
-        const searchResult = lodash.uniqBy(
-          usersByFirstName.concat(usersByLastName).concat(usersByEmail),
-          'id',
-        );
-
-        // Remove users that are already added.
-        const filtered = lodash.reject(searchResult, u => {
-          return lodash.findIndex(addedUsers, u) >= 0;
-        });
-
-        setFilteredUsers(filtered);
-      }
-    } else {
-      setFilteredUsers([]);
-    }
-  };
-
   const setLatestMessageAsReadByMe = () => {
     if (!myUserProfile?.id || !group) return;
 
@@ -434,9 +296,22 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
     }
   };
 
+  const onComposerChanged = (
+    selectedGroup?: Group,
+    userProfiles?: UserProfile[],
+  ) => {
+    setGroup(selectedGroup);
+    if (!selectedGroup) {
+      setChatMessages([]);
+      setGroupComposerHasRecipients(userProfiles?.length !== 0);
+    }
+  };
+
   const sendMessage = async (message: MessageType.PartialAny[]) => {
-    if (!myUserProfile) return;
-    const targetGroup = group || (await createGroup());
+    const targetGroup =
+      group || (await chatGroupComposerRef.current?.createGroup());
+
+    if (!myUserProfile || !targetGroup) return;
 
     sendMessages(message, myUserProfile, targetGroup, messagesBeingSend => {
       // Add pending messsages to the UI while they are being sent.
@@ -504,85 +379,27 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
     );
   };
 
-  const renderUser: ListRenderItem<UserProfile> = ({ item: userProfile }) => {
-    return (
-      <ListItem
-        title={userProfile.name || userProfile.email}
-        titleStyle={s.userProfileTitle}
-        leftImage={<ChatAvatar userProfile={userProfile} size={'medium'} />}
-        rightImage={false}
-        onPress={() => {
-          setAddedUsers(addedUsers.concat(userProfile));
-          resetSearch();
-        }}
-      />
-    );
-  };
-
-  const addedUserChips = () => {
-    return addedUsers.map(u => {
-      return {
-        label: u.name || u.email,
-        labelStyle: theme.styles.textSmall,
-        dismissColor: theme.colors.text,
-        dismissIconStyle: s.userChipDismissIcon,
-        onDismiss: () => {
-          const current = ([] as UserProfile[]).concat(addedUsers);
-          lodash.remove(current, u);
-          setAddedUsers(current);
-        },
-      } as Incubator.ChipsInputChipProps;
-    });
-  };
-
-  const renderGroupComposer = () => {
-    return (
-      <Animated.View
-        exiting={SlideOutUp.duration(750)}
-        style={s.groupComposerContainer}>
-        <Incubator.ChipsInput
-          leadingAccessory={<Text style={s.toLabel}>{'To:'}</Text>}
-          style={s.chipInputText}
-          fieldStyle={s.chipInput}
-          chips={addedUserChips()}
-          // @ts-ignore property is incorrectly typed
-          onChange={(_chips, changeReason, updatedChip) => {
-            if (changeReason === 'removed') {
-              // @ts-ignore property is incorrectly typed
-              updatedChip.onDismiss && updatedChip.onDismiss();
-            }
-          }}
-          onChangeText={(text: string) =>
-            searchFilter({
-              text,
-              scope: SearchScope.Username,
-            })
-          }
-          onBlur={() => setSearchFocused(false)}
-          onFocus={() => setSearchFocused(true)}
-          value={searchCriteria.text}
-        />
-        <FlatList
-          data={filteredUsers}
-          renderItem={renderUser}
-          keyExtractor={item => `${item.id}`}
-          contentInsetAdjustmentBehavior={'automatic'}
-        />
-      </Animated.View>
-    );
-  };
+  if (!myUserProfile) {
+    return null;
+  }
 
   return (
     <SafeAreaView edges={['left', 'right']} style={{ flex: 1 }}>
-      {composingGroup.current && renderGroupComposer()}
+      <ChatGroupComposer
+        ref={chatGroupComposerRef}
+        myUserProfile={myUserProfile}
+        myGroups={myGroups.current}
+        onComposerChanged={onComposerChanged}
+        visible={composingGroup.current}
+      />
       <Chat
         messages={chatMessages}
         user={{
-          id: myUserProfile?.id || '',
-          firstName: myUserProfile?.firstName,
-          lastName: myUserProfile?.lastName,
-          imageUrl: myUserProfile?.photoUrl || '',
-          avatarColor: myUserProfile?.avatar.color,
+          id: myUserProfile.id || '',
+          firstName: myUserProfile.firstName,
+          lastName: myUserProfile.lastName,
+          imageUrl: myUserProfile.photoUrl || '',
+          avatarColor: myUserProfile.avatar.color,
         }}
         isLastPage={allLoaded.current}
         isTyping={isTyping}
@@ -597,63 +414,19 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
         showUserNames={group && group?.members.length <= 2 ? 'none' : 'outside'}
         relativeDateTime={true}
         l10nOverride={{ inputPlaceholder: 'Type message' }}
-        disableSend={!group && !addedUsers.length}
+        disableSend={!group && !groupComposerHasRecipients}
         sendButtonVisibilityMode={'always'}
         theme={chatTheme(theme, { tabBarHeight })}
         emptyState={renderListEmptyComponent}
         resolveUrl={resolveUrl}
       />
-      <UserPickerModal
-        ref={userPickerModalRef}
-        multiple
-        snapPoints={['65%']}
-        onSelect={userProfile => {
-          setAddedUsers(addedUsers.concat(userProfile));
-        }}
-        onDeselect={userProfile => {
-          const current = ([] as UserProfile[]).concat(addedUsers);
-          lodash.remove(current, u => u.id === userProfile.id);
-          setAddedUsers(current);
-        }}
-        userProfiles={userSearchSet}
-        selected={addedUsers}
-      />
     </SafeAreaView>
   );
 };
 
-const useStyles = makeStyles((_theme, theme: AppTheme) => ({
+const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
   emptyListContainer: {
     marginTop: '50%',
-  },
-  groupComposerContainer: {
-    position: 'absolute',
-    width: '100%',
-    zIndex: 1,
-  },
-  chipInput: {
-    backgroundColor: theme.colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.subtleGray,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    minHeight: 50,
-  },
-  chipInputText: {
-    ...theme.styles.textNormal,
-    flexGrow: undefined,
-  },
-  userChipDismissIcon: {
-    width: 15,
-    height: 15,
-  },
-  toLabel: {
-    ...theme.styles.textNormal,
-    marginRight: 3,
-    marginTop: 14,
-  },
-  userProfileTitle: {
-    left: 20,
   },
 }));
 
