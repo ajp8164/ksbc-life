@@ -1,7 +1,5 @@
-import { AppTheme, useTheme } from 'theme';
 import { Button, Icon } from '@rneui/base';
 import { Chat, MessageType } from '@flyerhq/react-native-chat-ui';
-import { Keyboard, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   chatMessagesCollectionChangeListener,
@@ -26,6 +24,7 @@ import { ChatNavigatorParamList } from 'types/navigation';
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { FirestoreMessageType } from 'types/chat';
 import { Group } from 'types/group';
+import { Keyboard } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import NoItems from 'components/atoms/NoItems';
 import { PreviewData } from '@flyerhq/react-native-link-preview';
@@ -33,12 +32,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StackActions } from '@react-navigation/native';
 import { UserProfile } from 'types/user';
 import lodash from 'lodash';
-import { makeStyles } from '@rneui/themed';
 import notifee from '@notifee/react-native';
 import { resolveUrl } from 'lib/fileCache';
 import { selectUserProfile } from 'store/selectors/userSelectors';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useSelector } from 'react-redux';
+import { useTheme } from 'theme';
 
 export type Props = NativeStackScreenProps<
   ChatNavigatorParamList,
@@ -47,7 +46,6 @@ export type Props = NativeStackScreenProps<
 
 const ChatThreadScreen = ({ navigation, route }: Props) => {
   const theme = useTheme();
-  const s = useStyles(theme);
   const tabBarHeight = useBottomTabBarHeight();
 
   const chatGroupComposerRef = useRef<ChatGroupComposerMethods>(null);
@@ -372,10 +370,10 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
   };
 
   const renderListEmptyComponent = () => {
-    return (
-      <View style={s.emptyListContainer}>
-        {isLoading ? <NoItems isLoading /> : <NoItems title={'No messages'} />}
-      </View>
+    return isLoading ? (
+      <NoItems isLoading />
+    ) : (
+      <NoItems title={'No messages'} />
     );
   };
 
@@ -423,11 +421,5 @@ const ChatThreadScreen = ({ navigation, route }: Props) => {
     </SafeAreaView>
   );
 };
-
-const useStyles = makeStyles((_theme, __theme: AppTheme) => ({
-  emptyListContainer: {
-    marginTop: '50%',
-  },
-}));
 
 export default ChatThreadScreen;

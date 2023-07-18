@@ -70,6 +70,8 @@ const ChatGroupComposer = React.forwardRef<
 
   // Select and set/unset a group (shows messages) while adding users during composing a group.
   useEffect(() => {
+    if (!visible) return;
+
     const added = addedUsers.map(u => {
       return u.id;
     });
@@ -92,7 +94,7 @@ const ChatGroupComposer = React.forwardRef<
       onComposerChanged();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addedUsers]);
+  }, [addedUsers, visible]);
 
   const addedUserChips = () => {
     return addedUsers.map(u => {
