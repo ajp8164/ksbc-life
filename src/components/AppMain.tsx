@@ -72,7 +72,6 @@ const AppMain = () => {
             // The destination should handle condition NotAuthorized.
             setStartupScreen(StartupScreen.Home);
             break;
-          case InitStatus.NoKey:
           case InitStatus.NotVerified:
           default:
             setStartupScreen(StartupScreen.Welcome);
